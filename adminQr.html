@@ -281,25 +281,33 @@
         <section id="client-section" class="english-ui hidden w-full max-w-lg mx-auto mt-6">
             
             <!-- Valid Report View -->
-            <div id="client-success-view" class="hidden bg-white rounded-2xl shadow-2xl shadow-emerald-900/10 border border-gray-100 overflow-hidden" dir="ltr">
-                <!-- Header Card with Full White Logo (Frameless & Prominent) -->
-                <div class="bg-gradient-to-r from-emerald-600 to-green-700 p-8 text-center text-white relative overflow-hidden">
-                    <div class="absolute -right-10 -top-10 opacity-10 text-9xl"><i class="fa-solid fa-shield-halved"></i></div>
-                    <div class="flex justify-center items-center mb-4">
-                        <img src="Blue.png" alt="Blue Logo" class="h-16 max-w-[220px] object-contain bg-transparent drop-shadow-md logo-white" onerror="this.onerror=null; this.src='https://placehold.co/180x60/ffffff/059669?text=Blue+Logo'">
-                    </div>
-                    <h1 class="text-2xl font-bold m-0 tracking-wide">Verified Medical Report</h1>
-                    <p class="text-emerald-100 text-sm mt-1 opacity-95" id="c-clinic-subtitle">Authentic & Secure Document</p>
+            <div id="client-success-view" class="hidden bg-white rounded-2xl shadow-2xl shadow-emerald-900/10 border border-gray-100 overflow-hidden flex flex-col" dir="ltr">
+                
+                <!-- White Area for Logo -->
+                <div class="bg-white p-6 sm:p-8 flex justify-center items-center">
+                    <img src="Blue.png" alt="Clinic Logo" class="h-20 max-w-[260px] object-contain bg-transparent drop-shadow-sm" onerror="this.onerror=null; this.src='https://placehold.co/200x80/ffffff/059669?text=Clinic+Logo'">
                 </div>
 
+                <!-- Green Banner (Verification Status) -->
+                <div class="bg-gradient-to-r from-emerald-600 to-green-700 py-3.5 px-6 text-center text-white relative shadow-inner border-y border-emerald-800/20">
+                    <h1 class="text-xl sm:text-2xl font-bold m-0 tracking-wide flex justify-center items-center gap-2">
+                        <i class="fa-solid fa-circle-check"></i> QR Code Verified
+                    </h1>
+                </div>
+
+                <!-- Data Section -->
                 <div class="p-6 sm:p-8">
-                    <div class="flex justify-between items-center text-xs text-gray-500 mb-6 pb-4 border-b border-gray-100">
-                        <div class="flex items-center gap-1.5"><i class="fa-regular fa-calendar text-gray-400"></i> <span id="c-date"></span></div>
-                        <div class="text-emerald-700 bg-emerald-50 px-2.5 py-1 rounded-md font-medium border border-emerald-100 flex items-center gap-1.5">
+                    <!-- Date & Validity -->
+                    <div class="flex flex-col sm:flex-row justify-between items-center text-xs text-gray-500 mb-6 pb-4 border-b border-gray-100 gap-3">
+                        <div class="flex items-center gap-1.5">
+                            <i class="fa-regular fa-calendar text-gray-400"></i> <span id="c-date"></span>
+                        </div>
+                        <div class="text-emerald-700 bg-emerald-50 px-3 py-1.5 rounded-md font-bold border border-emerald-100 flex items-center gap-1.5 shadow-sm">
                             <i class="fa-solid fa-hourglass-half"></i> Valid till: <span id="c-expiry"></span>
                         </div>
                     </div>
 
+                    <!-- Info Table -->
                     <table class="info-table mb-8">
                         <tbody>
                             <tr><th>Clinic</th><td id="c-clinic" class="font-bold text-emerald-700"></td></tr>
@@ -310,13 +318,11 @@
                         </tbody>
                     </table>
 
-                    <div class="flex flex-col gap-3 no-print mt-4">
-                        <a id="c-download-btn" href="#" target="_blank" class="hidden w-full bg-emerald-600 hover:bg-emerald-700 text-white py-3.5 px-4 rounded-xl font-bold text-center transition-colors shadow-lg shadow-emerald-600/30 flex justify-center items-center gap-2">
+                    <!-- Download Button -->
+                    <div class="flex flex-col gap-3 no-print mt-2">
+                        <a id="c-download-btn" href="#" target="_blank" class="hidden w-full bg-emerald-600 hover:bg-emerald-700 text-white py-3.5 px-4 rounded-xl font-bold transition-colors shadow-lg shadow-emerald-600/30 flex justify-center items-center gap-2">
                             <i class="fa-solid fa-file-pdf text-lg"></i> Download Original PDF
                         </a>
-                        <button id="c-share-btn" class="w-full bg-white hover:bg-gray-50 text-gray-700 border-2 border-gray-200 py-3.5 px-4 rounded-xl font-bold transition-colors flex justify-center items-center gap-2">
-                            <i class="fa-solid fa-share-nodes text-lg"></i> Share Report Info
-                        </button>
                     </div>
                 </div>
             </div>
@@ -494,7 +500,6 @@
                     DOM.cSuccess.classList.remove('hidden');
                     
                     document.getElementById('c-clinic').textContent = data.clinic || '-';
-                    document.getElementById('c-clinic-subtitle').textContent = data.clinic || 'Authentic & Secure Document';
                     document.getElementById('c-id').textContent = data.patientId || '-';
                     document.getElementById('c-name').textContent = data.patientName || '-';
                     document.getElementById('c-age').textContent = data.age || '-';
@@ -510,21 +515,6 @@
                         btn.href = data.fileUrl;
                         btn.classList.remove('hidden');
                     }
-
-                    document.getElementById('c-share-btn').addEventListener('click', async () => {
-                        if (navigator.share) {
-                            try {
-                                await navigator.share({
-                                    title: 'Verified Medical Report',
-                                    text: `Medical Report for ${data.patientName} from ${data.clinic}`,
-                                    url: window.location.href
-                                });
-                            } catch(e) {}
-                        } else {
-                            copyTextToClipboard(window.location.href);
-                            showToast('تم نسخ رابط التقرير للمشاركة', 'success');
-                        }
-                    });
                 }
             } else {
                 DOM.cError.classList.remove('hidden');
