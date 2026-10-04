@@ -5,16 +5,9 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>نظام التقارير الطبية - QR Code Verified</title>
     
-    <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
-    
-    <!-- Google Fonts -->
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Tajawal:wght@500;700;800&display=swap" rel="stylesheet">
-    
-    <!-- QR Code Library (cdnjs stable version) -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
-    
-    <!-- FontAwesome for Icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 
     <style>
@@ -33,24 +26,18 @@
         .info-table th { background-color: #f9fafb; color: #374151; font-weight: 600; padding: 14px 16px; text-align: left; width: 35%; font-size: 15px; }
         .info-table td { color: #111827; padding: 14px 16px; text-align: left; font-weight: 500; font-size: 15px; word-break: break-word; }
 
-        /* Custom Scrollbar */
         ::-webkit-scrollbar { width: 8px; height: 8px; }
         ::-webkit-scrollbar-track { background: #f1f1f1; }
         ::-webkit-scrollbar-thumb { background: #c1c1c1; border-radius: 4px; }
         ::-webkit-scrollbar-thumb:hover { background: #a8a8a8; }
 
-        /* Toast Animation */
         @keyframes slideInUp { from { transform: translateY(100%); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
         @keyframes fadeOut { from { opacity: 1; } to { opacity: 0; } }
         .toast-enter { animation: slideInUp 0.3s ease-out forwards; }
         .toast-exit { animation: fadeOut 0.3s ease-out forwards; }
 
-        /* Full White Logo CSS Filter */
-        .logo-white {
-            filter: brightness(0) invert(1);
-        }
+        .logo-white { filter: brightness(0) invert(1); }
 
-        /* Print Styles - Optimized for ID Card Printing */
         @media print {
             body { background: white !important; margin: 0; padding: 0; }
             .no-print { display: none !important; }
@@ -131,11 +118,10 @@
                     </div>
                 </div>
                 <div class="flex items-center gap-2 flex-wrap justify-center">
-                    <!-- Backup & Restore Buttons -->
-                    <button id="export-backup-btn" class="bg-blue-50 hover:bg-blue-100 text-blue-700 px-3.5 py-2.5 rounded-xl font-bold transition-colors text-sm flex items-center gap-2 border border-blue-200" title="تنزيل نسخة احتياطية (يمكن حفظها في Google Drive)">
+                    <button id="export-backup-btn" class="bg-blue-50 hover:bg-blue-100 text-blue-700 px-3.5 py-2.5 rounded-xl font-bold transition-colors text-sm flex items-center gap-2 border border-blue-200" title="تنزيل نسخة احتياطية (Google Drive)">
                         <i class="fa-solid fa-cloud-arrow-down"></i> حفظ نسخة احتياطية
                     </button>
-                    <label for="import-backup-file" class="bg-indigo-50 hover:bg-indigo-100 text-indigo-700 px-3.5 py-2.5 rounded-xl font-bold transition-colors text-sm flex items-center gap-2 border border-indigo-200 cursor-pointer" title="استعادة السجلات من ملف احتياطي سابق">
+                    <label for="import-backup-file" class="bg-indigo-50 hover:bg-indigo-100 text-indigo-700 px-3.5 py-2.5 rounded-xl font-bold transition-colors text-sm flex items-center gap-2 border border-indigo-200 cursor-pointer" title="استعادة السجلات">
                         <i class="fa-solid fa-cloud-arrow-up"></i> استعادة النسخة
                     </label>
                     <input type="file" id="import-backup-file" accept=".json" class="hidden">
@@ -264,7 +250,7 @@
                             <thead class="text-xs text-gray-700 uppercase bg-gray-50 border-b sticky top-0 z-10 shadow-sm">
                                 <tr>
                                     <th class="px-3 py-3 text-center w-20">الحالة</th>
-                                    <th class="px-3 py-3 w-36">تاريخ الإنشاء (وقت وثواني)</th>
+                                    <th class="px-3 py-3 w-36">تاريخ الإنشاء</th>
                                     <th class="px-3 py-3 w-28 text-center">المدة المختارة</th>
                                     <th class="px-3 py-3 w-32">تاريخ الانتهاء</th>
                                     <th class="px-3 py-3">اسم المريض</th>
@@ -293,12 +279,14 @@
             <!-- Valid Report View -->
             <div id="client-success-view" class="hidden bg-white rounded-2xl shadow-2xl shadow-emerald-900/10 border border-gray-100 overflow-hidden flex flex-col w-full" dir="ltr">
                 
-                <!-- Green Header with White Logo -->
-                <div class="bg-gradient-to-r from-emerald-600 to-green-700 py-6 px-6 text-center text-white relative shadow-inner flex flex-col items-center justify-center gap-3">
-                    <img src="Blue.png" alt="Clinic Logo" class="h-14 sm:h-16 object-contain logo-white bg-transparent" onerror="this.onerror=null; this.src='https://placehold.co/180x60/ffffff/ffffff?text=Clinic+Logo'">
-                    <h1 class="text-xl sm:text-2xl font-bold m-0 tracking-wide flex justify-center items-center gap-2">
-                        <i class="fa-solid fa-circle-check"></i> QR Code Verified
-                    </h1>
+                <!-- White Header with Colored Logo -->
+                <div class="bg-white py-6 px-6 text-center text-gray-900 relative border-b border-gray-100 flex flex-col items-center justify-center gap-3">
+                    <img src="Blue.png" alt="Clinic Logo" class="h-16 sm:h-20 object-contain bg-transparent" onerror="this.onerror=null; this.src='https://placehold.co/180x60/ffffff/059669?text=Clinic+Logo'">
+                    
+                    <!-- Soft Green Header Box with Check Icon -->
+                    <div class="inline-flex items-center gap-2.5 bg-emerald-50 text-emerald-800 border border-emerald-200 px-5 py-2.5 rounded-full font-bold text-sm tracking-wide shadow-sm mt-1">
+                        <i class="fa-solid fa-circle-check text-emerald-600 text-base"></i> QR Code Verified
+                    </div>
                 </div>
 
                 <!-- Data Section -->
@@ -321,7 +309,7 @@
                         </table>
                     </div>
 
-                    <!-- Download Button Only (Share button removed) -->
+                    <!-- Download Button Only -->
                     <div class="flex flex-col gap-3 no-print mt-2">
                         <a id="c-download-btn" href="#" target="_blank" class="hidden w-full bg-emerald-600 hover:bg-emerald-700 text-white py-3.5 px-4 rounded-xl font-bold transition-colors shadow-lg shadow-emerald-600/30 flex justify-center items-center gap-2">
                             <i class="fa-solid fa-file-pdf text-lg"></i> Download Original PDF
@@ -388,7 +376,7 @@
         </div>
     </div>
 
-    <!-- Hidden Print Area (ID Card Style with Full White Blue.png logo) -->
+    <!-- Hidden Print Area -->
     <div id="print-card-area">
         <div style="display: flex; align-items: center; justify-content: center; gap: 8px; margin-bottom: 5px;">
             <img src="Blue.png" alt="Logo" style="height: 28px; object-fit: contain; filter: brightness(0) invert(1);" onerror="this.style.display='none'">
@@ -583,13 +571,15 @@
             if (editId) {
                 const index = currentRecords.findIndex(r => r.id === editId);
                 if (index !== -1) {
-                    // When editing, preserve original createdAt, expiresAt, and QR code payload to keep QR and creation date 100% constant
                     currentRecords[index].clinic = document.getElementById('input-clinic').value;
                     currentRecords[index].patientId = document.getElementById('input-id').value;
                     currentRecords[index].patientName = document.getElementById('input-name').value;
                     currentRecords[index].age = document.getElementById('input-age').value;
                     currentRecords[index].gender = document.getElementById('input-gender').value;
                     currentRecords[index].fileUrl = document.getElementById('input-file-url').value;
+                    // Recalculate expiry based on original creation date and newly selected validity duration
+                    currentRecords[index].validityText = validityText;
+                    currentRecords[index].expiresAt = currentRecords[index].createdAt + (validityDays * 24 * 60 * 60 * 1000);
                 }
                 localStorage.setItem(STORAGE_KEY, JSON.stringify(currentRecords));
                 showToast('تم تحديث السجل بنجاح (الـ QR وتاريخ الإنشاء ثابتان لضمان الصلاحية)');
@@ -600,7 +590,6 @@
             } else {
                 const docId = crypto.randomUUID ? crypto.randomUUID() : 'id_' + Date.now(); 
                 const now = Date.now();
-                // Correctly compute expiration timestamp by adding exact validity days in milliseconds (365 days = 365 * 24 * 3600 * 1000)
                 const expiresAt = now + (validityDays * 24 * 60 * 60 * 1000);
                 
                 const payload = {
@@ -832,9 +821,7 @@
             showToast('تم تحديث الجدول', 'info');
         });
 
-        // ========================================== -->
-        // ميزة النسخ الاحتياطي (Backup & Restore)      -->
-        // ========================================== -->
+        // Backup & Restore
         document.getElementById('export-backup-btn').addEventListener('click', () => {
             if(currentRecords.length === 0) return showToast('لا توجد سجلات لتصديرها كنسخة احتياطية', 'error');
             
@@ -852,7 +839,7 @@
             downloadAnchor.click();
             downloadAnchor.remove();
             
-            showToast('تم تنزيل النسخة الاحتياطية بنجاح (يمكنك حفظها في Google Drive)', 'success');
+            showToast('تم تنزيل النسخة الاحتياطية بنجاح', 'success');
         });
 
         document.getElementById('import-backup-file').addEventListener('change', (event) => {
