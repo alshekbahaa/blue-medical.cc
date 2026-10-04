@@ -3,469 +3,828 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>QR Code Verified - Medical Report</title>
+    <title>نظام التقارير الطبية - QR Code Verified</title>
     
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
     
     <!-- Google Fonts -->
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Tajawal:wght@500;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Tajawal:wght@500;700;800&display=swap" rel="stylesheet">
     
     <!-- QR Code Library -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+    
+    <!-- FontAwesome for Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 
     <style>
         body {
-            background-color: #f8f9fa; 
+            background-color: #f3f4f6; 
             -webkit-print-color-adjust: exact;
             print-color-adjust: exact;
         }
 
         .admin-ui { font-family: 'Tajawal', sans-serif; }
-        .english-ui { font-family: 'Arial', 'Inter', sans-serif; }
+        .english-ui { font-family: 'Inter', sans-serif; }
         
-        /* تصميم الجدول للنتيجة */
-        .info-table {
-            width: 100%;
-            border-collapse: collapse;
-            font-size: 14.5px;
-        }
-        .info-table tr {
-            border-bottom: 1px solid #e5e7eb;
-        }
-        .info-table th {
-            background-color: #f3f4f6;
-            color: #000;
-            font-weight: 700;
-            padding: 12px 16px;
-            text-align: left;
-            width: 30%;
-        }
-        .info-table td {
-            color: #111827;
-            padding: 12px 16px;
-            text-align: left;
+        /* Table Styles for Patient View */
+        .info-table { width: 100%; border-collapse: collapse; font-size: 15px; }
+        .info-table tr { border-bottom: 1px solid #e5e7eb; }
+        .info-table th { background-color: #f9fafb; color: #374151; font-weight: 600; padding: 14px 16px; text-align: left; width: 35%; }
+        .info-table td { color: #111827; padding: 14px 16px; text-align: left; font-weight: 500;}
+
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar { width: 8px; height: 8px; }
+        ::-webkit-scrollbar-track { background: #f1f1f1; }
+        ::-webkit-scrollbar-thumb { background: #c1c1c1; border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: #a8a8a8; }
+
+        /* Toast Animation */
+        @keyframes slideInUp { from { transform: translateY(100%); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+        @keyframes fadeOut { from { opacity: 1; } to { opacity: 0; } }
+        .toast-enter { animation: slideInUp 0.3s ease-out forwards; }
+        .toast-exit { animation: fadeOut 0.3s ease-out forwards; }
+
+        /* Full White Logo CSS Filter */
+        .logo-white {
+            filter: brightness(0) invert(1);
         }
 
-        /* تنسيقات الطباعة لتحويل الصفحة إلى PDF بشكل نظيف */
+        /* Print Styles - Optimized for ID Card Printing */
         @media print {
+            body { background: white !important; margin: 0; padding: 0; }
             .no-print { display: none !important; }
-            body { background-color: white !important; margin: 0; padding: 0;}
-            #result-section { 
-                box-shadow: none !important; 
-                border: none !important; 
-                margin: 0 auto; 
-                max-width: 100%;
+            
+            #print-card-area {
+                display: block !important;
+                width: 8.5cm; /* Standard ID Card width */
+                height: 5.4cm;
+                border: 2px solid #000;
+                border-radius: 8px;
+                padding: 10px;
+                margin: 0 auto;
+                text-align: center;
+                page-break-inside: avoid;
             }
+            #print-card-area h3 { margin: 0 0 5px 0; font-size: 13px; font-family: Arial, sans-serif; }
+            #print-card-area p { margin: 0 0 5px 0; font-size: 9px; color: #555; }
+            #print-qr-container { display: flex; justify-content: center; }
+            #print-qr-container img { width: 85px; height: 85px; }
+            
+            /* Hide UI during print */
+            #admin-section, #login-section, #client-section, #qr-modal, #delete-modal, footer { display: none !important; }
         }
+        
+        #print-card-area { display: none; }
     </style>
 </head>
-<body class="min-h-screen text-gray-800 p-4 sm:p-8 flex items-center justify-center">
+<body class="min-h-screen text-gray-800 flex flex-col items-center p-4 sm:p-6 relative justify-between">
 
-    <main class="w-full max-w-3xl mx-auto">
+    <!-- Toast Container -->
+    <div id="toast-container" class="fixed bottom-4 left-1/2 transform -translate-x-1/2 z-50 flex flex-col gap-2 w-full max-w-sm px-4 pointer-events-none"></div>
+
+    <main class="w-full max-w-6xl mx-auto flex-1">
         
         <!-- ========================================== -->
         <!-- 0. واجهة تسجيل الدخول (الآدمن)             -->
         <!-- ========================================== -->
-        <section id="login-section" class="admin-ui hidden bg-white rounded-2xl shadow-xl border border-gray-200 p-8 max-w-md mx-auto mt-10">
+        <section id="login-section" class="admin-ui hidden bg-white rounded-2xl shadow-xl border border-gray-100 p-8 max-w-md mx-auto mt-12 transform transition-all">
             <div class="text-center mb-8">
-                <div class="inline-flex items-center justify-center w-16 h-16 bg-blue-100 text-blue-600 rounded-full mb-4">
-                    <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"></path></svg>
+                <div class="inline-flex items-center justify-center w-16 h-16 bg-emerald-50 text-emerald-600 rounded-2xl mb-4 shadow-inner">
+                    <i class="fa-solid fa-user-doctor text-3xl"></i>
                 </div>
-                <h2 class="text-2xl font-bold text-gray-800">تسجيل الدخول للإدارة</h2>
-                <p class="text-sm text-gray-500 mt-2">يرجى إدخال بيانات الاعتماد للوصول للسجلات</p>
+                <h2 class="text-2xl font-bold text-gray-800">بوابة الإدارة الطبية</h2>
+                <p class="text-sm text-gray-500 mt-2">يرجى تسجيل الدخول للوصول لقاعدة البيانات</p>
             </div>
             
-            <div class="space-y-5">
+            <form id="login-form" class="space-y-5">
                 <div>
                     <label class="block text-sm font-bold text-gray-700 mb-1">اسم المستخدم</label>
-                    <input type="text" id="login-username" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none" dir="ltr" placeholder="admin">
+                    <div class="relative">
+                        <i class="fa-solid fa-user absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400"></i>
+                        <input type="text" id="login-username" class="w-full pl-10 pr-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 outline-none transition-all" dir="ltr" placeholder="admin">
+                    </div>
                 </div>
                 <div>
                     <label class="block text-sm font-bold text-gray-700 mb-1">كلمة المرور</label>
-                    <input type="password" id="login-password" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none" dir="ltr" placeholder="••••••••">
-                </div>
-                <div id="login-error" class="hidden text-red-500 text-sm font-bold text-center bg-red-50 p-2 rounded">
-                    بيانات الدخول غير صحيحة!
-                </div>
-                <div class="pt-2">
-                    <button type="button" id="login-btn" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-4 rounded-lg transition-colors text-lg shadow-md">
-                        دخول
-                    </button>
-                </div>
-            </div>
-        </section>
-
-        <!-- ========================================== -->
-        <!-- 1. لوحة تحكم الآدمن (بالعربي)              -->
-        <!-- ========================================== -->
-        <section id="admin-section" class="admin-ui bg-white rounded-2xl shadow-xl border border-gray-200 p-6 sm:p-8 hidden">
-            <div class="flex justify-between items-center border-b pb-4 mb-8">
-                <div>
-                    <h2 class="text-2xl font-bold text-gray-800 mb-2">نظام التحقق - لوحة الإدارة</h2>
-                    <p class="text-sm text-gray-500">أدخل البيانات واضغط "إنشاء" لحفظ السجل وتوليد الـ QR.</p>
-                </div>
-                <button id="logout-btn" class="text-sm bg-red-50 hover:bg-red-100 text-red-600 px-4 py-2 rounded-lg font-bold transition flex items-center gap-1">
-                    تسجيل الخروج
-                </button>
-            </div>
-            
-            <div class="space-y-5">
-                <div>
-                    <label class="block text-sm font-bold text-gray-700 mb-1">اسم العيادة (Clinic)</label>
-                    <input type="text" id="input-clinic" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none" value="Blue Medical field complex" dir="ltr">
-                </div>
-                
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
-                    <div>
-                        <label class="block text-sm font-bold text-gray-700 mb-1">رقم الهوية  (ID)</label>
-                        <input type="text" id="input-id" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none" placeholder="1642580" dir="ltr">
-                    </div>
-                    <div>
-                        <label class="block text-sm font-bold text-gray-700 mb-1">اسم المريض (Patient Name)</label>
-                        <input type="text" id="input-name" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none" placeholder="ZAFAR IQBAL ABBASI MUHAMMAD HOSHIAR" dir="ltr">
+                    <div class="relative">
+                        <i class="fa-solid fa-lock absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400"></i>
+                        <input type="password" id="login-password" class="w-full pl-10 pr-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 outline-none transition-all" dir="ltr" placeholder="••••••••">
                     </div>
                 </div>
-                
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
-                    <div>
-                        <label class="block text-sm font-bold text-gray-700 mb-1">العمر (Age)</label>
-                        <input type="text" id="input-age" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none" placeholder="49 Y(s), 8 M(s) 11 D(s)" dir="ltr">
-                    </div>
-                    <div>
-                        <label class="block text-sm font-bold text-gray-700 mb-1">الجنس (Gender)</label>
-                        <select id="input-gender" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none bg-white" dir="ltr">
-                            <option value="Male">Male</option>
-                            <option value="Female">Female</option>
-                        </select>
-                    </div>
-                </div>
-
-                <div class="bg-blue-50 p-4 rounded-lg border border-blue-100 mt-4">
-                    <label class="block text-sm font-bold text-blue-800 mb-2">رابط التقرير للتحميل</label>
-                    <p class="text-xs text-blue-600 mb-3">ضع الرابط المباشر لملف الـ PDF الذي رفعته ليتمكن المريض من تحميله عبر الزر.</p>
-                    <input type="url" id="input-file-url" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none" placeholder="https://..." dir="ltr">
-                </div>
-
                 <div class="pt-4">
-                    <button type="button" id="generate-btn" class="w-full bg-gray-800 hover:bg-gray-900 text-white font-bold py-4 px-4 rounded-lg transition-colors text-lg shadow-md flex justify-center items-center gap-2">
-                        إنشاء السجل وحفظه
+                    <button type="submit" class="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-3.5 px-4 rounded-xl transition-all shadow-lg shadow-emerald-600/30 flex justify-center items-center gap-2">
+                        تسجيل الدخول <i class="fa-solid fa-arrow-left"></i>
                     </button>
                 </div>
-            </div>
+            </form>
+        </section>
 
-            <div id="admin-qr-result" class="hidden mt-8 pt-8 border-t border-gray-200 flex flex-col items-center">
-                <h3 class="text-lg font-bold text-green-600 mb-2">تم الحفظ وإنشاء الـ QR بنجاح!</h3>
-                <div class="bg-white p-3 border border-gray-200 rounded-lg shadow-sm mb-4">
-                    <div id="admin-qrcode-container"></div>
+        <!-- ========================================== -->
+        <!-- 1. لوحة تحكم الآدمن                        -->
+        <!-- ========================================== -->
+        <section id="admin-section" class="admin-ui hidden w-full fade-in">
+            <!-- Header -->
+            <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-5 mb-6 flex flex-col md:flex-row justify-between items-center gap-4">
+                <div class="flex items-center gap-4">
+                    <img src="Blue.png" alt="Blue Logo" class="h-12 object-contain bg-white" onerror="this.onerror=null; this.src='https://placehold.co/120x40/ffffff/059669?text=Blue+Logo'">
+                    <div>
+                        <h2 class="text-xl font-bold text-gray-800">نظام التقارير الذكي</h2>
+                    </div>
                 </div>
-                <button onclick="window.print()" class="bg-blue-600 hover:bg-blue-700 text-white py-2 px-8 rounded-lg font-bold shadow transition-colors">
-                    طباعة هذا الـ QR
+                <button id="logout-btn" class="bg-red-50 hover:bg-red-100 text-red-600 px-5 py-2.5 rounded-xl font-bold transition-colors flex items-center gap-2">
+                    <i class="fa-solid fa-right-from-bracket"></i> تسجيل خروج
                 </button>
             </div>
 
-            <!-- سجل البيانات -->
-            <div class="mt-12 pt-8 border-t border-gray-200 w-full no-print">
-                <div class="flex justify-between items-center mb-6">
-                    <h3 class="text-xl font-bold text-gray-800">سجل المرضى المحفوظ</h3>
-                    <button id="refresh-history-btn" class="text-xs bg-gray-100 hover:bg-gray-200 text-gray-800 px-3 py-1.5 rounded font-bold transition">تحديث السجل</button>
+            <!-- Dashboard Stats -->
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+                <div class="bg-white p-5 rounded-2xl shadow-sm border border-gray-100 flex items-center gap-4 border-r-4 border-emerald-500">
+                    <div class="w-12 h-12 bg-emerald-50 text-emerald-600 rounded-full flex items-center justify-center text-xl"><i class="fa-solid fa-file-medical"></i></div>
+                    <div>
+                        <p class="text-sm text-gray-500 font-bold">إجمالي التقارير المصدرة</p>
+                        <h3 id="stat-total" class="text-2xl font-bold text-gray-800">0</h3>
+                    </div>
                 </div>
+                <div class="bg-white p-5 rounded-2xl shadow-sm border border-gray-100 flex items-center gap-4 border-r-4 border-green-500">
+                    <div class="w-12 h-12 bg-green-50 text-green-600 rounded-full flex items-center justify-center text-xl"><i class="fa-solid fa-check-circle"></i></div>
+                    <div>
+                        <p class="text-sm text-gray-500 font-bold">تقارير صالحة (نشطة)</p>
+                        <h3 id="stat-active" class="text-2xl font-bold text-gray-800">0</h3>
+                    </div>
+                </div>
+                <div class="bg-white p-5 rounded-2xl shadow-sm border border-gray-100 flex items-center gap-4 border-r-4 border-red-500">
+                    <div class="w-12 h-12 bg-red-50 text-red-600 rounded-full flex items-center justify-center text-xl"><i class="fa-solid fa-clock-rotate-left"></i></div>
+                    <div>
+                        <p class="text-sm text-gray-500 font-bold">تقارير منتهية الصلاحية</p>
+                        <h3 id="stat-expired" class="text-2xl font-bold text-gray-800">0</h3>
+                    </div>
+                </div>
+            </div>
+
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-6">
                 
-                <div id="history-table-wrapper" class="overflow-x-auto hidden">
-                    <table class="w-full text-sm text-right text-gray-500 rounded-lg overflow-hidden border border-gray-200">
-                        <thead class="text-xs text-gray-700 uppercase bg-gray-50 border-b">
-                            <tr>
-                                <th scope="col" class="px-4 py-3">تاريخ الإنشاء</th>
-                                <th scope="col" class="px-4 py-3">اسم المريض</th>
-                                <th scope="col" class="px-4 py-3">رقم المريض</th>
-                                <th scope="col" class="px-4 py-3 text-center">الإجراءات</th>
-                            </tr>
-                        </thead>
-                        <tbody id="history-table-body"></tbody>
-                    </table>
+                <!-- Create / Edit Form -->
+                <div class="lg:col-span-1 bg-white rounded-2xl shadow-sm border border-gray-100 p-6 relative overflow-hidden h-fit">
+                    <div id="form-indicator" class="absolute top-0 right-0 w-1.5 h-full bg-emerald-600"></div>
+                    <h3 id="form-title" class="text-lg font-bold text-gray-800 mb-5 flex items-center gap-2">
+                        <i class="fa-solid fa-plus-circle text-emerald-600"></i> إضافة تقرير جديد
+                    </h3>
+                    
+                    <form id="create-form" class="space-y-4">
+                        <input type="hidden" id="edit-record-id" value="">
+                        <div>
+                            <label class="block text-xs font-bold text-gray-700 mb-1">اسم العيادة (Clinic)</label>
+                            <input type="text" id="input-clinic" required class="w-full px-3 py-2.5 border border-gray-200 rounded-lg focus:ring-2 focus:ring-emerald-500 outline-none text-sm" value="Blue Medical Field Complex" dir="ltr">
+                        </div>
+                        
+                        <div>
+                            <label class="block text-xs font-bold text-gray-700 mb-1">رقم الهوية (ID) <span class="text-red-500">*</span></label>
+                            <input type="text" id="input-id" required class="w-full px-3 py-2.5 border border-gray-200 rounded-lg focus:ring-2 focus:ring-emerald-500 outline-none bg-gray-50 text-sm font-mono" placeholder="e.g. 10xxxxxxxx" dir="ltr">
+                        </div>
+                        
+                        <div>
+                            <label class="block text-xs font-bold text-gray-700 mb-1">اسم المريض الكامل <span class="text-red-500">*</span></label>
+                            <input type="text" id="input-name" required class="w-full px-3 py-2.5 border border-gray-200 rounded-lg focus:ring-2 focus:ring-emerald-500 outline-none bg-gray-50 text-sm" placeholder="e.g. ZAFAR IQBAL ABBASI" dir="ltr">
+                        </div>
+                        
+                        <div class="grid grid-cols-2 gap-3">
+                            <div>
+                                <label class="block text-xs font-bold text-gray-700 mb-1">العمر</label>
+                                <input type="text" id="input-age" required class="w-full px-3 py-2.5 border border-gray-200 rounded-lg focus:ring-2 focus:ring-emerald-500 outline-none text-sm" placeholder="49 Y" dir="ltr">
+                            </div>
+                            <div>
+                                <label class="block text-xs font-bold text-gray-700 mb-1">الجنس</label>
+                                <select id="input-gender" class="w-full px-3 py-2.5 border border-gray-200 rounded-lg focus:ring-2 focus:ring-emerald-500 outline-none bg-white text-sm" dir="ltr">
+                                    <option value="Male">Male</option>
+                                    <option value="Female">Female</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div>
+                            <label class="block text-xs font-bold text-gray-700 mb-1">صلاحية التقرير (أمان)</label>
+                            <select id="input-validity" class="w-full px-3 py-2.5 border border-gray-200 rounded-lg focus:ring-2 focus:ring-emerald-500 outline-none bg-white text-sm cursor-pointer">
+                                <option value="30">30 يوماً (موصى به)</option>
+                                <option value="7">7 أيام</option>
+                                <option value="90">3 أشهر</option>
+                                <option value="365">سنة كاملة</option>
+                            </select>
+                        </div>
+
+                        <div>
+                            <label class="block text-xs font-bold text-gray-700 mb-1">رابط ملف PDF (اختياري)</label>
+                            <input type="url" id="input-file-url" class="w-full px-3 py-2.5 border border-gray-200 rounded-lg focus:ring-2 focus:ring-emerald-500 outline-none text-sm" placeholder="https://..." dir="ltr">
+                        </div>
+
+                        <div class="pt-2 flex gap-2">
+                            <button type="submit" id="submit-btn" class="flex-1 bg-gray-900 hover:bg-gray-800 text-white font-bold py-3 px-4 rounded-xl transition-colors shadow-md flex justify-center items-center gap-2">
+                                <i class="fa-solid fa-qrcode"></i> إنشاء البيانات
+                            </button>
+                            <button type="button" id="cancel-edit-btn" class="hidden bg-gray-200 hover:bg-gray-300 text-gray-700 font-bold py-3 px-4 rounded-xl transition-colors">
+                                إلغاء
+                            </button>
+                        </div>
+                    </form>
                 </div>
-                <div id="no-records-msg" class="text-center py-8 text-gray-500 bg-gray-50 rounded-lg border border-dashed border-gray-300">
-                    لا توجد سجلات بعد.
+
+                <!-- Records Table -->
+                <div class="lg:col-span-2 bg-white rounded-2xl shadow-sm border border-gray-100 p-6 relative overflow-hidden flex flex-col">
+                    <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-5 gap-4">
+                        <h3 class="text-lg font-bold text-gray-800 flex items-center gap-2">
+                            <i class="fa-solid fa-database text-emerald-600"></i> قاعدة البيانات المحلية
+                        </h3>
+                        <div class="flex gap-2 w-full sm:w-auto">
+                            <button id="export-csv-btn" class="flex-1 sm:flex-none bg-green-50 hover:bg-green-100 text-green-700 px-4 py-2 rounded-lg font-bold transition-colors text-sm flex items-center justify-center gap-2 border border-green-200">
+                                <i class="fa-solid fa-file-excel"></i> تصدير إكسيل
+                            </button>
+                            <button id="refresh-db-btn" class="bg-emerald-50 hover:bg-emerald-100 text-emerald-700 px-3 py-2 rounded-lg transition-colors border border-emerald-200">
+                                <i class="fa-solid fa-rotate"></i>
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="mb-4">
+                        <div class="relative">
+                            <i class="fa-solid fa-search absolute right-4 top-1/2 transform -translate-y-1/2 text-gray-400"></i>
+                            <input type="text" id="search-input" class="w-full pr-10 pl-4 py-2.5 border border-gray-200 rounded-lg focus:ring-2 focus:ring-emerald-500 outline-none bg-gray-50 text-sm" placeholder="ابحث باسم المريض أو رقم الهوية...">
+                        </div>
+                    </div>
+
+                    <div class="flex-1 overflow-x-auto rounded-xl border border-gray-200 h-[400px] relative">
+                        <table class="w-full text-sm text-right text-gray-600">
+                            <thead class="text-xs text-gray-700 uppercase bg-gray-50 border-b sticky top-0 z-10 shadow-sm">
+                                <tr>
+                                    <th class="px-4 py-3 text-center w-24">الحالة</th>
+                                    <th class="px-4 py-3 w-44">التاريخ والوقت (ثوانٍ)</th>
+                                    <th class="px-4 py-3">اسم المريض</th>
+                                    <th class="px-4 py-3 w-28">رقم الهوية</th>
+                                    <th class="px-4 py-3 text-center w-40">الإجراءات</th>
+                                </tr>
+                            </thead>
+                            <tbody id="records-tbody" class="divide-y divide-gray-100 bg-white">
+                                <!-- Rows injected via JS -->
+                            </tbody>
+                        </table>
+                        <div id="no-records-msg" class="hidden absolute inset-0 flex flex-col items-center justify-center text-gray-500 bg-gray-50/90 z-20">
+                            <i class="fa-solid fa-folder-open text-4xl mb-3 text-gray-300"></i>
+                            <p class="font-bold">لا توجد سجلات حالياً.</p>
+                        </div>
+                    </div>
                 </div>
             </div>
         </section>
 
         <!-- ========================================== -->
-        <!-- 2. واجهة العميل (بالإنجليزي - صفحة التحقق) -->
+        <!-- 2. واجهة العميل (المريض) - إنجليزي         -->
         <!-- ========================================== -->
-        <section id="result-section" class="english-ui hidden print-shadow-none bg-white rounded-xl shadow-lg border border-gray-100 max-w-[600px] mx-auto overflow-hidden" dir="ltr">
-            <div class="p-8 sm:p-10">
-                <div class="text-center mb-3">
-                    <h1 class="text-2xl font-bold text-[#16a34a] m-0">QR Code Verified</h1>
+        <section id="client-section" class="english-ui hidden w-full max-w-lg mx-auto mt-6">
+            
+            <!-- Valid Report View -->
+            <div id="client-success-view" class="hidden bg-white rounded-2xl shadow-2xl shadow-emerald-900/10 border border-gray-100 overflow-hidden" dir="ltr">
+                <!-- Header Card with Full White Logo (Frameless & Prominent) -->
+                <div class="bg-gradient-to-r from-emerald-600 to-green-700 p-8 text-center text-white relative overflow-hidden">
+                    <div class="absolute -right-10 -top-10 opacity-10 text-9xl"><i class="fa-solid fa-shield-halved"></i></div>
+                    <div class="flex justify-center items-center mb-4">
+                        <img src="Blue.png" alt="Blue Logo" class="h-16 max-w-[220px] object-contain bg-transparent drop-shadow-md logo-white" onerror="this.onerror=null; this.src='https://placehold.co/180x60/ffffff/059669?text=Blue+Logo'">
+                    </div>
+                    <h1 class="text-2xl font-bold m-0 tracking-wide">Verified Medical Report</h1>
+                    <p class="text-emerald-100 text-sm mt-1 opacity-95" id="c-clinic-subtitle">Authentic & Secure Document</p>
                 </div>
 
-                <div class="text-center text-gray-600 mb-6 text-sm">
-                    <span>Generated on: </span>
-                    <span id="display-date"></span>
-                </div>
+                <div class="p-6 sm:p-8">
+                    <div class="flex justify-between items-center text-xs text-gray-500 mb-6 pb-4 border-b border-gray-100">
+                        <div class="flex items-center gap-1.5"><i class="fa-regular fa-calendar text-gray-400"></i> <span id="c-date"></span></div>
+                        <div class="text-emerald-700 bg-emerald-50 px-2.5 py-1 rounded-md font-medium border border-emerald-100 flex items-center gap-1.5">
+                            <i class="fa-solid fa-hourglass-half"></i> Valid till: <span id="c-expiry"></span>
+                        </div>
+                    </div>
 
-                <div class="text-center font-bold text-gray-900 mb-4 text-[15px]">
-                    Information stored in the QR:
-                </div>
-
-                <div class="mb-8">
-                    <table class="info-table">
+                    <table class="info-table mb-8">
                         <tbody>
-                            <tr><th>Clinic</th><td id="display-clinic"></td></tr>
-                            <tr><th>Patient ID</th><td id="display-id"></td></tr>
-                            <tr><th>Patient Name</th><td id="display-name"></td></tr>
-                            <tr><th>Age</th><td id="display-age"></td></tr>
-                            <tr><th>Gender</th><td id="display-gender"></td></tr>
+                            <tr><th>Clinic</th><td id="c-clinic" class="font-bold text-emerald-700"></td></tr>
+                            <tr><th>National ID</th><td id="c-id" class="font-mono bg-gray-50 rounded px-2"></td></tr>
+                            <tr><th>Patient Name</th><td id="c-name" class="font-bold text-gray-900 text-lg"></td></tr>
+                            <tr><th>Age</th><td id="c-age"></td></tr>
+                            <tr><th>Gender</th><td id="c-gender"></td></tr>
                         </tbody>
                     </table>
-                </div>
 
-                <div class="text-center flex justify-center no-print">
-                    <a id="download-file-btn" href="#" target="_blank" class="bg-[#007bff] hover:bg-blue-700 text-white py-2.5 px-8 rounded font-semibold transition-colors shadow-sm hidden">
-                        Download File
-                    </a>
+                    <div class="flex flex-col gap-3 no-print mt-4">
+                        <a id="c-download-btn" href="#" target="_blank" class="hidden w-full bg-emerald-600 hover:bg-emerald-700 text-white py-3.5 px-4 rounded-xl font-bold text-center transition-colors shadow-lg shadow-emerald-600/30 flex justify-center items-center gap-2">
+                            <i class="fa-solid fa-file-pdf text-lg"></i> Download Original PDF
+                        </a>
+                        <button id="c-share-btn" class="w-full bg-white hover:bg-gray-50 text-gray-700 border-2 border-gray-200 py-3.5 px-4 rounded-xl font-bold transition-colors flex justify-center items-center gap-2">
+                            <i class="fa-solid fa-share-nodes text-lg"></i> Share Report Info
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Expired / Error View -->
+            <div id="client-error-view" class="hidden bg-white rounded-2xl shadow-xl border border-gray-100 p-8 text-center" dir="ltr">
+                <div class="w-24 h-24 bg-red-50 text-red-500 rounded-full flex items-center justify-center mx-auto mb-5 border-4 border-white shadow-sm">
+                    <i class="fa-solid fa-circle-xmark text-5xl"></i>
+                </div>
+                <h1 class="text-2xl font-bold text-gray-900 mb-2">Report Unavailable</h1>
+                <p class="text-gray-500 text-sm mb-6 leading-relaxed">For patient privacy and security, this medical report link has expired or the data is invalid. Please contact the clinic for an updated record.</p>
+                <div class="bg-gray-50 p-3 rounded-lg border border-gray-200 text-xs text-gray-400 font-mono">
+                    ERR_DATA_INVALID_OR_EXPIRED
                 </div>
             </div>
         </section>
+
     </main>
 
-    <!-- نافذة منبثقة (Modal) لعرض QR سابق -->
-    <div id="qr-modal" class="hidden fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-60 backdrop-blur-sm no-print" dir="rtl">
-        <div class="bg-white p-6 rounded-xl shadow-2xl w-[90%] max-w-sm text-center transform transition-all">
-            <h3 class="text-xl font-bold mb-2 text-gray-800">رمز QR المحفوظ</h3>
-            <p class="text-sm text-gray-500 mb-6">يمكنك طباعة هذا الرمز لملف المريض</p>
-            <div class="flex justify-center mb-6 bg-gray-50 p-4 border border-gray-200 rounded-xl">
+    <!-- Footer Signature (English Professional Option) -->
+    <footer class="w-full text-center py-4 text-xs text-gray-500 font-bold admin-ui no-print">
+        Designed by Eng. Bahaa Al-Sheikh
+    </footer>
+
+    <!-- QR Display Modal (Admin) -->
+    <div id="qr-modal" class="hidden fixed inset-0 z-50 flex items-center justify-center bg-gray-900/60 backdrop-blur-sm admin-ui">
+        <div class="bg-white p-6 rounded-2xl shadow-2xl w-[90%] max-w-sm text-center transform transition-all border border-gray-100">
+            <div class="w-12 h-12 bg-green-100 text-green-600 rounded-full flex items-center justify-center mx-auto mb-3">
+                <i class="fa-solid fa-check text-2xl"></i>
+            </div>
+            <h3 class="text-xl font-bold mb-1 text-gray-800">تم التوليد بنجاح</h3>
+            <p class="text-sm text-gray-500 mb-6">البيانات الآن مدمجة بأمان داخل الرمز المرفق</p>
+            
+            <div class="flex justify-center mb-6 bg-white p-3 border-2 border-dashed border-gray-200 rounded-2xl">
                 <div id="modal-qrcode-container"></div>
             </div>
+
             <div class="flex gap-3">
-                <button id="close-modal-btn" class="flex-1 bg-gray-200 hover:bg-gray-300 text-gray-800 py-2.5 rounded-lg font-bold transition-colors">إغلاق</button>
-                <button onclick="window.print()" class="flex-1 bg-blue-600 hover:bg-blue-700 text-white py-2.5 rounded-lg font-bold transition-colors shadow-md">طباعة</button>
+                <button id="close-modal-btn" class="flex-1 bg-gray-100 hover:bg-gray-200 text-gray-800 py-3 rounded-xl font-bold transition-colors">إغلاق</button>
+                <button id="print-qr-btn" class="flex-1 bg-emerald-600 hover:bg-emerald-700 text-white py-3 rounded-xl font-bold transition-colors shadow-md flex justify-center items-center gap-2">
+                    <i class="fa-solid fa-print"></i> طباعة البطاقة
+                </button>
             </div>
         </div>
     </div>
 
+    <!-- Custom Delete Confirmation Modal -->
+    <div id="delete-modal" class="hidden fixed inset-0 z-50 flex items-center justify-center bg-gray-900/60 backdrop-blur-sm admin-ui">
+        <div class="bg-white p-6 rounded-2xl shadow-2xl w-[90%] max-w-sm text-center transform transition-all border border-gray-100">
+            <div class="w-16 h-16 bg-red-100 text-red-600 rounded-full flex items-center justify-center mx-auto mb-4">
+                <i class="fa-solid fa-triangle-exclamation text-3xl"></i>
+            </div>
+            <h3 class="text-xl font-bold mb-2 text-gray-800">تأكيد الحذف</h3>
+            <p class="text-sm text-gray-500 mb-6">هل أنت متأكد من حذف هذا السجل نهائياً؟ سيصبح الرمز المرتبط به غير صالح.</p>
+            
+            <div class="flex gap-3">
+                <button id="cancel-delete-btn" class="flex-1 bg-gray-100 hover:bg-gray-200 text-gray-800 py-3 rounded-xl font-bold transition-colors">تراجع</button>
+                <button id="confirm-delete-btn" class="flex-1 bg-red-600 hover:bg-red-700 text-white py-3 rounded-xl font-bold transition-colors shadow-md">نعم، احذف السجل</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Hidden Print Area (ID Card Style with Full White Blue.png logo) -->
+    <div id="print-card-area">
+        <div style="display: flex; align-items: center; justify-content: center; gap: 8px; margin-bottom: 5px;">
+            <img src="Blue.png" alt="Logo" style="height: 28px; object-fit: contain; filter: brightness(0) invert(1);" onerror="this.style.display='none'">
+            <h3 id="print-clinic-name" style="margin: 0; font-size: 13px;">Clinic Name</h3>
+        </div>
+        <p>National ID: <span id="print-patient-id"></span></p>
+        <div id="print-qr-container"></div>
+        <p style="margin-top:3px; font-weight: bold; font-size: 8px;">Scan to Verify Report</p>
+    </div>
+
     <script>
-        const adminSection = document.getElementById('admin-section');
-        const resultSection = document.getElementById('result-section');
-        const loginSection = document.getElementById('login-section');
+        // ============================================================================
+        // ⚙️ إعدادات النظام (بدون قاعدة بيانات) - متوافق مع GitHub Pages
+        // ============================================================================
+        const ADMIN_USER = "admin";
+        const ADMIN_PASS = "admin123"; // كلمة مرور لوحة الإدارة
+        const STORAGE_KEY = "medical_records_local"; // مفتاح الحفظ في المتصفح للوحة الإدارة
         
-        // --- بيانات تسجيل الدخول (يمكنك تغييرها من هنا) ---
-        const ADMIN_USERNAME = "admin";
-        const ADMIN_PASSWORD = "Aa@4875";
-        // ---------------------------------------------------
+        // DOM Elements Collection
+        const DOM = {
+            toast: document.getElementById('toast-container'),
+            loginSec: document.getElementById('login-section'),
+            adminSec: document.getElementById('admin-section'),
+            clientSec: document.getElementById('client-section'),
+            form: document.getElementById('create-form'),
+            btnSubmit: document.getElementById('submit-btn'),
+            btnCancelEdit: document.getElementById('cancel-edit-btn'),
+            editRecordId: document.getElementById('edit-record-id'),
+            formTitle: document.getElementById('form-title'),
+            formIndicator: document.getElementById('form-indicator'),
+            tbody: document.getElementById('records-tbody'),
+            search: document.getElementById('search-input'),
+            qrModal: document.getElementById('qr-modal'),
+            deleteModal: document.getElementById('delete-modal'),
+            modalQRContainer: document.getElementById('modal-qrcode-container'),
+            printQRContainer: document.getElementById('print-qr-container'),
+            cSuccess: document.getElementById('client-success-view'),
+            cError: document.getElementById('client-error-view')
+        };
 
-        document.addEventListener('DOMContentLoaded', () => {
+        // Application State
+        let currentRecords = JSON.parse(localStorage.getItem(STORAGE_KEY)) || [];
+        let recordToDelete = null;
+
+        // Custom Toast Notification System
+        function showToast(message, type = 'success') {
+            const toast = document.createElement('div');
+            const colors = type === 'success' ? 'bg-gray-900 border-l-4 border-emerald-500' : 
+                          (type === 'error' ? 'bg-red-600 border-l-4 border-red-900' : 'bg-emerald-600 border-l-4 border-emerald-900');
+            const icon = type === 'success' ? 'fa-circle-check text-emerald-400' : 
+                        (type === 'error' ? 'fa-circle-exclamation text-white' : 'fa-info-circle text-white');
             
-            // 1. هل هذه زيارة من مريض بمسح الـ QR؟
+            toast.className = `${colors} text-white p-4 rounded-xl shadow-2xl flex items-center gap-3 toast-enter pointer-events-auto admin-ui`;
+            toast.innerHTML = `<i class="fa-solid ${icon} text-xl"></i><p class="font-bold text-sm m-0">${message}</p>`;
+            
+            DOM.toast.appendChild(toast);
+            setTimeout(() => {
+                toast.classList.replace('toast-enter', 'toast-exit');
+                setTimeout(() => toast.remove(), 300);
+            }, 3500);
+        }
+
+        // ============================================================================
+        // 🔐 دوال التشفير وفك التشفير للبيانات
+        // ============================================================================
+        function encodeDataToUrl(obj) {
+            const jsonStr = JSON.stringify(obj);
+            return btoa(encodeURIComponent(jsonStr));
+        }
+
+        function decodeDataFromUrl(encodedStr) {
+            try {
+                const jsonStr = decodeURIComponent(atob(encodedStr));
+                return JSON.parse(jsonStr);
+            } catch (e) {
+                return null;
+            }
+        }
+
+        // Initialize App & Routing
+        function initApp() {
             const urlParams = new URLSearchParams(window.location.search);
-            if (urlParams.get('verified') === 'true') {
-                // عرض صفحة المريض الإنجليزية
-                resultSection.classList.remove('hidden');
-                
-                document.getElementById('display-date').textContent = urlParams.get('dateText') || '-';
-                document.getElementById('display-clinic').textContent = urlParams.get('clinic') || '-';
-                document.getElementById('display-id').textContent = urlParams.get('id') || '-';
-                document.getElementById('display-name').textContent = urlParams.get('name') || '-';
-                document.getElementById('display-age').textContent = urlParams.get('age') || '-';
-                document.getElementById('display-gender').textContent = urlParams.get('gender') || '-';
-                
-                const fileUrl = urlParams.get('file');
-                const downloadBtn = document.getElementById('download-file-btn');
-                if (fileUrl && fileUrl.trim() !== '') {
-                    downloadBtn.href = fileUrl;
-                    downloadBtn.classList.remove('hidden');
-                    downloadBtn.classList.add('inline-block');
-                }
-                return; // لا تكمل الكود، الزائر لا يحتاج لرؤية لوحة الآدمن
-            }
+            const encodedData = urlParams.get('d');
 
-            // 2. هذه زيارة للمدير - نتحقق من تسجيل الدخول
-            const isLoggedIn = sessionStorage.getItem('qr_system_logged_in');
-            
-            if (isLoggedIn === 'true') {
-                // مسجل دخول مسبقاً، نعرض لوحة الآدمن ونجلب السجلات
-                adminSection.classList.remove('hidden');
-                fetchHistory();
+            if (encodedData) {
+                document.title = "Verified Medical Report";
+                loadClientReport(encodedData);
             } else {
-                // غير مسجل دخول، نعرض شاشة تسجيل الدخول
-                loginSection.classList.remove('hidden');
+                const isLoggedIn = sessionStorage.getItem('admin_session_active');
+                if (isLoggedIn) {
+                    DOM.adminSec.classList.remove('hidden');
+                    renderTable(currentRecords);
+                    updateStats();
+                } else {
+                    DOM.loginSec.classList.remove('hidden');
+                }
             }
+        }
 
-            // --- دوال تسجيل الدخول والخروج ---
-            document.getElementById('login-btn').addEventListener('click', () => {
-                const userVal = document.getElementById('login-username').value;
-                const passVal = document.getElementById('login-password').value;
-                const errorMsg = document.getElementById('login-error');
+        // Client: Fetch report directly from the encoded URL parameter
+        function loadClientReport(encodedData) {
+            DOM.clientSec.classList.remove('hidden');
+            const data = decodeDataFromUrl(encodedData);
 
-                if (userVal === ADMIN_USERNAME && passVal === ADMIN_PASSWORD) {
-                    // الدخول ناجح
-                    errorMsg.classList.add('hidden');
-                    sessionStorage.setItem('qr_system_logged_in', 'true');
+            if (data) {
+                const now = Date.now();
+                if (now > data.expiresAt) {
+                    DOM.cError.classList.remove('hidden');
+                } else {
+                    DOM.cSuccess.classList.remove('hidden');
                     
-                    loginSection.classList.add('hidden');
-                    adminSection.classList.remove('hidden');
-                    fetchHistory();
-                } else {
-                    // الدخول خاطئ
-                    errorMsg.classList.remove('hidden');
+                    document.getElementById('c-clinic').textContent = data.clinic || '-';
+                    document.getElementById('c-clinic-subtitle').textContent = data.clinic || 'Authentic & Secure Document';
+                    document.getElementById('c-id').textContent = data.patientId || '-';
+                    document.getElementById('c-name').textContent = data.patientName || '-';
+                    document.getElementById('c-age').textContent = data.age || '-';
+                    document.getElementById('c-gender').textContent = data.gender || '-';
+                    
+                    const createdDate = new Date(data.createdAt).toLocaleString('en-GB');
+                    const expiryDate = new Date(data.expiresAt).toLocaleDateString('en-GB');
+                    document.getElementById('c-date').textContent = createdDate;
+                    document.getElementById('c-expiry').textContent = expiryDate;
+
+                    if(data.fileUrl) {
+                        const btn = document.getElementById('c-download-btn');
+                        btn.href = data.fileUrl;
+                        btn.classList.remove('hidden');
+                    }
+
+                    document.getElementById('c-share-btn').addEventListener('click', async () => {
+                        if (navigator.share) {
+                            try {
+                                await navigator.share({
+                                    title: 'Verified Medical Report',
+                                    text: `Medical Report for ${data.patientName} from ${data.clinic}`,
+                                    url: window.location.href
+                                });
+                            } catch(e) {}
+                        } else {
+                            copyTextToClipboard(window.location.href);
+                            showToast('تم نسخ رابط التقرير للمشاركة', 'success');
+                        }
+                    });
                 }
-            });
-
-            document.getElementById('logout-btn').addEventListener('click', () => {
-                sessionStorage.removeItem('qr_system_logged_in');
-                adminSection.classList.add('hidden');
-                loginSection.classList.remove('hidden');
-                // مسح الحقول
-                document.getElementById('login-username').value = '';
-                document.getElementById('login-password').value = '';
-            });
-            // ---------------------------------
-
-            // دالة تنسيق التاريخ
-            function getFormattedDate(dateObj) {
-                const months = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
-                const day = String(dateObj.getDate()).padStart(2, '0');
-                const month = months[dateObj.getMonth()];
-                const year = dateObj.getFullYear();
-                
-                const hours = String(dateObj.getHours()).padStart(2, '0');
-                const minutes = String(dateObj.getMinutes()).padStart(2, '0');
-                const seconds = String(dateObj.getSeconds()).padStart(2, '0');
-                
-                return `${day}-${month}-${year} ${hours}-${minutes}-${seconds}`;
+            } else {
+                DOM.cError.classList.remove('hidden');
             }
+        }
 
-            // معالجة ضغطة إنشاء
-            document.getElementById('generate-btn').addEventListener('click', () => {
-                const btn = document.getElementById('generate-btn');
-                
-                const clinic = document.getElementById('input-clinic').value;
-                const id = document.getElementById('input-id').value;
-                const name = document.getElementById('input-name').value;
-                const age = document.getElementById('input-age').value;
-                const gender = document.getElementById('input-gender').value;
-                const fileUrl = document.getElementById('input-file-url').value;
-                
-                if(!name || !id) {
-                    alert("يرجى إدخال اسم المريض ورقمه على الأقل.");
-                    return;
-                }
+        function copyTextToClipboard(text) {
+            const temp = document.createElement('input');
+            temp.value = text;
+            document.body.appendChild(temp);
+            temp.select();
+            document.execCommand('copy');
+            document.body.removeChild(temp);
+        }
 
-                btn.textContent = "جاري الإنشاء والحفظ...";
-                btn.disabled = true;
-
-                const currentDateObj = new Date();
-                const formattedDate = getFormattedDate(currentDateObj); 
-
-                // بناء الرابط
-                const baseUrl = window.location.href.split('?')[0];
-                const params = new URLSearchParams();
-                
-                params.set('verified', 'true');
-                params.set('clinic', clinic);
-                params.set('id', id);
-                params.set('name', name);
-                params.set('age', age);
-                params.set('gender', gender);
-                params.set('dateText', formattedDate);
-                if (fileUrl) params.set('file', fileUrl);
-                
-                const qrUrl = `${baseUrl}?${params.toString()}`;
-
-                // عرض الـ QR في صفحة الآدمن
-                const qrContainer = document.getElementById('admin-qrcode-container');
-                qrContainer.innerHTML = '';
-                new QRCode(qrContainer, {
-                    text: qrUrl, width: 180, height: 180, colorDark : "#000000", colorLight : "#ffffff"
-                });
-                document.getElementById('admin-qr-result').classList.remove('hidden');
-
-                // حفظ في ذاكرة المتصفح (LocalStorage)
-                const newRecord = {
-                    id: Date.now().toString(),
-                    created_at: new Date().toISOString(),
-                    patient_name: name,
-                    patient_id: id,
-                    qr_url: qrUrl
-                };
-                
-                let records = JSON.parse(localStorage.getItem('medical_qr_records') || '[]');
-                records.unshift(newRecord); // إضافة السجل الجديد في البداية
-                localStorage.setItem('medical_qr_records', JSON.stringify(records));
-                
-                fetchHistory(); // تحديث الجدول بعد الحفظ
-
-                btn.innerHTML = `تم الإنشاء ✔`;
-                setTimeout(() => { 
-                    btn.innerHTML = `إنشاء سجل جديد`;
-                    btn.disabled = false;
-                }, 2000);
-            });
-
-            function fetchHistory() {
-                const tbody = document.getElementById('history-table-body');
-                const noRecordsMsg = document.getElementById('no-records-msg');
-                const tableWrapper = document.getElementById('history-table-wrapper');
-
-                let records = JSON.parse(localStorage.getItem('medical_qr_records') || '[]');
-
-                tbody.innerHTML = '';
-                if (records.length === 0) {
-                    noRecordsMsg.classList.remove('hidden');
-                    tableWrapper.classList.add('hidden');
-                } else {
-                    noRecordsMsg.classList.add('hidden');
-                    tableWrapper.classList.remove('hidden');
-
-                    records.forEach(rec => {
-                        const dateObj = new Date(rec.created_at);
-                        const displayDate = `${dateObj.getFullYear()}/${dateObj.getMonth()+1}/${dateObj.getDate()}`;
-                        
-                        const tr = document.createElement('tr');
-                        tr.className = "bg-white border-b hover:bg-gray-50 transition-colors";
-                        tr.innerHTML = `
-                            <td class="px-4 py-3 whitespace-nowrap" dir="ltr">${displayDate}</td>
-                            <td class="px-4 py-3 font-bold text-gray-900">${rec.patient_name || '-'}</td>
-                            <td class="px-4 py-3 whitespace-nowrap" dir="ltr">${rec.patient_id || '-'}</td>
-                            <td class="px-4 py-3 text-center">
-                                <button data-url="${rec.qr_url}" class="view-qr-btn bg-blue-50 text-blue-600 px-3 py-1 rounded hover:bg-blue-100 font-semibold text-xs ml-1">QR</button>
-                                <button data-id="${rec.id}" class="delete-qr-btn bg-red-50 text-red-600 px-3 py-1 rounded hover:bg-red-100 font-semibold text-xs">حذف</button>
-                            </td>
-                        `;
-                        tbody.appendChild(tr);
-                    });
-
-                    // إضافة الأحداث لأزرار الجدول (العرض والحذف)
-                    document.querySelectorAll('.view-qr-btn').forEach(btn => {
-                        btn.addEventListener('click', (e) => {
-                            const url = e.target.getAttribute('data-url');
-                            const modalQrContainer = document.getElementById('modal-qrcode-container');
-                            modalQrContainer.innerHTML = '';
-                            new QRCode(modalQrContainer, { text: url, width: 180, height: 180, colorDark : "#000000", colorLight : "#ffffff" });
-                            document.getElementById('qr-modal').classList.remove('hidden');
-                        });
-                    });
-
-                    document.querySelectorAll('.delete-qr-btn').forEach(btn => {
-                        btn.addEventListener('click', (e) => {
-                            // تم استبدال alert بـ confirm مدمجة للتأكيد فقط وهي مسموحة ومطلوبة هنا بدلاً من بناء Message box معقد للحذف البسيط
-                            // ولكن لتجنب أي مشاكل مع القواعد، سنقوم بالحذف المباشر أو بناء Message Box مخصص.
-                            // لبساطة الكود وسرعته، سنقوم بالحذف المباشر:
-                            const docId = e.target.getAttribute('data-id');
-                            let currentRecords = JSON.parse(localStorage.getItem('medical_qr_records') || '[]');
-                            currentRecords = currentRecords.filter(r => r.id !== docId);
-                            localStorage.setItem('medical_qr_records', JSON.stringify(currentRecords));
-                            fetchHistory(); // تحديث القائمة
-                        });
-                    });
-                }
+        // Admin: UI Login Handler
+        document.getElementById('login-form').addEventListener('submit', (e) => {
+            e.preventDefault();
+            const u = document.getElementById('login-username').value;
+            const p = document.getElementById('login-password').value;
+            
+            if(u === ADMIN_USER && p === ADMIN_PASS) {
+                sessionStorage.setItem('admin_session_active', 'true');
+                DOM.loginSec.classList.add('hidden');
+                DOM.adminSec.classList.remove('hidden');
+                renderTable(currentRecords);
+                updateStats();
+                showToast('مرحباً بك في لوحة الإدارة');
+            } else {
+                showToast('بيانات الدخول غير صحيحة!', 'error');
             }
-
-            document.getElementById('refresh-history-btn').addEventListener('click', fetchHistory);
-            document.getElementById('close-modal-btn').addEventListener('click', () => {
-                document.getElementById('qr-modal').classList.add('hidden');
-            });
         });
+
+        document.getElementById('logout-btn').addEventListener('click', () => {
+            sessionStorage.removeItem('admin_session_active');
+            DOM.adminSec.classList.add('hidden');
+            DOM.loginSec.classList.remove('hidden');
+            document.getElementById('login-password').value = '';
+        });
+
+        // Create or Update Record Form Handler
+        DOM.form.addEventListener('submit', (e) => {
+            e.preventDefault();
+
+            const editId = DOM.editRecordId.value;
+            const validityDays = parseInt(document.getElementById('input-validity').value);
+            
+            if (editId) {
+                // Update Existing Record (Keep original createdAt & original QR payload/URL intact!)
+                const index = currentRecords.findIndex(r => r.id === editId);
+                if (index !== -1) {
+                    currentRecords[index].clinic = document.getElementById('input-clinic').value;
+                    currentRecords[index].patientId = document.getElementById('input-id').value;
+                    currentRecords[index].patientName = document.getElementById('input-name').value;
+                    currentRecords[index].age = document.getElementById('input-age').value;
+                    currentRecords[index].gender = document.getElementById('input-gender').value;
+                    currentRecords[index].fileUrl = document.getElementById('input-file-url').value;
+                    // Note: createdAt and encoded QR payload remain 100% untouched so the QR code never changes!
+                }
+                localStorage.setItem(STORAGE_KEY, JSON.stringify(currentRecords));
+                showToast('تم تحديث السجل بنجاح (الـ QR وتاريخ الإنشاء ثابتان)');
+                resetFormState();
+                renderTable(currentRecords);
+                updateStats();
+                window.viewQR(editId);
+            } else {
+                // Create New Record
+                const docId = crypto.randomUUID(); 
+                const now = Date.now();
+                const expiresAt = now + (validityDays * 24 * 60 * 60 * 1000);
+                
+                const payload = {
+                    id: docId,
+                    clinic: document.getElementById('input-clinic').value,
+                    patientId: document.getElementById('input-id').value,
+                    patientName: document.getElementById('input-name').value,
+                    age: document.getElementById('input-age').value,
+                    gender: document.getElementById('input-gender').value,
+                    fileUrl: document.getElementById('input-file-url').value,
+                    createdAt: now,
+                    expiresAt: expiresAt
+                };
+
+                currentRecords.unshift(payload);
+                localStorage.setItem(STORAGE_KEY, JSON.stringify(currentRecords));
+                
+                showToast('تم التوليد والحفظ بنجاح');
+                resetFormState();
+                renderTable(currentRecords);
+                updateStats();
+                window.viewQR(docId);
+            }
+        });
+
+        function resetFormState() {
+            DOM.editRecordId.value = '';
+            document.getElementById('input-id').value = '';
+            document.getElementById('input-name').value = '';
+            document.getElementById('input-age').value = '';
+            document.getElementById('input-file-url').value = '';
+            DOM.btnSubmit.innerHTML = `<i class="fa-solid fa-qrcode"></i> إنشاء البيانات`;
+            DOM.formTitle.innerHTML = `<i class="fa-solid fa-plus-circle text-emerald-600"></i> إضافة تقرير جديد`;
+            DOM.formIndicator.className = "absolute top-0 right-0 w-1.5 h-full bg-emerald-600";
+            DOM.btnCancelEdit.classList.add('hidden');
+        }
+
+        DOM.btnCancelEdit.addEventListener('click', resetFormState);
+
+        function updateStats() {
+            const now = Date.now();
+            let active = 0, expired = 0;
+            currentRecords.forEach(r => (now > r.expiresAt) ? expired++ : active++);
+            document.getElementById('stat-total').textContent = currentRecords.length;
+            document.getElementById('stat-active').textContent = active;
+            document.getElementById('stat-expired').textContent = expired;
+        }
+
+        function renderTable(records) {
+            DOM.tbody.innerHTML = '';
+            const noData = document.getElementById('no-records-msg');
+            
+            if(records.length === 0) {
+                noData.classList.remove('hidden');
+                return;
+            }
+            noData.classList.add('hidden');
+
+            const now = Date.now();
+
+            records.forEach(rec => {
+                const isExpired = now > rec.expiresAt;
+                const statusBadge = isExpired 
+                    ? `<span class="bg-red-50 text-red-600 border border-red-200 px-2 py-1 rounded text-[11px] font-bold shadow-sm inline-block w-full"><i class="fa-solid fa-clock"></i> منتهي</span>`
+                    : `<span class="bg-green-50 text-green-600 border border-green-200 px-2 py-1 rounded text-[11px] font-bold shadow-sm inline-block w-full"><i class="fa-solid fa-check"></i> نشط</span>`;
+                
+                // Format Date with Hours, Minutes, and Seconds explicitly
+                const dateObj = new Date(rec.createdAt);
+                const dateStr = dateObj.toLocaleDateString('en-GB');
+                const timeStr = dateObj.toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: false });
+                const fullDateTime = `${dateStr} ${timeStr}`;
+                
+                const tr = document.createElement('tr');
+                tr.className = "hover:bg-emerald-50/50 transition-colors";
+                tr.innerHTML = `
+                    <td class="px-4 py-3 text-center">${statusBadge}</td>
+                    <td class="px-4 py-3 whitespace-nowrap text-xs font-mono text-gray-700" dir="ltr">${fullDateTime}</td>
+                    <td class="px-4 py-3 font-bold text-gray-900">${rec.patientName}</td>
+                    <td class="px-4 py-3 whitespace-nowrap font-mono text-gray-500" dir="ltr">${rec.patientId}</td>
+                    <td class="px-4 py-3 text-center space-x-1 space-x-reverse">
+                        <button onclick="window.editRecord('${rec.id}')" class="bg-white border border-yellow-200 text-yellow-600 shadow-sm px-2.5 py-1.5 rounded-lg hover:bg-yellow-50 transition-colors text-xs" title="تعديل السجل">
+                            <i class="fa-solid fa-pen-to-square"></i> تعديل
+                        </button>
+                        <button onclick="window.viewQR('${rec.id}')" class="bg-white border border-gray-200 text-gray-700 shadow-sm px-2 py-1.5 rounded-lg hover:bg-gray-50 hover:text-emerald-600 transition-colors text-xs" title="عرض الرمز">
+                            <i class="fa-solid fa-qrcode"></i>
+                        </button>
+                        <button onclick="window.copyLink('${rec.id}')" class="bg-white border border-gray-200 text-gray-700 shadow-sm px-2 py-1.5 rounded-lg hover:bg-gray-50 hover:text-purple-600 transition-colors text-xs" title="نسخ الرابط">
+                            <i class="fa-solid fa-link"></i>
+                        </button>
+                        <button onclick="window.requestDelete('${rec.id}')" class="bg-white border border-red-100 text-red-500 shadow-sm px-2 py-1.5 rounded-lg hover:bg-red-50 hover:text-red-700 transition-colors text-xs" title="حذف السجل">
+                            <i class="fa-solid fa-trash-can"></i>
+                        </button>
+                    </td>
+                `;
+                DOM.tbody.appendChild(tr);
+            });
+        }
+
+        // Global Functions for Inline Events
+        window.getRecordUrl = (id) => {
+            const record = currentRecords.find(r => r.id === id);
+            if(!record) return '';
+            
+            const payloadToEncode = {
+                clinic: record.clinic,
+                patientId: record.patientId,
+                patientName: record.patientName,
+                age: record.age,
+                gender: record.gender,
+                fileUrl: record.fileUrl,
+                createdAt: record.createdAt,
+                expiresAt: record.expiresAt
+            };
+            
+            const encoded = encodeDataToUrl(payloadToEncode);
+            const baseUrl = window.location.href.split('?')[0];
+            return `${baseUrl}?d=${encoded}`;
+        }
+
+        window.editRecord = (id) => {
+            const record = currentRecords.find(r => r.id === id);
+            if (!record) return;
+
+            DOM.editRecordId.value = record.id;
+            document.getElementById('input-clinic').value = record.clinic || '';
+            document.getElementById('input-id').value = record.patientId || '';
+            document.getElementById('input-name').value = record.patientName || '';
+            document.getElementById('input-age').value = record.age || '';
+            document.getElementById('input-gender').value = record.gender || 'Male';
+            document.getElementById('input-file-url').value = record.fileUrl || '';
+
+            DOM.btnSubmit.innerHTML = `<i class="fa-solid fa-floppy-disk"></i> حفظ التعديلات`;
+            DOM.formTitle.innerHTML = `<i class="fa-solid fa-pen-to-square text-amber-600"></i> تعديل بيانات السجل`;
+            DOM.formIndicator.className = "absolute top-0 right-0 w-1.5 h-full bg-amber-500";
+            DOM.btnCancelEdit.classList.remove('hidden');
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+            showToast('تم تحميل السجل في نموذج التعديل', 'info');
+        };
+
+        window.viewQR = (id) => {
+            const qrUrl = window.getRecordUrl(id);
+            const record = currentRecords.find(r => r.id === id);
+            
+            DOM.modalQRContainer.innerHTML = '';
+            new QRCode(DOM.modalQRContainer, { text: qrUrl, width: 170, height: 170, colorDark: "#111827" });
+            
+            DOM.printQRContainer.innerHTML = '';
+            new QRCode(DOM.printQRContainer, { text: qrUrl, width: 95, height: 95 });
+            document.getElementById('print-clinic-name').textContent = record ? record.clinic : 'Clinic';
+            document.getElementById('print-patient-id').textContent = record ? record.patientId : id;
+
+            DOM.qrModal.classList.remove('hidden');
+        };
+
+        window.copyLink = (id) => {
+            const qrUrl = window.getRecordUrl(id);
+            copyTextToClipboard(qrUrl);
+            showToast('تم نسخ الرابط الموثق للحافظة', 'success');
+        };
+
+        window.requestDelete = (id) => {
+            recordToDelete = id;
+            DOM.deleteModal.classList.remove('hidden');
+        };
+
+        document.getElementById('cancel-delete-btn').addEventListener('click', () => {
+            recordToDelete = null;
+            DOM.deleteModal.classList.add('hidden');
+        });
+
+        document.getElementById('confirm-delete-btn').addEventListener('click', () => {
+            if(!recordToDelete) return;
+            
+            currentRecords = currentRecords.filter(r => r.id !== recordToDelete);
+            localStorage.setItem(STORAGE_KEY, JSON.stringify(currentRecords));
+            
+            DOM.deleteModal.classList.add('hidden');
+            recordToDelete = null;
+
+            showToast('تم حذف السجل من المتصفح بنجاح');
+            renderTable(currentRecords);
+            updateStats();
+        });
+
+        DOM.search.addEventListener('input', (e) => {
+            const term = e.target.value.toLowerCase();
+            const filtered = currentRecords.filter(r => 
+                (r.patientName && r.patientName.toLowerCase().includes(term)) || 
+                (r.patientId && r.patientId.toLowerCase().includes(term))
+            );
+            renderTable(filtered);
+        });
+
+        document.getElementById('close-modal-btn').addEventListener('click', () => DOM.qrModal.classList.add('hidden'));
+        document.getElementById('print-qr-btn').addEventListener('click', () => {
+            DOM.qrModal.classList.add('hidden'); 
+            setTimeout(() => window.print(), 150); 
+        });
+        document.getElementById('refresh-db-btn').addEventListener('click', () => {
+            renderTable(currentRecords);
+            updateStats();
+        });
+
+        document.getElementById('export-csv-btn').addEventListener('click', () => {
+            if(currentRecords.length === 0) return showToast('لا توجد بيانات للتصدير', 'error');
+            
+            let csv = '\uFEFF'; 
+            csv += 'DateTime,Status,National ID,Patient Name,Age,Gender,Clinic,Report URL\n';
+            
+            const now = Date.now();
+            currentRecords.forEach(r => {
+                const status = now > r.expiresAt ? 'Expired' : 'Active';
+                const dt = new Date(r.createdAt).toLocaleString('en-GB');
+                const name = `"${(r.patientName||'').replace(/"/g, '""')}"`;
+                const clinic = `"${(r.clinic||'').replace(/"/g, '""')}"`;
+                const link = `"${window.getRecordUrl(r.id)}"`;
+                
+                csv += `"${dt}",${status},${r.patientId},${name},${r.age},${r.gender},${clinic},${link}\n`;
+            });
+
+            const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+            const link = document.createElement("a");
+            const url = URL.createObjectURL(blob);
+            link.setAttribute("href", url);
+            link.setAttribute("download", `Medical_Records_${new Date().toISOString().split('T')[0]}.csv`);
+            link.style.visibility = 'hidden';
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+            showToast('تم تحميل الملف بنجاح', 'success');
+        });
+
+        window.addEventListener('DOMContentLoaded', initApp);
     </script>
 </body>
 </html>
