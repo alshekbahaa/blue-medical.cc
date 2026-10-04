@@ -313,7 +313,7 @@
                         <table class="info-table mb-8">
                             <tbody>
                                 <tr><th>Clinic</th><td id="c-clinic"></td></tr>
-                                <tr><th>National ID</th><td id="c-id"></td></tr>
+                                <tr><th> ID</th><td id="c-id"></td></tr>
                                 <tr><th>Patient Name</th><td id="c-name"></td></tr>
                                 <tr><th>Age</th><td id="c-age"></td></tr>
                                 <tr><th>Gender</th><td id="c-gender"></td></tr>
@@ -394,7 +394,7 @@
             <img src="Blue.png" alt="Logo" style="height: 28px; object-fit: contain; filter: brightness(0) invert(1);" onerror="this.style.display='none'">
             <h3 id="print-clinic-name" style="margin: 0; font-size: 13px;">Clinic Name</h3>
         </div>
-        <p>National ID: <span id="print-patient-id"></span></p>
+        <p> ID: <span id="print-patient-id"></span></p>
         <div id="print-qr-container"></div>
         <p style="margin-top:3px; font-weight: bold; font-size: 8px;">Scan to Verify Report</p>
     </div>
@@ -902,7 +902,7 @@
             if(currentRecords.length === 0) return showToast('لا توجد بيانات للتصدير', 'error');
             
             let csv = '\uFEFF'; 
-            csv += 'DateTime,Validity,ExpiryDate,Status,National ID,Patient Name,Age,Gender,Clinic,Report URL\n';
+            csv += 'DateTime,Validity,ExpiryDate,Status, ID,Patient Name,Age,Gender,Clinic,Report URL\n';
             
             const now = Date.now();
             currentRecords.forEach(r => {
