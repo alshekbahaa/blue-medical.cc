@@ -336,7 +336,7 @@
 
     </main>
 
-    <!-- Footer Signature (English Professional Option) -->
+    <!-- Footer Signature (English Professional) -->
     <footer class="w-full text-center py-4 text-xs text-gray-500 font-bold admin-ui no-print">
         Designed by Eng. Bahaa Al-Sheikh
     </footer>
@@ -465,9 +465,11 @@
             const encodedData = urlParams.get('d');
 
             if (encodedData) {
+                // Client View Mode: Directly load and display report without any login prompts
                 document.title = "Verified Medical Report";
                 loadClientReport(encodedData);
             } else {
+                // Admin Mode: Check session
                 const isLoggedIn = sessionStorage.getItem('admin_session_active');
                 if (isLoggedIn) {
                     DOM.adminSec.classList.remove('hidden');
@@ -790,7 +792,7 @@
             DOM.qrModal.classList.add('hidden'); 
             setTimeout(() => window.print(), 150); 
         });
-        document.getElementById('refresh-db-btn').addEventListener('click', () => {
+        document.getElementById('refresh-btn')?.addEventListener('click', () => {
             renderTable(currentRecords);
             updateStats();
         });
