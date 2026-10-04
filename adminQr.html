@@ -27,10 +27,10 @@
         .admin-ui { font-family: 'Tajawal', sans-serif; }
         .english-ui { font-family: 'Inter', sans-serif; }
         
-        /* Table Styles for Patient View - Equal font sizes and no wrap for names */
+        /* Table Styles for Patient View - Fluid width with no text wrapping for patient name */
         .info-table { width: 100%; border-collapse: collapse; font-size: 15px; table-layout: auto; }
         .info-table tr { border-bottom: 1px solid #e5e7eb; }
-        .info-table th { background-color: #f9fafb; color: #374151; font-weight: 600; padding: 14px 16px; text-align: left; width: 30%; font-size: 15px; white-space: nowrap; }
+        .info-table th { background-color: #f9fafb; color: #374151; font-weight: 600; padding: 14px 16px; text-align: left; width: 32%; font-size: 15px; white-space: nowrap; }
         .info-table td { color: #111827; padding: 14px 16px; text-align: left; font-weight: 500; font-size: 15px; white-space: nowrap; }
 
         /* Custom Scrollbar */
@@ -77,11 +77,11 @@
         #print-card-area { display: none; }
     </style>
 </head>
-<body class="min-h-screen text-gray-800 flex flex-col items-center p-4 sm:p-6 relative justify-between">
+<body class="min-h-screen text-gray-800 flex flex-col items-center p-3 sm:p-6 relative justify-between">
 
     <div id="toast-container" class="fixed bottom-4 left-1/2 transform -translate-x-1/2 z-50 flex flex-col gap-2 w-full max-w-sm px-4 pointer-events-none"></div>
 
-    <main class="w-full max-w-7xl mx-auto flex-1">
+    <main class="w-full max-w-6xl mx-auto flex-1">
         
         <!-- ========================================== -->
         <!-- 0. واجهة تسجيل الدخول (الآدمن)             -->
@@ -288,42 +288,40 @@
         <!-- ========================================== -->
         <!-- 2. واجهة العميل (المريض) - إنجليزي         -->
         <!-- ========================================== -->
-        <section id="client-section" class="english-ui hidden w-full max-w-2xl mx-auto mt-6">
+        <section id="client-section" class="english-ui hidden w-full max-w-xl mx-auto mt-4 px-2 sm:px-0">
             
             <!-- Valid Report View -->
-            <div id="client-success-view" class="hidden bg-white rounded-2xl shadow-2xl shadow-emerald-900/10 border border-gray-100 overflow-hidden flex flex-col" dir="ltr">
+            <div id="client-success-view" class="hidden bg-white rounded-2xl shadow-2xl shadow-emerald-900/10 border border-gray-100 overflow-hidden flex flex-col w-full" dir="ltr">
                 
-                <!-- White Logo Container -->
-                <div class="bg-white p-6 pb-2 text-center flex justify-center items-center">
-                    <img src="Blue.png" alt="Clinic Logo" class="h-20 object-contain" onerror="this.onerror=null; this.src='https://placehold.co/240x80/ffffff/059669?text=Clinic+Logo'">
-                </div>
-
-                <!-- Green Verification Header -->
-                <div class="bg-gradient-to-r from-emerald-600 to-green-700 py-4 px-6 text-center text-white relative shadow-inner">
+                <!-- Green Header with White Logo -->
+                <div class="bg-gradient-to-r from-emerald-600 to-green-700 py-6 px-6 text-center text-white relative shadow-inner flex flex-col items-center justify-center gap-3">
+                    <img src="Blue.png" alt="Clinic Logo" class="h-14 sm:h-16 object-contain logo-white bg-transparent" onerror="this.onerror=null; this.src='https://placehold.co/180x60/ffffff/ffffff?text=Clinic+Logo'">
                     <h1 class="text-xl sm:text-2xl font-bold m-0 tracking-wide flex justify-center items-center gap-2">
                         <i class="fa-solid fa-circle-check"></i> QR Code Verified
                     </h1>
                 </div>
 
                 <!-- Data Section -->
-                <div class="p-6 sm:p-8">
+                <div class="p-4 sm:p-8 w-full overflow-hidden">
                     <!-- Date -->
                     <div class="flex items-center justify-center text-xs text-gray-500 mb-6 pb-4 border-b border-gray-100 font-medium gap-1.5">
                         <i class="fa-regular fa-calendar text-gray-400"></i> Generated on: <span id="c-date"></span>
                     </div>
 
-                    <!-- Info Table (Expanded table layout with equal font sizes and no-wrap names) -->
-                    <table class="info-table mb-8">
-                        <tbody>
-                            <tr><th>Clinic</th><td id="c-clinic"></td></tr>
-                            <tr><th>National ID</th><td id="c-id"></td></tr>
-                            <tr><th>Patient Name</th><td id="c-name"></td></tr>
-                            <tr><th>Age</th><td id="c-age"></td></tr>
-                            <tr><th>Gender</th><td id="c-gender"></td></tr>
-                        </tbody>
-                    </table>
+                    <!-- Info Table Container with Horizontal Scroll for Mobile protection -->
+                    <div class="w-full overflow-x-auto pb-2">
+                        <table class="info-table mb-8">
+                            <tbody>
+                                <tr><th>Clinic</th><td id="c-clinic"></td></tr>
+                                <tr><th>National ID</th><td id="c-id"></td></tr>
+                                <tr><th>Patient Name</th><td id="c-name"></td></tr>
+                                <tr><th>Age</th><td id="c-age"></td></tr>
+                                <tr><th>Gender</th><td id="c-gender"></td></tr>
+                            </tbody>
+                        </table>
+                    </div>
 
-                    <!-- Download Button Only -->
+                    <!-- Download Button Only (Share button removed) -->
                     <div class="flex flex-col gap-3 no-print mt-2">
                         <a id="c-download-btn" href="#" target="_blank" class="hidden w-full bg-emerald-600 hover:bg-emerald-700 text-white py-3.5 px-4 rounded-xl font-bold transition-colors shadow-lg shadow-emerald-600/30 flex justify-center items-center gap-2">
                             <i class="fa-solid fa-file-pdf text-lg"></i> Download Original PDF
@@ -333,7 +331,7 @@
             </div>
 
             <!-- Expired / Error View -->
-            <div id="client-error-view" class="hidden bg-white rounded-2xl shadow-xl border border-gray-100 p-8 text-center" dir="ltr">
+            <div id="client-error-view" class="hidden bg-white rounded-2xl shadow-xl border border-gray-100 p-8 text-center w-full" dir="ltr">
                 <div class="w-24 h-24 bg-red-50 text-red-500 rounded-full flex items-center justify-center mx-auto mb-5 border-4 border-white shadow-sm">
                     <i class="fa-solid fa-circle-xmark text-5xl"></i>
                 </div>
@@ -585,13 +583,14 @@
             if (editId) {
                 const index = currentRecords.findIndex(r => r.id === editId);
                 if (index !== -1) {
-                    // When editing, preserve original createdAt, expiresAt, validity and QR code payload to keep QR intact
+                    // When editing, preserve original createdAt, expiresAt, and QR code payload to keep QR and creation date 100% constant
                     currentRecords[index].clinic = document.getElementById('input-clinic').value;
                     currentRecords[index].patientId = document.getElementById('input-id').value;
                     currentRecords[index].patientName = document.getElementById('input-name').value;
                     currentRecords[index].age = document.getElementById('input-age').value;
                     currentRecords[index].gender = document.getElementById('input-gender').value;
                     currentRecords[index].fileUrl = document.getElementById('input-file-url').value;
+                    // Validity and expiration remain identical to original creation to prevent QR invalidation
                 }
                 localStorage.setItem(STORAGE_KEY, JSON.stringify(currentRecords));
                 showToast('تم تحديث السجل بنجاح (الـ QR وتاريخ الإنشاء ثابتان لضمان الصلاحية)');
@@ -602,7 +601,7 @@
             } else {
                 const docId = crypto.randomUUID ? crypto.randomUUID() : 'id_' + Date.now(); 
                 const now = Date.now();
-                // Correctly compute expiration timestamp by adding validity days in milliseconds (365 days = 365 * 24 * 3600 * 1000)
+                // Correctly compute expiration timestamp by adding exact validity days in milliseconds (365 days = 365 * 24 * 3600 * 1000)
                 const expiresAt = now + (validityDays * 24 * 60 * 60 * 1000);
                 
                 const payload = {
