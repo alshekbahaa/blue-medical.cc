@@ -1,0 +1,552 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>مجمع الميدان الأزرق الطبي - Blue Medical Field Complex</title>
+    <!-- Tailwind CSS for modern and responsive styling -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- FontAwesome for icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Google Fonts Cairo & Inter -->
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;600;700;800;900&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        medicalBlue: '#22286b', // المستوحى من الشعار الأزرق الداكن
+                        medicalGreen: '#009951', // المستوحى من لون الشجر والأخضر في الشعار
+                        medicalLight: '#f0fdf4',
+                        accentBlue: '#3b82f6'
+                    },
+                    fontFamily: {
+                        cairo: ['Cairo', 'sans-serif'],
+                        inter: ['Inter', 'sans-serif']
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        body {
+            font-family: 'Cairo', sans-serif;
+            background-color: #f8fafc;
+        }
+        .tab-content {
+            display: none;
+        }
+        .tab-content.active {
+            display: block;
+            animation: fadeIn 0.4s ease-in-out;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+    </style>
+</head>
+<body class="bg-gray-50 text-gray-800 flex flex-col min-h-screen">
+
+    <!-- Navbar -->
+    <header class="bg-white shadow-md sticky top-0 z-50 border-b border-gray-100">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between items-center h-20">
+                <!-- Logo Area matching the uploaded brand emblem -->
+                <div class="flex items-center space-x-3 space-x-reverse cursor-pointer" onclick="switchTab('home')">
+                    <div class="w-12 h-12 rounded-full bg-medicalGreen/10 flex items-center justify-center border-2 border-medicalGreen">
+                        <i class="fa-solid fa-heart-pulse text-medicalGreen text-2xl"></i>
+                    </div>
+                    <div>
+                        <div class="flex items-center space-x-1 space-x-reverse">
+                            <span class="text-xl sm:text-2xl font-black text-medicalBlue">مجمع الميدان الأزرق</span>
+                            <span class="text-xs bg-medicalGreen text-white px-2 py-0.5 rounded-full font-bold">الطبي</span>
+                        </div>
+                        <p class="text-xs text-medicalGreen tracking-wider font-semibold font-inter">Blue Medical field complex</p>
+                    </div>
+                </div>
+
+                <!-- Desktop Navigation Tabs -->
+                <nav class="hidden md:flex items-center space-x-1 space-x-reverse">
+                    <button onclick="switchTab('home')" id="btn-home" class="nav-btn px-4 py-2 rounded-xl text-medicalBlue font-bold hover:bg-emerald-50 transition duration-200 active-tab bg-emerald-50 text-medicalGreen">
+                        <i class="fa-solid fa-house ml-1.5"></i> الرئيسية
+                    </button>
+                    <button onclick="switchTab('about')" id="btn-about" class="nav-btn px-4 py-2 rounded-xl text-gray-600 font-medium hover:bg-emerald-50 hover:text-medicalGreen transition duration-200">
+                        <i class="fa-solid fa-hospital ml-1.5"></i> من نحن
+                    </button>
+                    <button onclick="switchTab('services')" id="btn-services" class="nav-btn px-4 py-2 rounded-xl text-gray-600 font-medium hover:bg-emerald-50 hover:text-medicalGreen transition duration-200">
+                        <i class="fa-solid fa-stethoscope ml-1.5"></i> التخصصات الطبية
+                    </button>
+                    <button onclick="switchTab('contact')" id="btn-contact" class="nav-btn px-4 py-2 rounded-xl text-gray-600 font-medium hover:bg-emerald-50 hover:text-medicalGreen transition duration-200">
+                        <i class="fa-solid fa-headset ml-1.5"></i> التواصل
+                    </button>
+                </nav>
+
+                <!-- Direct Phone Quick Contact Button -->
+                <div class="hidden sm:flex items-center">
+                    <a href="tel:+966509807030" class="bg-gradient-to-r from-medicalGreen to-emerald-600 text-white font-bold px-5 py-2.5 rounded-xl shadow-lg hover:shadow-emerald-500/30 hover:scale-105 transition duration-300 flex items-center space-x-2 space-x-reverse font-inter">
+                        <i class="fa-solid fa-phone-volume ml-1"></i>
+                        <span>050 980 7030</span>
+                    </a>
+                </div>
+
+                <!-- Mobile Menu Button -->
+                <div class="md:hidden flex items-center">
+                    <button onclick="toggleMobileMenu()" class="text-gray-600 hover:text-medicalBlue focus:outline-none p-2">
+                        <i class="fa-solid fa-bars text-2xl" id="menu-icon"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Mobile Menu dropdown -->
+        <div id="mobile-menu" class="hidden md:hidden bg-white border-t border-gray-100 px-4 pt-2 pb-4 space-y-2">
+            <button onclick="switchTab('home'); toggleMobileMenu();" class="block w-full text-right px-4 py-2 rounded-lg text-medicalBlue font-bold bg-emerald-50">الرئيسية</button>
+            <button onclick="switchTab('about'); toggleMobileMenu();" class="block w-full text-right px-4 py-2 rounded-lg text-gray-700 hover:bg-gray-50">من نحن</button>
+            <button onclick="switchTab('services'); toggleMobileMenu();" class="block w-full text-right px-4 py-2 rounded-lg text-gray-700 hover:bg-gray-50">التخصصات الطبية</button>
+            <button onclick="switchTab('contact'); toggleMobileMenu();" class="block w-full text-right px-4 py-2 rounded-lg text-gray-700 hover:bg-gray-50">التواصل</button>
+        </div>
+    </header>
+
+    <main class="flex-grow">
+
+        <!-- 1. HOME TAB -->
+        <section id="home" class="tab-content active">
+            <!-- Hero Banner -->
+            <div class="relative bg-gradient-to-br from-medicalBlue via-[#1a2342] to-medicalGreen text-white overflow-hidden py-20 lg:py-28">
+                <div class="absolute inset-0 opacity-10 bg-[radial-gradient(#fff_1px,transparent_1px)] [background-size:16px_16px]"></div>
+                <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
+                    <div class="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
+                        <div class="space-y-6 text-center lg:text-right">
+                            <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold bg-medicalGreen/30 text-emerald-300 border border-medicalGreen/40">
+                                <i class="fa-solid fa-shield-heart ml-1.5"></i> النعيرية - حي العزيزية
+                            </span>
+                            <h1 class="text-4xl sm:text-5xl lg:text-6xl font-extrabold tracking-tight leading-tight">
+                                نعتني بصحتكم <br><span class="text-emerald-400">بأعلى معايير الجودة</span>
+                            </h1>
+                            <p class="text-lg text-gray-200 max-w-xl mx-auto lg:mx-0 font-light">
+                                في مجمع الميدان الأزرق الطبي بالنعيرية، نجمع بين الخبرات الطبية المتميزة وأحدث التقنيات لنضمن لكم ولأسركم حياة صحية مليئة بالعافية.
+                            </p>
+                            <div class="flex flex-wrap justify-center lg:justify-start gap-4 pt-4">
+                                <button onclick="switchTab('services')" class="bg-medicalGreen hover:bg-emerald-600 text-white font-bold px-8 py-3.5 rounded-xl shadow-lg hover:shadow-emerald-600/40 transition duration-300">
+                                    استكشف أقسامنا الطبية
+                                </button>
+                                <a href="https://maps.app.goo.gl/q9Xzn2UfU24QbwkX6" target="_blank" class="bg-white/10 hover:bg-white/20 text-white border border-white/30 font-bold px-8 py-3.5 rounded-xl transition duration-300 flex items-center justify-center">
+                                    <i class="fa-solid fa-map-location-dot ml-2"></i> موقعنا على الخريطة
+                                </a>
+                            </div>
+                        </div>
+                        <!-- Hero Visual / Brand Emblem Card -->
+                        <div class="flex justify-center">
+                            <div class="bg-white/10 backdrop-blur-md p-8 rounded-3xl border border-white/20 shadow-2xl max-w-md w-full text-center relative overflow-hidden">
+                                <div class="absolute top-0 right-0 w-32 h-32 bg-medicalGreen/20 rounded-full blur-2xl"></div>
+                                <div class="w-24 h-24 bg-white rounded-2xl mx-auto flex items-center justify-center shadow-lg mb-6 border border-emerald-100">
+                                    <i class="fa-solid fa-notes-medical text-medicalGreen text-5xl"></i>
+                                </div>
+                                <h3 class="text-2xl font-bold text-white mb-2">مجمع الميدان الأزرق الطبي</h3>
+                                <p class="text-emerald-300 text-sm mb-4">النعيرية - حي العزيزية</p>
+                                <a href="tel:+966509807030" class="inline-block bg-medicalGreen text-white font-bold px-6 py-2 rounded-xl text-sm shadow-md hover:bg-emerald-600 transition font-inter mb-6">
+                                    <i class="fa-solid fa-phone ml-1"></i> 050 980 7030
+                                </a>
+                                <div class="grid grid-cols-3 gap-2 text-center pt-4 border-t border-white/10">
+                                    <div>
+                                        <div class="text-xl font-bold text-white">+15</div>
+                                        <div class="text-xs text-gray-300">تخصص طبي</div>
+                                    </div>
+                                    <div>
+                                        <div class="text-xl font-bold text-white">+50k</div>
+                                        <div class="text-xs text-gray-300">مريض راضٍ</div>
+                                    </div>
+                                    <div>
+                                        <div class="text-xl font-bold text-white">24/7</div>
+                                        <div class="text-xs text-gray-300">خدمة طوارئ</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Features Cards Grid -->
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 -mt-10 relative z-20 pb-16">
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                    <div class="bg-white p-6 rounded-2xl shadow-xl border border-gray-100 flex items-start space-x-4 space-x-reverse hover:translate-y-[-4px] transition duration-300">
+                        <div class="w-14 h-14 rounded-2xl bg-medicalGreen/10 flex-shrink-0 flex items-center justify-center text-medicalGreen text-2xl font-bold">
+                            <i class="fa-solid fa-user-doctor"></i>
+                        </div>
+                        <div>
+                            <h4 class="text-lg font-bold text-medicalBlue mb-1">استشاريون متخصصون</h4>
+                            <p class="text-gray-600 text-sm leading-relaxed">نخبة من أفضل الأطباء والاستشاريين ذوي الكفاءة العالية.</p>
+                        </div>
+                    </div>
+                    <div class="bg-white p-6 rounded-2xl shadow-xl border border-gray-100 flex items-start space-x-4 space-x-reverse hover:translate-y-[-4px] transition duration-300">
+                        <div class="w-14 h-14 rounded-2xl bg-medicalBlue/10 flex-shrink-0 flex items-center justify-center text-medicalBlue text-2xl font-bold">
+                            <i class="fa-solid fa-microscope"></i>
+                        </div>
+                        <div>
+                            <h4 class="text-lg font-bold text-medicalBlue mb-1">أجهزة تشخيصية متطورة</h4>
+                            <p class="text-gray-600 text-sm leading-relaxed">تقنيات حديثة ومختبرات مجهزة بأحدث معايير الجودة العالمية.</p>
+                        </div>
+                    </div>
+                    <div class="bg-white p-6 rounded-2xl shadow-xl border border-gray-100 flex items-start space-x-4 space-x-reverse hover:translate-y-[-4px] transition duration-300">
+                        <div class="w-14 h-14 rounded-2xl bg-emerald-100 flex-shrink-0 flex items-center justify-center text-emerald-600 text-2xl font-bold">
+                            <i class="fa-solid fa-location-crosshairs"></i>
+                        </div>
+                        <div>
+                            <h4 class="text-lg font-bold text-medicalBlue mb-1">موقع مميز بالنعيرية</h4>
+                            <p class="text-gray-600 text-sm leading-relaxed">يسهل الوصول إلينا في حي العزيزية لخدمة أهل المنطقة بكفاءة.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 2. ABOUT TAB (من نحن) -->
+        <section id="about" class="tab-content py-16 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto">
+            <div class="text-center max-w-3xl mx-auto mb-16">
+                <span class="text-medicalGreen font-bold text-sm tracking-widest uppercase bg-emerald-50 px-3 py-1 rounded-full border border-emerald-200">من نحن</span>
+                <h2 class="text-3xl sm:text-4xl font-extrabold text-medicalBlue mt-3">رواد الرعاية الصحية والتميز الطبي بالنعيرية</h2>
+                <p class="text-gray-600 mt-4 leading-relaxed">تأسس مجمع الميدان الأزرق الطبي ليقدم نموذجاً فريداً للرعاية الشاملة والمتكاملة وفق أرفع المعايير الطبية العالمية.</p>
+            </div>
+
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center mb-16">
+                <div class="space-y-6">
+                    <div class="flex items-start space-x-4 space-x-reverse">
+                        <div class="w-10 h-10 rounded-full bg-medicalGreen text-white flex items-center justify-center flex-shrink-0 font-bold mt-1">
+                            <i class="fa-solid fa-bullseye"></i>
+                        </div>
+                        <div>
+                            <h3 class="text-xl font-bold text-medicalBlue mb-1">رؤيتنا</h3>
+                            <p class="text-gray-600 leading-relaxed">أن نكون الوجهة الطبية الأولى والموثوقة بمدينة النعيرية لتقديم خدمات صحية متكاملة ومتميزة تلبي تطلعات المرضى.</p>
+                        </div>
+                    </div>
+                    <div class="flex items-start space-x-4 space-x-reverse">
+                        <div class="w-10 h-10 rounded-full bg-medicalBlue text-white flex items-center justify-center flex-shrink-0 font-bold mt-1">
+                            <i class="fa-solid fa-gem"></i>
+                        </div>
+                        <div>
+                            <h3 class="text-xl font-bold text-medicalBlue mb-1">قيمنا الجوهرية</h3>
+                            <p class="text-gray-600 leading-relaxed">الجودة، الإنسانية، الأمانة الطبية، الابتكار المستمر، والتركيز الكامل على راحة ورضا المريض.</p>
+                        </div>
+                    </div>
+                    <div class="flex items-start space-x-4 space-x-reverse">
+                        <div class="w-10 h-10 rounded-full bg-emerald-600 text-white flex items-center justify-center flex-shrink-0 font-bold mt-1">
+                            <i class="fa-solid fa-award"></i>
+                        </div>
+                        <div>
+                            <h3 class="text-xl font-bold text-medicalBlue mb-1">التزامنا للجودة</h3>
+                            <p class="text-gray-600 leading-relaxed">نحرص على استخدام أفضل البروتوكولات الطبية وتطبيق معايير مكافحة العدوى والسلامة الدولية بحذافيرها.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="bg-gradient-to-tr from-medicalBlue to-medicalGreen p-1 rounded-3xl shadow-xl">
+                    <div class="bg-white p-8 rounded-[22px] space-y-6">
+                        <h3 class="text-2xl font-bold text-medicalBlue border-b pb-4">لماذا يختارنا المرضى؟</h3>
+                        <ul class="space-y-4 text-gray-700">
+                            <li class="flex items-center space-x-3 space-x-reverse">
+                                <i class="fa-solid fa-circle-check text-medicalGreen"></i>
+                                <span>فريق طبي استشاري معتمد وعالي الخبرة.</span>
+                            </li>
+                            <li class="flex items-center space-x-3 space-x-reverse">
+                                <i class="fa-solid fa-circle-check text-medicalGreen"></i>
+                                <span>موقع متميز يسهل الوصول إليه في حي العزيزية.</span>
+                            </li>
+                            <li class="flex items-center space-x-3 space-x-reverse">
+                                <i class="fa-solid fa-circle-check text-medicalGreen"></i>
+                                <span>أحدث تقنيات التشخيص والفحص المخبري والإشعاعي.</span>
+                            </li>
+                            <li class="flex items-center space-x-3 space-x-reverse">
+                                <i class="fa-solid fa-circle-check text-medicalGreen"></i>
+                                <span>خدمة تواصل مباشرة وسريعة على مدار الساعة.</span>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 3. SERVICES TAB (التخصصات الطبية) -->
+        <section id="services" class="tab-content py-16 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto">
+            <div class="text-center max-w-3xl mx-auto mb-16">
+                <span class="text-medicalGreen font-bold text-sm tracking-widest uppercase bg-emerald-50 px-3 py-1 rounded-full border border-emerald-200">أقسامنا</span>
+                <h2 class="text-3xl sm:text-4xl font-extrabold text-medicalBlue mt-3">التخصصات الطبية الشاملة</h2>
+                <p class="text-gray-600 mt-4 leading-relaxed">نقدم حزمة واسعة ومتكاملة من الخدمات الطبية لتغطية كافة احتياجات الأسرة الصحية.</p>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                <!-- Service Card 1 -->
+                <div class="bg-white rounded-2xl p-6 shadow-lg border border-gray-100 hover:shadow-xl transition duration-300 group">
+                    <div class="w-14 h-14 rounded-xl bg-medicalGreen/10 text-medicalGreen flex items-center justify-center text-2xl font-bold mb-6 group-hover:bg-medicalGreen group-hover:text-white transition duration-300">
+                        <i class="fa-solid fa-tooth"></i>
+                    </div>
+                    <h3 class="text-xl font-bold text-medicalBlue mb-2">قسم طب الأسنان</h3>
+                    <p class="text-gray-600 text-sm leading-relaxed mb-6">تجميل الأسنان، زراعة الأسنان، التقويم، وعلاج اللثة بأحدث الأجهزة.</p>
+                    <a href="tel:+966509807030" class="text-medicalGreen font-bold text-sm inline-flex items-center hover:underline">
+                        تواصل للاستفسار <i class="fa-solid fa-arrow-left mr-2"></i>
+                    </a>
+                </div>
+
+                <!-- Service Card 2 -->
+                <div class="bg-white rounded-2xl p-6 shadow-lg border border-gray-100 hover:shadow-xl transition duration-300 group">
+                    <div class="w-14 h-14 rounded-xl bg-medicalBlue/10 text-medicalBlue flex items-center justify-center text-2xl font-bold mb-6 group-hover:bg-medicalBlue group-hover:text-white transition duration-300">
+                        <i class="fa-solid fa-heart-pulse"></i>
+                    </div>
+                    <h3 class="text-xl font-bold text-medicalBlue mb-2">قسم الأمراض الباطنية</h3>
+                    <p class="text-gray-600 text-sm leading-relaxed mb-6">تشخيص وعلاج الأمراض المزمنة، ضغط الدم، السكري، والاضطرابات العامة.</p>
+                    <a href="tel:+966509807030" class="text-medicalGreen font-bold text-sm inline-flex items-center hover:underline">
+                        تواصل للاستفسار <i class="fa-solid fa-arrow-left mr-2"></i>
+                    </a>
+                </div>
+
+                <!-- Service Card 3 -->
+                <div class="bg-white rounded-2xl p-6 shadow-lg border border-gray-100 hover:shadow-xl transition duration-300 group">
+                    <div class="w-14 h-14 rounded-xl bg-emerald-100 text-emerald-600 flex items-center justify-center text-2xl font-bold mb-6 group-hover:bg-emerald-600 group-hover:text-white transition duration-300">
+                        <i class="fa-solid fa-child"></i>
+                    </div>
+                    <h3 class="text-xl font-bold text-medicalBlue mb-2">قسم الأطفال والرضع</h3>
+                    <p class="text-gray-600 text-sm leading-relaxed mb-6">رعاية صحية شاملة للأطفال، متابعة النمو، اللقاحات، وعلاج الحالات الحادة.</p>
+                    <a href="tel:+966509807030" class="text-medicalGreen font-bold text-sm inline-flex items-center hover:underline">
+                        تواصل للاستفسار <i class="fa-solid fa-arrow-left mr-2"></i>
+                    </a>
+                </div>
+
+                <!-- Service Card 4 -->
+                <div class="bg-white rounded-2xl p-6 shadow-lg border border-gray-100 hover:shadow-xl transition duration-300 group">
+                    <div class="w-14 h-14 rounded-xl bg-medicalGreen/10 text-medicalGreen flex items-center justify-center text-2xl font-bold mb-6 group-hover:bg-medicalGreen group-hover:text-white transition duration-300">
+                        <i class="fa-solid fa-venus"></i>
+                    </div>
+                    <h3 class="text-xl font-bold text-medicalBlue mb-2">قسم النساء والتوليد</h3>
+                    <p class="text-gray-600 text-sm leading-relaxed mb-6">متابعة الحمل، الفحوصات الدورية، وعلاج صحة المرأة بأعلى معايير الخصوصية.</p>
+                    <a href="tel:+966509807030" class="text-medicalGreen font-bold text-sm inline-flex items-center hover:underline">
+                        تواصل للاستفسار <i class="fa-solid fa-arrow-left mr-2"></i>
+                    </a>
+                </div>
+
+                <!-- Service Card 5 -->
+                <div class="bg-white rounded-2xl p-6 shadow-lg border border-gray-100 hover:shadow-xl transition duration-300 group">
+                    <div class="w-14 h-14 rounded-xl bg-medicalBlue/10 text-medicalBlue flex items-center justify-center text-2xl font-bold mb-6 group-hover:bg-medicalBlue group-hover:text-white transition duration-300">
+                        <i class="fa-solid fa-flask"></i>
+                    </div>
+                    <h3 class="text-xl font-bold text-medicalBlue mb-2">المختبر والتحاليل الطبية</h3>
+                    <p class="text-gray-600 text-sm leading-relaxed mb-6">تحاليل مخبرية شاملة ودقيقة بأحدث أجهزة الفحص الآلي وسرعة إصدار النتائج.</p>
+                    <a href="tel:+966509807030" class="text-medicalGreen font-bold text-sm inline-flex items-center hover:underline">
+                        تواصل للاستفسار <i class="fa-solid fa-arrow-left mr-2"></i>
+                    </a>
+                </div>
+
+                <!-- Service Card 6 -->
+                <div class="bg-white rounded-2xl p-6 shadow-lg border border-gray-100 hover:shadow-xl transition duration-300 group">
+                    <div class="w-14 h-14 rounded-xl bg-emerald-100 text-emerald-600 flex items-center justify-center text-2xl font-bold mb-6 group-hover:bg-emerald-600 group-hover:text-white transition duration-300">
+                        <i class="fa-solid fa-x-ray"></i>
+                    </div>
+                    <h3 class="text-xl font-bold text-medicalBlue mb-2">قسم الأشعة التشخيصية</h3>
+                    <p class="text-gray-600 text-sm leading-relaxed mb-6">أشعة تلفزيونية متطورة وتصوير رقمي آمن بدقة ووضوح عاليين.</p>
+                    <a href="tel:+966509807030" class="text-medicalGreen font-bold text-sm inline-flex items-center hover:underline">
+                        تواصل للاستفسار <i class="fa-solid fa-arrow-left mr-2"></i>
+                    </a>
+                </div>
+            </div>
+        </section>
+
+        <!-- 4. CONTACT TAB (التواصل) -->
+        <section id="contact" class="tab-content py-16 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto">
+            <div class="text-center max-w-3xl mx-auto mb-16">
+                <span class="text-medicalGreen font-bold text-sm tracking-widest uppercase bg-emerald-50 px-3 py-1 rounded-full border border-emerald-200">تواصل معنا</span>
+                <h2 class="text-3xl sm:text-4xl font-extrabold text-medicalBlue mt-3">نحن هنا لخدمتكم دائماً</h2>
+                <p class="text-gray-600 mt-4 leading-relaxed">يسعدنا تلقي استفساراتكم وملاحظاتكم طوال أيام الأسبوع عبر قنوات الاتصال أدناه.</p>
+            </div>
+
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+                <!-- Contact Info Cards -->
+                <div class="space-y-6">
+                    <div class="bg-white p-6 rounded-2xl shadow-md border border-gray-100 flex items-start space-x-4 space-x-reverse">
+                        <div class="w-12 h-12 rounded-xl bg-medicalGreen/10 text-medicalGreen flex items-center justify-center text-xl font-bold flex-shrink-0">
+                            <i class="fa-solid fa-location-dot"></i>
+                        </div>
+                        <div>
+                            <h4 class="text-lg font-bold text-medicalBlue mb-1">العنوان</h4>
+                            <p class="text-gray-600 text-sm leading-relaxed mb-2">المملكة العربية السعودية - النعيرية - حي العزيزية</p>
+                            <a href="https://maps.app.goo.gl/q9Xzn2UfU24QbwkX6" target="_blank" class="text-medicalGreen font-bold text-xs inline-flex items-center hover:underline bg-emerald-50 px-3 py-1 rounded-lg border border-emerald-200">
+                                <i class="fa-solid fa-map-location-dot ml-1.5"></i> فتح الخريطة المباشرة
+                            </a>
+                        </div>
+                    </div>
+                    
+                    <!-- رقم التواصل المباشر المحدث -->
+                    <div class="bg-white p-6 rounded-2xl shadow-md border border-gray-100 flex items-start space-x-4 space-x-reverse">
+                        <div class="w-12 h-12 rounded-xl bg-medicalBlue/10 text-medicalBlue flex items-center justify-center text-xl font-bold flex-shrink-0">
+                            <i class="fa-solid fa-phone"></i>
+                        </div>
+                        <div>
+                            <h4 class="text-lg font-bold text-medicalBlue mb-1">رقم الهاتف المباشر</h4>
+                            <a href="tel:+966509807030" class="text-medicalGreen font-bold text-lg leading-relaxed font-inter hover:underline block" dir="ltr">050 980 7030</a>
+                            <p class="text-gray-500 text-xs mt-1">متاح للاتصال والاستفسار طوال ساعات العمل</p>
+                        </div>
+                    </div>
+
+                    <div class="bg-white p-6 rounded-2xl shadow-md border border-gray-100 flex items-start space-x-4 space-x-reverse">
+                        <div class="w-12 h-12 rounded-xl bg-emerald-100 text-emerald-600 flex items-center justify-center text-xl font-bold flex-shrink-0">
+                            <i class="fa-solid fa-clock"></i>
+                        </div>
+                        <div>
+                            <h4 class="text-lg font-bold text-medicalBlue mb-1">ساعات العمل</h4>
+                            <p class="text-gray-600 text-sm leading-relaxed">السبت - الخميس: 9:00 صباحاً - 10:00 مساءً</p>
+                            <p class="text-emerald-600 text-xs font-bold mt-1">الجمعة: قسم الطوارئ فقط (24 ساعة)</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Contact Form -->
+                <div class="lg:col-span-2 bg-white p-8 rounded-3xl shadow-lg border border-gray-100">
+                    <h3 class="text-2xl font-bold text-medicalBlue mb-6">أرسل استفسارك</h3>
+                    <form onsubmit="handleContactSubmit(event)" class="space-y-6">
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-6">
+                            <div>
+                                <label class="block text-sm font-semibold text-gray-700 mb-2">الاسم الكامل</label>
+                                <input type="text" required placeholder="أدخل اسمك الكريم" class="w-full px-4 py-3 rounded-xl border border-gray-200 focus:ring-2 focus:ring-medicalGreen focus:outline-none transition">
+                            </div>
+                            <div>
+                                <label class="block text-sm font-semibold text-gray-700 mb-2">رقم الجوال</label>
+                                <input type="tel" required placeholder="05xxxxxxxx" class="w-full px-4 py-3 rounded-xl border border-gray-200 focus:ring-2 focus:ring-medicalGreen focus:outline-none transition">
+                            </div>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-semibold text-gray-700 mb-2">البريد الإلكتروني</label>
+                            <input type="email" placeholder="name@example.com" class="w-full px-4 py-3 rounded-xl border border-gray-200 focus:ring-2 focus:ring-medicalGreen focus:outline-none transition">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-semibold text-gray-700 mb-2">رسالتك أو استفسارك</label>
+                            <textarea rows="4" required placeholder="كيف يمكننا مساعدتك اليوم؟" class="w-full px-4 py-3 rounded-xl border border-gray-200 focus:ring-2 focus:ring-medicalGreen focus:outline-none transition"></textarea>
+                        </div>
+                        <button type="submit" class="w-full bg-medicalGreen hover:bg-emerald-600 text-white font-bold py-3.5 rounded-xl shadow-lg hover:shadow-emerald-600/30 transition duration-300">
+                            إرسال الرسالة
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- Footer -->
+    <footer class="bg-medicalBlue text-white pt-16 pb-8 mt-auto border-t-4 border-medicalGreen">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-8 mb-12">
+                <div class="space-y-4">
+                    <div class="flex items-center space-x-2 space-x-reverse">
+                        <div class="w-10 h-10 rounded-full bg-white flex items-center justify-center text-medicalGreen">
+                            <i class="fa-solid fa-heart-pulse text-xl"></i>
+                        </div>
+                        <span class="text-xl font-bold">مجمع الميدان الأزرق</span>
+                    </div>
+                    <p class="text-gray-300 text-sm leading-relaxed">
+                        نقدم رعاية صحية متكاملة بمعايير عالمية، وبإشراف نخبة من الكفاءات الطبية المتميزة بالنعيرية.
+                    </p>
+                    <p class="text-emerald-400 text-xs font-inter">Blue Medical field complex</p>
+                </div>
+
+                <div>
+                    <h4 class="text-lg font-bold mb-4 border-b border-white/10 pb-2">روابط سريعة</h4>
+                    <ul class="space-y-2 text-sm text-gray-300">
+                        <li><a href="#" onclick="switchTab('home')" class="hover:text-emerald-400 transition">الصفحة الرئيسية</a></li>
+                        <li><a href="#" onclick="switchTab('about')" class="hover:text-emerald-400 transition">من نحن</a></li>
+                        <li><a href="#" onclick="switchTab('services')" class="hover:text-emerald-400 transition">التخصصات الطبية</a></li>
+                        <li><a href="#" onclick="switchTab('contact')" class="hover:text-emerald-400 transition">اتصل بنا</a></li>
+                    </ul>
+                </div>
+
+                <div>
+                    <h4 class="text-lg font-bold mb-4 border-b border-white/10 pb-2">التخصصات الطبية</h4>
+                    <ul class="space-y-2 text-sm text-gray-300">
+                        <li><span>قسم طب الأسنان</span></li>
+                        <li><span>الأمراض الباطنية</span></li>
+                        <li><span>الأطفال والرضع</span></li>
+                        <li><span>النساء والتوليد</span></li>
+                    </ul>
+                </div>
+
+                <div>
+                    <h4 class="text-lg font-bold mb-4 border-b border-white/10 pb-2">معلومات الموقع</h4>
+                    <p class="text-sm text-gray-300 mb-1">النعيرية - حي العزيزية</p>
+                    <a href="https://maps.app.goo.gl/q9Xzn2UfU24QbwkX6" target="_blank" class="text-emerald-400 text-xs font-semibold hover:underline block mb-3">
+                        <i class="fa-solid fa-map-location-dot ml-1"></i> رابط الخريطة المباشر
+                    </a>
+                    <a href="tel:+966509807030" class="text-sm text-white font-bold font-inter block mb-4">
+                        <i class="fa-solid fa-phone text-emerald-400 ml-1"></i> 050 980 7030
+                    </a>
+                    <div class="flex space-x-4 space-x-reverse">
+                        <a href="#" class="w-9 h-9 rounded-full bg-white/10 flex items-center justify-center hover:bg-medicalGreen transition"><i class="fa-brands fa-twitter"></i></a>
+                        <a href="#" class="w-9 h-9 rounded-full bg-white/10 flex items-center justify-center hover:bg-medicalGreen transition"><i class="fa-brands fa-instagram"></i></a>
+                        <a href="#" class="w-9 h-9 rounded-full bg-white/10 flex items-center justify-center hover:bg-medicalGreen transition"><i class="fa-brands fa-linkedin-in"></i></a>
+                    </div>
+                </div>
+            </div>
+
+            <div class="border-t border-white/10 pt-8 flex flex-col sm:flex-row justify-between items-center text-xs text-gray-400">
+                <p>&copy; 2026 مجمع الميدان الأزرق الطبي - النعيرية. جميع الحقوق محفوظة.</p>
+                <p class="mt-2 sm:mt-0 font-inter">Blue Medical Field Complex</p>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Notification Toast Box -->
+    <div id="toast-box" class="fixed bottom-6 left-6 z-50 transform translate-y-32 opacity-0 transition-all duration-300 bg-medicalBlue text-white px-6 py-3 rounded-xl shadow-2xl flex items-center space-x-3 space-x-reverse border-l-4 border-medicalGreen">
+        <i class="fa-solid fa-circle-check text-medicalGreen text-xl"></i>
+        <span id="toast-message" class="text-sm font-medium">تم إرسال رسالتك بنجاح!</span>
+    </div>
+
+    <!-- JavaScript code for tabs and actions -->
+    <script>
+        function switchTab(tabId) {
+            // Hide all tab contents
+            const contents = document.querySelectorAll('.tab-content');
+            contents.forEach(content => content.classList.remove('active'));
+
+            // Show selected tab
+            const targetTab = document.getElementById(tabId);
+            if (targetTab) {
+                targetTab.classList.add('active');
+            }
+
+            // Update button styles on navigation
+            const buttons = document.querySelectorAll('.nav-btn');
+            buttons.forEach(btn => {
+                btn.classList.remove('bg-emerald-50', 'text-medicalGreen', 'font-bold');
+                btn.classList.add('text-gray-600', 'font-medium');
+            });
+
+            const activeBtn = document.getElementById('btn-' + tabId);
+            if (activeBtn) {
+                activeBtn.classList.remove('text-gray-600', 'font-medium');
+                activeBtn.classList.add('bg-emerald-50', 'text-medicalGreen', 'font-bold');
+            }
+
+            // Scroll to top smoothly
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        function toggleMobileMenu() {
+            const menu = document.getElementById('mobile-menu');
+            menu.classList.toggle('hidden');
+        }
+
+        function showToast(message) {
+            const toast = document.getElementById('toast-box');
+            const msgSpan = document.getElementById('toast-message');
+            msgSpan.textContent = message;
+            toast.classList.remove('translate-y-32', 'opacity-0');
+            setTimeout(() => {
+                toast.classList.add('translate-y-32', 'opacity-0');
+            }, 4000);
+        }
+
+        function handleContactSubmit(event) {
+            event.preventDefault();
+            event.target.reset();
+            showToast('تم إرسال رسالتك بنجاح، شكراً لتواصلك معنا.');
+        }
+    </script>
+</body>
+</html>
