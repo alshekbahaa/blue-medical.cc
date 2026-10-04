@@ -82,7 +82,7 @@
     <!-- Toast Container -->
     <div id="toast-container" class="fixed bottom-4 left-1/2 transform -translate-x-1/2 z-50 flex flex-col gap-2 w-full max-w-sm px-4 pointer-events-none"></div>
 
-    <main class="w-full max-w-6xl mx-auto flex-1">
+    <main class="w-full max-w-7xl mx-auto flex-1">
         
         <!-- ========================================== -->
         <!-- 0. واجهة تسجيل الدخول (الآدمن)             -->
@@ -131,9 +131,20 @@
                         <h2 class="text-xl font-bold text-gray-800">نظام التقارير الذكي</h2>
                     </div>
                 </div>
-                <button id="logout-btn" class="bg-red-50 hover:bg-red-100 text-red-600 px-5 py-2.5 rounded-xl font-bold transition-colors flex items-center gap-2">
-                    <i class="fa-solid fa-right-from-bracket"></i> تسجيل خروج
-                </button>
+                <div class="flex items-center gap-2 flex-wrap justify-center">
+                    <!-- Backup & Restore Buttons -->
+                    <button id="export-backup-btn" class="bg-blue-50 hover:bg-blue-100 text-blue-700 px-3.5 py-2.5 rounded-xl font-bold transition-colors text-sm flex items-center gap-2 border border-blue-200" title="تنزيل نسخة احتياطية (يمكن حفظها في Google Drive)">
+                        <i class="fa-solid fa-cloud-arrow-down"></i> حفظ نسخة احتياطية
+                    </button>
+                    <label for="import-backup-file" class="bg-indigo-50 hover:bg-indigo-100 text-indigo-700 px-3.5 py-2.5 rounded-xl font-bold transition-colors text-sm flex items-center gap-2 border border-indigo-200 cursor-pointer" title="استعادة السجلات من ملف احتياطي سابق">
+                        <i class="fa-solid fa-cloud-arrow-up"></i> استعادة النسخة
+                    </label>
+                    <input type="file" id="import-backup-file" accept=".json" class="hidden">
+
+                    <button id="logout-btn" class="bg-red-50 hover:bg-red-100 text-red-600 px-4 py-2.5 rounded-xl font-bold transition-colors flex items-center gap-2">
+                        <i class="fa-solid fa-right-from-bracket"></i> خروج
+                    </button>
+                </div>
             </div>
 
             <!-- Dashboard Stats -->
@@ -235,9 +246,9 @@
                         </h3>
                         <div class="flex gap-2 w-full sm:w-auto">
                             <button id="export-csv-btn" class="flex-1 sm:flex-none bg-green-50 hover:bg-green-100 text-green-700 px-4 py-2 rounded-lg font-bold transition-colors text-sm flex items-center justify-center gap-2 border border-green-200">
-                                <i class="fa-solid fa-file-excel"></i> تصدير إكسيل
+                                <i class="fa-solid fa-file-excel"></i> إكسيل
                             </button>
-                            <button id="refresh-db-btn" class="bg-emerald-50 hover:bg-emerald-100 text-emerald-700 px-3 py-2 rounded-lg transition-colors border border-emerald-200">
+                            <button id="refresh-db-btn" class="bg-emerald-50 hover:bg-emerald-100 text-emerald-700 px-3 py-2 rounded-lg transition-colors border border-emerald-200" title="تحديث القائمة">
                                 <i class="fa-solid fa-rotate"></i>
                             </button>
                         </div>
@@ -250,15 +261,17 @@
                         </div>
                     </div>
 
-                    <div class="flex-1 overflow-x-auto rounded-xl border border-gray-200 h-[400px] relative">
+                    <div class="flex-1 overflow-x-auto rounded-xl border border-gray-200 h-[420px] relative">
                         <table class="w-full text-sm text-right text-gray-600">
                             <thead class="text-xs text-gray-700 uppercase bg-gray-50 border-b sticky top-0 z-10 shadow-sm">
                                 <tr>
-                                    <th class="px-4 py-3 text-center w-24">الحالة</th>
-                                    <th class="px-4 py-3 w-44">التاريخ والوقت (ثوانٍ)</th>
-                                    <th class="px-4 py-3">اسم المريض</th>
-                                    <th class="px-4 py-3 w-28">رقم الهوية</th>
-                                    <th class="px-4 py-3 text-center w-40">الإجراءات</th>
+                                    <th class="px-3 py-3 text-center w-20">الحالة</th>
+                                    <th class="px-3 py-3 w-36">تاريخ الإنشاء (وقت)</th>
+                                    <th class="px-3 py-3 w-28 text-center">المدة المختارة</th>
+                                    <th class="px-3 py-3 w-32">تاريخ الانتهاء</th>
+                                    <th class="px-3 py-3">اسم المريض</th>
+                                    <th class="px-3 py-3 w-24">رقم الهوية</th>
+                                    <th class="px-3 py-3 text-center w-36">الإجراءات</th>
                                 </tr>
                             </thead>
                             <tbody id="records-tbody" class="divide-y divide-gray-100 bg-white">
@@ -282,13 +295,13 @@
             <!-- Valid Report View -->
             <div id="client-success-view" class="hidden bg-white rounded-2xl shadow-2xl shadow-emerald-900/10 border border-gray-100 overflow-hidden flex flex-col" dir="ltr">
                 
-                <!-- White Area for Logo (Prominent & Frameless) -->
-                <div class="bg-white p-8 pb-4 flex justify-center items-center">
-                    <img src="Blue.png" alt="Clinic Logo" class="h-24 max-w-[280px] object-contain bg-transparent drop-shadow-sm" onerror="this.onerror=null; this.src='https://placehold.co/220x90/ffffff/059669?text=Clinic+Logo'">
+                <!-- Logo Top Container -->
+                <div class="bg-white p-6 pb-2 text-center flex justify-center items-center">
+                    <img src="Blue.png" alt="Clinic Logo" class="h-16 object-contain" onerror="this.onerror=null; this.src='https://placehold.co/200x70/ffffff/059669?text=Clinic+Logo'">
                 </div>
 
-                <!-- Green Banner (Verification Status) -->
-                <div class="bg-gradient-to-r from-emerald-600 to-green-700 py-3.5 px-6 text-center text-white relative shadow-inner border-y border-emerald-800/20">
+                <!-- Green Verification Header -->
+                <div class="bg-gradient-to-r from-emerald-600 to-green-700 py-4 px-6 text-center text-white relative shadow-inner">
                     <h1 class="text-xl sm:text-2xl font-bold m-0 tracking-wide flex justify-center items-center gap-2">
                         <i class="fa-solid fa-circle-check"></i> QR Code Verified
                     </h1>
@@ -296,24 +309,19 @@
 
                 <!-- Data Section -->
                 <div class="p-6 sm:p-8">
-                    <!-- Date & Validity -->
-                    <div class="flex flex-col sm:flex-row justify-between items-center text-xs text-gray-500 mb-6 pb-4 border-b border-gray-100 gap-3">
-                        <div class="flex items-center gap-1.5 font-medium">
-                            <i class="fa-regular fa-calendar text-gray-400"></i> <span id="c-date"></span>
-                        </div>
-                        <div class="text-emerald-700 bg-emerald-50 px-3 py-1.5 rounded-md font-bold border border-emerald-100 flex items-center gap-1.5 shadow-sm">
-                            <i class="fa-solid fa-hourglass-half"></i> Valid till: <span id="c-expiry"></span>
-                        </div>
+                    <!-- Date -->
+                    <div class="flex items-center justify-center text-xs text-gray-500 mb-6 pb-4 border-b border-gray-100 font-medium gap-1.5">
+                        <i class="fa-regular fa-calendar text-gray-400"></i> Generated on: <span id="c-date"></span>
                     </div>
 
-                    <!-- Info Table (Equal font sizes) -->
+                    <!-- Info Table (Equal font sizes across all cells) -->
                     <table class="info-table mb-8">
                         <tbody>
-                            <tr><th>Clinic</th><td id="c-clinic" class="font-semibold text-gray-900"></td></tr>
-                            <tr><th>National ID</th><td id="c-id" class="font-semibold text-gray-900"></td></tr>
-                            <tr><th>Patient Name</th><td id="c-name" class="font-semibold text-gray-900"></td></tr>
-                            <tr><th>Age</th><td id="c-age" class="font-semibold text-gray-900"></td></tr>
-                            <tr><th>Gender</th><td id="c-gender" class="font-semibold text-gray-900"></td></tr>
+                            <tr><th>Clinic</th><td id="c-clinic" style="font-size: 15px; font-weight: 500;"></td></tr>
+                            <tr><th>National ID</th><td id="c-id" style="font-size: 15px; font-weight: 500;"></td></tr>
+                            <tr><th>Patient Name</th><td id="c-name" style="font-size: 15px; font-weight: 500;"></td></tr>
+                            <tr><th>Age</th><td id="c-age" style="font-size: 15px; font-weight: 500;"></td></tr>
+                            <tr><th>Gender</th><td id="c-gender" style="font-size: 15px; font-weight: 500;"></td></tr>
                         </tbody>
                     </table>
 
@@ -465,7 +473,6 @@
                 if (encodedData) {
                     loadClientReport(encodedData);
                 } else {
-                    // Handle legacy unencrypted URL parameters seamlessly
                     loadLegacyClientReport(urlParams);
                 }
             } else {
@@ -490,7 +497,6 @@
             document.getElementById('c-age').textContent = params.get('age') || '-';
             document.getElementById('c-gender').textContent = params.get('gender') || '-';
             document.getElementById('c-date').textContent = params.get('dateText') || new Date().toLocaleString('en-GB');
-            document.getElementById('c-expiry').textContent = 'Valid';
 
             const fileUrl = params.get('file');
             if(fileUrl) {
@@ -518,9 +524,7 @@
                     document.getElementById('c-gender').textContent = data.gender || '-';
                     
                     const createdDate = new Date(data.createdAt).toLocaleString('en-GB');
-                    const expiryDate = new Date(data.expiresAt).toLocaleDateString('en-GB');
                     document.getElementById('c-date').textContent = createdDate;
-                    document.getElementById('c-expiry').textContent = expiryDate;
 
                     if(data.fileUrl) {
                         const btn = document.getElementById('c-download-btn');
@@ -572,16 +576,25 @@
             const editId = DOM.editRecordId.value;
             const validityDays = parseInt(document.getElementById('input-validity').value);
             
+            const validityLabels = {
+                "365": "سنة كاملة",
+                "30": "30 يوماً",
+                "7": "7 أيام",
+                "90": "3 أشهر"
+            };
+            const validityText = validityLabels[validityDays] || `${validityDays} يوم`;
+            
             if (editId) {
-                // Update Existing Record (Keep original createdAt & QR payload/URL strictly intact)
                 const index = currentRecords.findIndex(r => r.id === editId);
                 if (index !== -1) {
+                    // Logic fix: preserve original createdAt and expiresAt and original encoded QR payload data when editing details
                     currentRecords[index].clinic = document.getElementById('input-clinic').value;
                     currentRecords[index].patientId = document.getElementById('input-id').value;
                     currentRecords[index].patientName = document.getElementById('input-name').value;
                     currentRecords[index].age = document.getElementById('input-age').value;
                     currentRecords[index].gender = document.getElementById('input-gender').value;
                     currentRecords[index].fileUrl = document.getElementById('input-file-url').value;
+                    currentRecords[index].validityText = validityText;
                 }
                 localStorage.setItem(STORAGE_KEY, JSON.stringify(currentRecords));
                 showToast('تم تحديث السجل بنجاح (الـ QR وتاريخ الإنشاء ثابتان لضمان الصلاحية)');
@@ -590,9 +603,9 @@
                 updateStats();
                 window.viewQR(editId);
             } else {
-                // Create New Record
                 const docId = crypto.randomUUID ? crypto.randomUUID() : 'id_' + Date.now(); 
                 const now = Date.now();
+                // Logic fix: correctly compute expiration timestamp by adding validity days in milliseconds
                 const expiresAt = now + (validityDays * 24 * 60 * 60 * 1000);
                 
                 const payload = {
@@ -603,6 +616,7 @@
                     age: document.getElementById('input-age').value,
                     gender: document.getElementById('input-gender').value,
                     fileUrl: document.getElementById('input-file-url').value,
+                    validityText: validityText,
                     createdAt: now,
                     expiresAt: expiresAt
                 };
@@ -656,24 +670,30 @@
             records.forEach(rec => {
                 const isExpired = now > rec.expiresAt;
                 const statusBadge = isExpired 
-                    ? `<span class="bg-red-50 text-red-600 border border-red-200 px-2 py-1 rounded text-[11px] font-bold shadow-sm inline-block w-full"><i class="fa-solid fa-clock"></i> منتهي</span>`
-                    : `<span class="bg-green-50 text-green-600 border border-green-200 px-2 py-1 rounded text-[11px] font-bold shadow-sm inline-block w-full"><i class="fa-solid fa-check"></i> نشط</span>`;
+                    ? `<span class="bg-red-50 text-red-600 border border-red-200 px-2 py-1 rounded text-[11px] font-bold shadow-sm inline-block w-full text-center"><i class="fa-solid fa-clock"></i> منتهي</span>`
+                    : `<span class="bg-green-50 text-green-600 border border-green-200 px-2 py-1 rounded text-[11px] font-bold shadow-sm inline-block w-full text-center"><i class="fa-solid fa-check"></i> نشط</span>`;
                 
-                // Format Date with Hours, Minutes, and Seconds
                 const dateObj = new Date(rec.createdAt);
                 const dateStr = dateObj.toLocaleDateString('en-GB');
                 const timeStr = dateObj.toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: false });
                 const fullDateTime = `${dateStr} ${timeStr}`;
+
+                const expiryObj = new Date(rec.expiresAt);
+                const expiryStr = `${expiryObj.toLocaleDateString('en-GB')} ${expiryObj.toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit', hour12: false })}`;
                 
+                const validityDisplay = rec.validityText || 'سنة كاملة';
+
                 const tr = document.createElement('tr');
                 tr.className = "hover:bg-emerald-50/50 transition-colors";
                 tr.innerHTML = `
-                    <td class="px-4 py-3 text-center">${statusBadge}</td>
-                    <td class="px-4 py-3 whitespace-nowrap text-xs font-mono text-gray-700" dir="ltr">${fullDateTime}</td>
-                    <td class="px-4 py-3 font-bold text-gray-900">${rec.patientName}</td>
-                    <td class="px-4 py-3 whitespace-nowrap font-mono text-gray-500" dir="ltr">${rec.patientId}</td>
-                    <td class="px-4 py-3 text-center space-x-1 space-x-reverse">
-                        <button onclick="window.editRecord('${rec.id}')" class="bg-white border border-yellow-200 text-yellow-600 shadow-sm px-2.5 py-1.5 rounded-lg hover:bg-yellow-50 transition-colors text-xs" title="تعديل السجل">
+                    <td class="px-3 py-3 text-center">${statusBadge}</td>
+                    <td class="px-3 py-3 whitespace-nowrap text-xs font-mono text-gray-700" dir="ltr">${fullDateTime}</td>
+                    <td class="px-3 py-3 text-center text-xs font-semibold text-gray-800">${validityDisplay}</td>
+                    <td class="px-3 py-3 whitespace-nowrap text-xs font-mono text-gray-600" dir="ltr">${expiryStr}</td>
+                    <td class="px-3 py-3 font-bold text-gray-900">${rec.patientName}</td>
+                    <td class="px-3 py-3 whitespace-nowrap font-mono text-gray-500 text-xs" dir="ltr">${rec.patientId}</td>
+                    <td class="px-3 py-3 text-center space-x-1 space-x-reverse">
+                        <button onclick="window.editRecord('${rec.id}')" class="bg-white border border-yellow-200 text-yellow-600 shadow-sm px-2 py-1.5 rounded-lg hover:bg-yellow-50 transition-colors text-xs" title="تعديل السجل">
                             <i class="fa-solid fa-pen-to-square"></i> تعديل
                         </button>
                         <button onclick="window.viewQR('${rec.id}')" class="bg-white border border-gray-200 text-gray-700 shadow-sm px-2 py-1.5 rounded-lg hover:bg-gray-50 hover:text-emerald-600 transition-colors text-xs" title="عرض الرمز">
@@ -682,7 +702,7 @@
                         <button onclick="window.copyLink('${rec.id}')" class="bg-white border border-gray-200 text-gray-700 shadow-sm px-2 py-1.5 rounded-lg hover:bg-gray-50 hover:text-purple-600 transition-colors text-xs" title="نسخ الرابط">
                             <i class="fa-solid fa-link"></i>
                         </button>
-                        <button onclick="window.requestDelete('${rec.id}')" class="bg-white border border-red-100 text-red-500 shadow-sm px-2 py-1.5 rounded-lg hover:bg-red-50 hover:text-red-700 transition-colors text-xs" title="حذف السجل">
+                        <button onclick="window.requestDelete('${rec.id}')" class="bg-white border border-red-100 text-red-500 shadow-sm px-2.5 py-1.5 rounded-lg hover:bg-red-50 hover:text-red-700 transition-colors text-xs" title="حذف السجل">
                             <i class="fa-solid fa-trash-can"></i>
                         </button>
                     </td>
@@ -736,7 +756,6 @@
             const record = currentRecords.find(r => r.id === id);
             
             DOM.modalQRContainer.innerHTML = '';
-            // Properly initialize QRCode with absolute dimensions for crystal clear scannability
             try {
                 new QRCode(DOM.modalQRContainer, { 
                     text: qrUrl, 
@@ -818,21 +837,88 @@
             showToast('تم تحديث الجدول', 'info');
         });
 
+        // ========================================== -->
+        // ميزة النسخ الاحتياطي (Backup & Restore)      -->
+        // ========================================== -->
+        document.getElementById('export-backup-btn').addEventListener('click', () => {
+            if(currentRecords.length === 0) return showToast('لا توجد سجلات لتصديرها كنسخة احتياطية', 'error');
+            
+            const backupData = {
+                version: "2.0",
+                exportDate: new Date().toISOString(),
+                records: currentRecords
+            };
+            
+            const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(backupData, null, 2));
+            const downloadAnchor = document.createElement('a');
+            downloadAnchor.setAttribute("href", dataStr);
+            downloadAnchor.setAttribute("download", `Medical_Backup_${new Date().toISOString().split('T')[0]}.json`);
+            document.body.appendChild(downloadAnchor);
+            downloadAnchor.click();
+            downloadAnchor.remove();
+            
+            showToast('تم تنزيل النسخة الاحتياطية بنجاح (يمكنك حفظها في Google Drive)', 'success');
+        });
+
+        document.getElementById('import-backup-file').addEventListener('change', (event) => {
+            const file = event.target.files[0];
+            if (!file) return;
+
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                try {
+                    const parsed = JSON.parse(e.target.result);
+                    let importedRecords = [];
+
+                    if (Array.isArray(parsed)) {
+                        importedRecords = parsed;
+                    } else if (parsed && Array.isArray(parsed.records)) {
+                        importedRecords = parsed.records;
+                    } else {
+                        throw new Error("ملف غير صالح");
+                    }
+
+                    if(confirm(`هل تريد دمج واستعادة ${importedRecords.length} سجل في قاعدة البيانات؟`)) {
+                        const existingIds = new Set(currentRecords.map(r => r.id));
+                        let addedCount = 0;
+
+                        importedRecords.forEach(rec => {
+                            if (rec && rec.id && !existingIds.has(rec.id)) {
+                                currentRecords.push(rec);
+                                addedCount++;
+                            }
+                        });
+
+                        localStorage.setItem(STORAGE_KEY, JSON.stringify(currentRecords));
+                        renderTable(currentRecords);
+                        updateStats();
+                        showToast(`تمت استعادة ${addedCount} سجل بنجاح!`, 'success');
+                    }
+                } catch(err) {
+                    showToast('فشل قراءة الملف! تأكد أنه ملف نسخة احتياطية صالح بصيغة JSON.', 'error');
+                }
+                event.target.value = '';
+            };
+            reader.readAsText(file);
+        });
+
         document.getElementById('export-csv-btn').addEventListener('click', () => {
             if(currentRecords.length === 0) return showToast('لا توجد بيانات للتصدير', 'error');
             
             let csv = '\uFEFF'; 
-            csv += 'DateTime,Status,National ID,Patient Name,Age,Gender,Clinic,Report URL\n';
+            csv += 'DateTime,Validity,ExpiryDate,Status,National ID,Patient Name,Age,Gender,Clinic,Report URL\n';
             
             const now = Date.now();
             currentRecords.forEach(r => {
                 const status = now > r.expiresAt ? 'Expired' : 'Active';
                 const dt = new Date(r.createdAt).toLocaleString('en-GB');
+                const exp = new Date(r.expiresAt).toLocaleString('en-GB');
+                const validity = r.validityText || 'سنة كاملة';
                 const name = `"${(r.patientName||'').replace(/"/g, '""')}"`;
                 const clinic = `"${(r.clinic||'').replace(/"/g, '""')}"`;
                 const link = `"${window.getRecordUrl(r.id)}"`;
                 
-                csv += `"${dt}",${status},${r.patientId},${name},${r.age},${r.gender},${clinic},${link}\n`;
+                csv += `"${dt}","${validity}","${exp}",${status},${r.patientId},${name},${r.age},${r.gender},${clinic},${link}\n`;
             });
 
             const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
