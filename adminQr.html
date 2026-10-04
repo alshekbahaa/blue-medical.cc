@@ -27,11 +27,11 @@
         .admin-ui { font-family: 'Tajawal', sans-serif; }
         .english-ui { font-family: 'Inter', sans-serif; }
         
-        /* Table Styles for Patient View - Equal font sizes */
-        .info-table { width: 100%; border-collapse: collapse; font-size: 15px; }
+        /* Table Styles for Patient View - Equal font sizes and no wrap for names */
+        .info-table { width: 100%; border-collapse: collapse; font-size: 15px; table-layout: auto; }
         .info-table tr { border-bottom: 1px solid #e5e7eb; }
-        .info-table th { background-color: #f9fafb; color: #374151; font-weight: 600; padding: 14px 16px; text-align: left; width: 35%; font-size: 15px; }
-        .info-table td { color: #111827; padding: 14px 16px; text-align: left; font-weight: 500; font-size: 15px; }
+        .info-table th { background-color: #f9fafb; color: #374151; font-weight: 600; padding: 14px 16px; text-align: left; width: 30%; font-size: 15px; white-space: nowrap; }
+        .info-table td { color: #111827; padding: 14px 16px; text-align: left; font-weight: 500; font-size: 15px; white-space: nowrap; }
 
         /* Custom Scrollbar */
         ::-webkit-scrollbar { width: 8px; height: 8px; }
@@ -79,7 +79,6 @@
 </head>
 <body class="min-h-screen text-gray-800 flex flex-col items-center p-4 sm:p-6 relative justify-between">
 
-    <!-- Toast Container -->
     <div id="toast-container" class="fixed bottom-4 left-1/2 transform -translate-x-1/2 z-50 flex flex-col gap-2 w-full max-w-sm px-4 pointer-events-none"></div>
 
     <main class="w-full max-w-7xl mx-auto flex-1">
@@ -238,7 +237,6 @@
                     </form>
                 </div>
 
-                <!-- Records Table -->
                 <div class="lg:col-span-2 bg-white rounded-2xl shadow-sm border border-gray-100 p-6 relative overflow-hidden flex flex-col">
                     <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-5 gap-4">
                         <h3 class="text-lg font-bold text-gray-800 flex items-center gap-2">
@@ -266,7 +264,7 @@
                             <thead class="text-xs text-gray-700 uppercase bg-gray-50 border-b sticky top-0 z-10 shadow-sm">
                                 <tr>
                                     <th class="px-3 py-3 text-center w-20">الحالة</th>
-                                    <th class="px-3 py-3 w-36">تاريخ الإنشاء (وقت)</th>
+                                    <th class="px-3 py-3 w-36">تاريخ الإنشاء (وقت وثواني)</th>
                                     <th class="px-3 py-3 w-28 text-center">المدة المختارة</th>
                                     <th class="px-3 py-3 w-32">تاريخ الانتهاء</th>
                                     <th class="px-3 py-3">اسم المريض</th>
@@ -290,14 +288,14 @@
         <!-- ========================================== -->
         <!-- 2. واجهة العميل (المريض) - إنجليزي         -->
         <!-- ========================================== -->
-        <section id="client-section" class="english-ui hidden w-full max-w-lg mx-auto mt-6">
+        <section id="client-section" class="english-ui hidden w-full max-w-2xl mx-auto mt-6">
             
             <!-- Valid Report View -->
             <div id="client-success-view" class="hidden bg-white rounded-2xl shadow-2xl shadow-emerald-900/10 border border-gray-100 overflow-hidden flex flex-col" dir="ltr">
                 
-                <!-- Logo Top Container -->
+                <!-- White Logo Container -->
                 <div class="bg-white p-6 pb-2 text-center flex justify-center items-center">
-                    <img src="Blue.png" alt="Clinic Logo" class="h-16 object-contain" onerror="this.onerror=null; this.src='https://placehold.co/200x70/ffffff/059669?text=Clinic+Logo'">
+                    <img src="Blue.png" alt="Clinic Logo" class="h-20 object-contain" onerror="this.onerror=null; this.src='https://placehold.co/240x80/ffffff/059669?text=Clinic+Logo'">
                 </div>
 
                 <!-- Green Verification Header -->
@@ -314,14 +312,14 @@
                         <i class="fa-regular fa-calendar text-gray-400"></i> Generated on: <span id="c-date"></span>
                     </div>
 
-                    <!-- Info Table (Equal font sizes across all cells) -->
+                    <!-- Info Table (Expanded table layout with equal font sizes and no-wrap names) -->
                     <table class="info-table mb-8">
                         <tbody>
-                            <tr><th>Clinic</th><td id="c-clinic" style="font-size: 15px; font-weight: 500;"></td></tr>
-                            <tr><th>National ID</th><td id="c-id" style="font-size: 15px; font-weight: 500;"></td></tr>
-                            <tr><th>Patient Name</th><td id="c-name" style="font-size: 15px; font-weight: 500;"></td></tr>
-                            <tr><th>Age</th><td id="c-age" style="font-size: 15px; font-weight: 500;"></td></tr>
-                            <tr><th>Gender</th><td id="c-gender" style="font-size: 15px; font-weight: 500;"></td></tr>
+                            <tr><th>Clinic</th><td id="c-clinic"></td></tr>
+                            <tr><th>National ID</th><td id="c-id"></td></tr>
+                            <tr><th>Patient Name</th><td id="c-name"></td></tr>
+                            <tr><th>Age</th><td id="c-age"></td></tr>
+                            <tr><th>Gender</th><td id="c-gender"></td></tr>
                         </tbody>
                     </table>
 
@@ -406,7 +404,7 @@
     <script>
         const ADMIN_USER = "admin";
         const ADMIN_PASS = "admin123"; 
-        const STORAGE_KEY = "medical_records_local_v2"; 
+        const STORAGE_KEY = "medical_records_local_v3"; 
         
         const DOM = {
             toast: document.getElementById('toast-container'),
@@ -587,14 +585,13 @@
             if (editId) {
                 const index = currentRecords.findIndex(r => r.id === editId);
                 if (index !== -1) {
-                    // Logic fix: preserve original createdAt and expiresAt and original encoded QR payload data when editing details
+                    // When editing, preserve original createdAt, expiresAt, validity and QR code payload to keep QR intact
                     currentRecords[index].clinic = document.getElementById('input-clinic').value;
                     currentRecords[index].patientId = document.getElementById('input-id').value;
                     currentRecords[index].patientName = document.getElementById('input-name').value;
                     currentRecords[index].age = document.getElementById('input-age').value;
                     currentRecords[index].gender = document.getElementById('input-gender').value;
                     currentRecords[index].fileUrl = document.getElementById('input-file-url').value;
-                    currentRecords[index].validityText = validityText;
                 }
                 localStorage.setItem(STORAGE_KEY, JSON.stringify(currentRecords));
                 showToast('تم تحديث السجل بنجاح (الـ QR وتاريخ الإنشاء ثابتان لضمان الصلاحية)');
@@ -605,7 +602,7 @@
             } else {
                 const docId = crypto.randomUUID ? crypto.randomUUID() : 'id_' + Date.now(); 
                 const now = Date.now();
-                // Logic fix: correctly compute expiration timestamp by adding validity days in milliseconds
+                // Correctly compute expiration timestamp by adding validity days in milliseconds (365 days = 365 * 24 * 3600 * 1000)
                 const expiresAt = now + (validityDays * 24 * 60 * 60 * 1000);
                 
                 const payload = {
@@ -844,7 +841,7 @@
             if(currentRecords.length === 0) return showToast('لا توجد سجلات لتصديرها كنسخة احتياطية', 'error');
             
             const backupData = {
-                version: "2.0",
+                version: "3.0",
                 exportDate: new Date().toISOString(),
                 records: currentRecords
             };
