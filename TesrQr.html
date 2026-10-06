@@ -58,6 +58,10 @@
                 </div>
                 <h2 class="text-2xl font-bold text-gray-800">بوابة الخادم الطبية</h2>
                 <p class="text-sm text-gray-500 mt-2">تسجيل الدخول المشفر لقاعدة البيانات</p>
+                <!-- للمعاينة، يمكنك تسجيل الدخول باستخدام admin و admin123 -->
+                <div class="mt-4 p-3 bg-blue-50 text-blue-700 rounded-lg text-xs font-bold border border-blue-200">
+                    للمعاينة استخدم:<br>اسم المستخدم: admin<br>كلمة المرور: admin123
+                </div>
             </div>
             
             <form id="login-form" class="space-y-5">
@@ -95,12 +99,29 @@
                     </div>
                     <div>
                         <h2 class="text-xl font-bold text-gray-800">نظام الأتمتة الطبية</h2>
-                        <p class="text-xs text-gray-500">Automated PDF Processing & G-Drive Sync</p>
+                        <p class="text-xs text-gray-500">Automated PDF Processing & Secure DB</p>
                     </div>
                 </div>
                 <div class="flex items-center gap-2 flex-wrap justify-center">
-                    <button id="logout-btn" class="bg-red-50 hover:bg-red-100 text-red-600 px-4 py-2.5 rounded-xl font-bold transition-colors flex items-center gap-2">
-                        <i class="fa-solid fa-right-from-bracket"></i> تسجيل الخروج
+                    
+                    <!-- أزرار النسخ الاحتياطي والتصدير الجديدة -->
+                    <button id="btn-export-csv" class="bg-blue-50 hover:bg-blue-100 text-blue-700 px-3 py-2 rounded-xl font-bold transition-colors text-xs flex items-center gap-1.5 border border-blue-200">
+                        <i class="fa-solid fa-file-csv"></i> تصدير إكسيل
+                    </button>
+                    
+                    <button id="btn-backup" class="bg-indigo-50 hover:bg-indigo-100 text-indigo-700 px-3 py-2 rounded-xl font-bold transition-colors text-xs flex items-center gap-1.5 border border-indigo-200">
+                        <i class="fa-solid fa-download"></i> أخذ نسخة
+                    </button>
+                    
+                    <label class="bg-amber-50 hover:bg-amber-100 text-amber-700 px-3 py-2 rounded-xl font-bold transition-colors text-xs flex items-center gap-1.5 border border-amber-200 cursor-pointer mb-0">
+                        <i class="fa-solid fa-upload"></i> رفع نسخة
+                        <input type="file" id="input-restore" accept=".json" class="hidden">
+                    </label>
+
+                    <div class="w-px h-8 bg-gray-200 mx-1 hidden md:block"></div>
+
+                    <button id="logout-btn" class="bg-red-50 hover:bg-red-100 text-red-600 px-4 py-2.5 rounded-xl font-bold transition-colors flex items-center gap-2 text-sm">
+                        <i class="fa-solid fa-right-from-bracket"></i> خروج
                     </button>
                 </div>
             </div>
@@ -395,6 +416,30 @@
 
                     if (method === 'GET' && url === '/api/reports') {
                         return { status: 200, data: db.reports.sort((a,b) => b.createdAt - a.createdAt) };
+                    }
+
+                    // Backup endpoint
+                    if (method === 'GET' && url === '/api/system/backup') {
+                        return { status: 200, data: { reports: db.reports, verifications: db.verifications, exportDate: new Date().toISOString() } };
+                    }
+                    
+                    // Restore endpoint
+                    if (method === 'POST' && url === '/api/system/restore') {
+                        let addedReports = 0;
+                        if (body.reports && Array.isArray(body.reports)) {
+                            const existingIds = new Set(db.reports.map(r => r.id));
+                            body.reports.forEach(r => {
+                                if (!existingIds.has(r.id)) { db.reports.push(r); addedReports++; }
+                            });
+                        }
+                        if (body.verifications && Array.isArray(body.verifications)) {
+                            const existingVIds = new Set(db.verifications.map(v => v.id));
+                            body.verifications.forEach(v => {
+                                if (!existingVIds.has(v.id)) { db.verifications.push(v); }
+                            });
+                        }
+                        saveDB();
+                        return { status: 200, message: `تمت استعادة البيانات. أضيف ${addedReports} تقرير جديد لقاعدة البيانات.` };
                     }
 
                     // THE AUTOMATION ENDPOINT
@@ -707,6 +752,71 @@
             DOM.successModal.classList.remove('hidden');
         }
 
+        // --- Backup, Restore & CSV Actions ---
+        
+        // Backup (JSON)
+        document.getElementById('btn-backup').addEventListener('click', async () => {
+            try {
+                const data = await apiFetch('/api/system/backup');
+                const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+                const a = document.createElement('a');
+                a.href = URL.createObjectURL(blob);
+                a.download = `Medical_DB_Backup_${new Date().toISOString().split('T')[0]}.json`;
+                a.click();
+                showToast('تم تحميل النسخة الاحتياطية بنجاح', 'success');
+            } catch(e) {
+                showToast('فشل تحميل النسخة الاحتياطية', 'error');
+            }
+        });
+
+        // Restore (JSON)
+        document.getElementById('input-restore').addEventListener('change', (e) => {
+            const file = e.target.files[0];
+            if (!file) return;
+            const reader = new FileReader();
+            reader.onload = async (event) => {
+                try {
+                    const json = JSON.parse(event.target.result);
+                    const response = await apiFetch('/api/system/restore', { method: 'POST', body: JSON.stringify(json) });
+                    showToast(response.message || 'تمت استعادة البيانات بنجاح', 'success');
+                    fetchDashboardData(); // Refresh UI
+                } catch(err) {
+                    showToast('ملف النسخة الاحتياطية غير صالح', 'error');
+                }
+                e.target.value = ''; // Reset input
+            };
+            reader.readAsText(file);
+        });
+
+        // Export to CSV
+        document.getElementById('btn-export-csv').addEventListener('click', async () => {
+            try {
+                const reports = await apiFetch('/api/reports');
+                if(reports.length === 0) return showToast('لا توجد بيانات للتصدير', 'error');
+                
+                // Add BOM for UTF-8 Arabic support in Excel
+                let csv = '\uFEFFرقم التقرير,العيادة,اسم المريض,العمر,الجنس,تاريخ الإصدار,تاريخ الانتهاء,حالة التقرير,رابط التحقق\n';
+                
+                reports.forEach(r => {
+                    const status = Date.now() > r.expiresAt ? 'منتهي' : 'نشط';
+                    const issueDate = new Date(r.createdAt).toLocaleDateString('ar-SA');
+                    const expDate = new Date(r.expiresAt).toLocaleDateString('ar-SA');
+                    const verifyLink = `${window.location.origin}${window.location.pathname}?token=${r.verificationToken}`;
+                    
+                    csv += `"${r.reportNumber}","${r.clinic}","${r.patientName}","${r.age}","${r.gender}","${issueDate}","${expDate}","${status}","${verifyLink}"\n`;
+                });
+
+                const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+                const a = document.createElement('a');
+                a.href = URL.createObjectURL(blob);
+                a.download = `Reports_Export_${new Date().toISOString().split('T')[0]}.csv`;
+                a.click();
+                showToast('تم تصدير الإكسيل بنجاح', 'success');
+            } catch(e) {
+                showToast('فشل التصدير', 'error');
+            }
+        });
+
         // --- Dashboard Data Fetching ---
         async function loadAdminDashboard() {
             DOM.adminSec.classList.remove('hidden');
@@ -784,4 +894,3 @@
     </script>
 </body>
 </html>
-```eof
