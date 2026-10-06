@@ -1,0 +1,435 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Batch Invoices Generator</title>
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@500;700;800&display=swap" rel="stylesheet">
+    
+    <!-- QR Code Library -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+
+    <style>
+        body {
+            background-color: #f3f4f6; 
+            font-family: 'Tajawal', sans-serif;
+            -webkit-print-color-adjust: exact;
+            print-color-adjust: exact;
+        }
+
+        /* تنسيق الجدول ليكون مطابقاً للصورة */
+        .invoice-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 14px;
+            text-align: center;
+            border: 2px solid #111827; 
+        }
+        .invoice-table th {
+            border: 1px solid #111827;
+            background-color: #e5e7eb;
+            color: #111827;
+            padding: 12px 8px;
+            font-weight: 800;
+        }
+        .invoice-table td {
+            border: 1px solid #111827;
+            padding: 16px 8px;
+            color: #111827;
+            font-weight: 700;
+        }
+
+        /* إعدادات الطباعة الدقيقة لورق A4 */
+        @media print {
+            @page {
+                size: A4;
+                margin: 0; 
+            }
+            .no-print { display: none !important; }
+            body, html { 
+                background-color: white !important; 
+                margin: 0; 
+                padding: 0;
+            }
+            
+            #invoices-container {
+                margin: 0;
+                padding: 0;
+                width: 100%;
+            }
+
+            .invoice-page { 
+                box-shadow: none !important; 
+                border: none !important; 
+                margin: 0; 
+                padding: 1.5cm 1.5cm !important; 
+                width: 210mm; 
+                height: 297mm; 
+                page-break-after: always;
+                page-break-inside: avoid;
+                box-sizing: border-box;
+                display: flex;
+                flex-direction: column;
+                background-color: white !important;
+            }
+        }
+
+        /* تنسيق الشاشة العادية */
+        .invoice-page {
+            width: 210mm;
+            height: 297mm;
+            background: white;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+            margin: 20px auto;
+            padding: 1.5cm 1.5cm;
+            display: flex;
+            flex-direction: column;
+            box-sizing: border-box;
+            border: 1px solid #e5e7eb;
+        }
+    </style>
+</head>
+<body class="min-h-screen text-gray-800 pb-12">
+
+    <!-- لوحة التحكم (مخفية أثناء الطباعة) -->
+    <div class="no-print bg-white p-8 shadow-lg rounded-2xl max-w-2xl mx-auto border border-gray-200 mt-8 mb-12">
+        <div class="text-center mb-6">
+            <h2 class="text-2xl font-bold text-gray-800 mb-2">مولد الفواتير المجمع 📄</h2>
+            <p class="text-sm text-gray-500">ارفع ملف البيانات لتوليد فواتير A4 مطابقة للأصل لكل مريض</p>
+        </div>
+
+        <div class="bg-blue-50 border border-blue-100 p-4 rounded-lg mb-6 text-sm text-blue-800">
+            <p><strong>تنبيهات هامة قبل الطباعة:</strong></p>
+            <ul class="list-disc list-inside mt-1 space-y-1 font-semibold">
+                <li>تأكد من وجود صورة <code>صورة1.png</code> (الترويسة العلوية الجديدة).</li>
+                <li>تأكد من وجود صورة <code>صورة2.png</code> (التذييل السفلي).</li>
+            </ul>
+        </div>
+
+        <div class="space-y-5">
+            <!-- إعدادات اللغة والمبلغ -->
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div class="bg-gray-50 p-4 rounded-lg border border-gray-200">
+                    <label class="block text-sm font-bold text-gray-700 mb-1">لغة التقرير:</label>
+                    <select id="invoice-lang" class="w-full px-4 py-2 border border-gray-300 rounded focus:ring-2 focus:ring-blue-500 outline-none font-bold">
+                        <option value="ar">اللغة العربية</option>
+                        <option value="en">English</option>
+                    </select>
+                </div>
+
+                <div class="bg-gray-50 p-4 rounded-lg border border-gray-200">
+                    <label class="block text-sm font-bold text-gray-700 mb-1">المبلغ الأساسي:</label>
+                    <div class="flex items-center gap-2">
+                        <input type="number" id="base-amount" value="78.26" step="0.01" class="w-full px-4 py-2 border border-gray-300 rounded focus:ring-2 focus:ring-blue-500 outline-none font-bold" dir="ltr">
+                        <span class="text-sm font-bold text-gray-500">SAR</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- رفع الملف -->
+            <div>
+                <label class="block text-sm font-bold text-gray-700 mb-2">اختر ملف البيانات (JSON أو CSV):</label>
+                <input type="file" id="file-upload" accept=".json,.csv" class="block w-full text-sm text-gray-500 file:mr-4 file:py-3 file:px-6 file:rounded-lg file:border-0 file:text-sm file:font-bold file:bg-gray-100 file:text-gray-700 hover:file:bg-gray-200 cursor-pointer border border-gray-300 rounded-lg">
+            </div>
+            
+            <button id="process-btn" class="w-full bg-gray-800 hover:bg-gray-900 text-white font-bold py-3.5 px-4 rounded-lg transition-colors text-lg shadow-md flex justify-center items-center gap-2">
+                ⚙️ توليد جميع الفواتير
+            </button>
+
+            <!-- ملخص الاستيراد -->
+            <div id="import-summary" class="hidden bg-emerald-50 border border-emerald-200 text-emerald-800 p-4 rounded-lg text-center shadow-sm mt-4">
+                <div class="text-3xl mb-2">✅</div>
+                <div class="font-bold text-lg">تم استخراج <span id="patients-count" class="text-2xl text-emerald-600 mx-1">0</span> مريض بنجاح!</div>
+                <p class="text-sm text-emerald-700 mt-1">تم رسم جميع الفواتير والـ QR، يمكنك طباعتها الآن.</p>
+            </div>
+
+            <button id="print-btn" onclick="window.print()" class="hidden w-full bg-green-600 hover:bg-green-700 text-white font-bold py-3.5 px-4 rounded-lg transition-colors text-lg shadow-md flex justify-center items-center gap-2 mt-4">
+                🖨️ طباعة كملف PDF (فصل تلقائي للصفحات)
+            </button>
+        </div>
+    </div>
+
+    <!-- مساحة عرض الفواتير -->
+    <main id="invoices-container" class="w-full flex flex-col items-center"></main>
+
+    <script>
+        // قاموس الترجمة للغتين
+        const translations = {
+            ar: {
+                invLabel: 'فاتورة:',
+                dateLabel: 'التاريخ:',
+                examTitle: 'اصدار فحص طبي إقامة CCC',
+                colName: 'الاسم',
+                colPrice: 'السعر',
+                colVat: 'Vat',
+                colQty: 'العدد',
+                colAmount: 'المبلغ',
+                colTax: 'مبلغ الضريبة',
+                colTotal: 'السعر شامل الضريبة',
+                finance: 'المالية',
+                qrTotal: 'الإجمالي:'
+            },
+            en: {
+                invLabel: 'Invoice:',
+                dateLabel: 'Date:',
+                examTitle: 'Issuance of CCC Iqama Medical Exam',
+                colName: 'Patient Name & ID',
+                colPrice: 'Price',
+                colVat: 'Vat',
+                colQty: 'Qty',
+                colAmount: 'Amount',
+                colTax: 'Tax Amt',
+                colTotal: 'Total w/ Tax',
+                finance: 'Finance',
+                qrTotal: 'Total:'
+            }
+        };
+
+        document.addEventListener('DOMContentLoaded', () => {
+            
+            function showMessage(msg, isError = false) {
+                const toast = document.createElement('div');
+                toast.className = `fixed top-5 left-1/2 transform -translate-x-1/2 px-6 py-3 rounded-lg shadow-xl font-bold z-50 text-white transition-opacity duration-300 ${isError ? 'bg-red-500' : 'bg-gray-800'}`;
+                toast.innerText = msg;
+                document.body.appendChild(toast);
+                setTimeout(() => {
+                    toast.style.opacity = '0';
+                    setTimeout(() => toast.remove(), 300);
+                }, 4000);
+            }
+
+            // دالة تنسيق التاريخ من ملف الـ JSON
+            function formatDateFromTimestamp(timestamp) {
+                if (!timestamp) return '-';
+                const d = new Date(timestamp);
+                const day = String(d.getDate()).padStart(2, '0');
+                const month = String(d.getMonth() + 1).padStart(2, '0');
+                const year = d.getFullYear();
+                return `${day}/${month}/${year}`;
+            }
+
+            document.getElementById('process-btn').addEventListener('click', () => {
+                const fileInput = document.getElementById('file-upload');
+                
+                if (!fileInput.files[0]) {
+                    return showMessage('الرجاء اختيار ملف البيانات أولاً!', true);
+                }
+
+                // حساب الضريبة والإجمالي بناءً على المدخل
+                const baseAmount = parseFloat(document.getElementById('base-amount').value) || 0;
+                const taxAmount = baseAmount * 0.15;
+                const totalAmount = baseAmount + taxAmount;
+                const selectedLang = document.getElementById('invoice-lang').value;
+
+                const file = fileInput.files[0];
+                const reader = new FileReader();
+
+                reader.onload = function(e) {
+                    const content = e.target.result;
+                    let patients = [];
+
+                    try {
+                        const data = JSON.parse(content);
+                        
+                        // البحث بذكاء عن المصفوفة التي تحتوي البيانات (مثل مصفوفة records في ملفك)
+                        let dataArray = [];
+                        if (Array.isArray(data)) { dataArray = data; } 
+                        else if (data.records && Array.isArray(data.records)) { dataArray = data.records; }
+                        else {
+                            Object.keys(data).forEach(key => {
+                                if (Array.isArray(data[key])) dataArray = data[key];
+                            });
+                        }
+
+                        dataArray.forEach(record => {
+                            // التقاط الاسم ورقم الإقامة مهما كان اسم المفتاح
+                            const name = record.patientName || record.name || record.patient_name || record['الاسم'];
+                            const id = record.patientId || record.id || record.patient_id || record['رقم الاقامة'];
+                            const dateRaw = record.createdAt || record.created_at || record.date;
+                            const age = record.age || '';
+                            const gender = record.gender || '';
+                            
+                            // إضافة المريض فقط إذا كان يمتلك اسماً ورقم إقامة
+                            if (name && id) {
+                                patients.push({ 
+                                    name: name, 
+                                    id: id, 
+                                    date: formatDateFromTimestamp(dateRaw),
+                                    age: age,
+                                    gender: gender
+                                });
+                            }
+                        });
+
+                        if (patients.length === 0) {
+                            return showMessage('الملف فارغ أو لا يحتوي على بيانات صحيحة!', true);
+                        }
+                        
+                        renderInvoices(patients, baseAmount, taxAmount, totalAmount, selectedLang);
+                        
+                        // عرض الإحصائيات
+                        document.getElementById('patients-count').textContent = patients.length;
+                        document.getElementById('import-summary').classList.remove('hidden');
+                        document.getElementById('print-btn').classList.remove('hidden');
+                        
+                        showMessage(`تم استخراج ${patients.length} سجل بنجاح!`);
+
+                    } catch (err) {
+                        console.error(err);
+                        showMessage('حدث خطأ أثناء قراءة الملف. تأكد من صحة البيانات.', true);
+                    }
+                };
+                reader.readAsText(file);
+            });
+
+            function renderInvoices(patients, baseAmount, taxAmount, totalAmount, lang) {
+                const container = document.getElementById('invoices-container');
+                let allInvoicesHTML = '';
+                let qrTasks = []; 
+                const t = translations[lang];
+
+                const formatNum = (num) => Number.isInteger(num) ? num.toString() : num.toFixed(2);
+                
+                // تحديد رابط صفحة التحقق (index.html) الموجودة في نفس المجلد
+                const baseUrl = window.location.href.split('?')[0].replace(/[^/]*$/, 'index.html');
+
+                patients.forEach((patient, index) => {
+                    const invNo = `2026-10${Math.floor(1000 + Math.random() * 9000)}`;
+                    const qrId = `qr-code-${index}`;
+                    
+                    // بناء الرابط لصفحة التحقق ليوضع داخل الـ QR
+                    const params = new URLSearchParams();
+                    params.set('verified', 'true');
+                    params.set('clinic', 'Blue Medical field complex');
+                    params.set('name', patient.name);
+                    params.set('id', patient.id);
+                    params.set('dateText', patient.date);
+                    if(patient.age) params.set('age', patient.age);
+                    if(patient.gender) params.set('gender', patient.gender);
+                    
+                    const qrText = `${baseUrl}?${params.toString()}`;
+                    qrTasks.push({ id: qrId, text: qrText });
+
+                    allInvoicesHTML += `
+                        <div class="invoice-page">
+                            
+                            <!-- الترويسة العلوية (صورة1.png) بعرض كامل -->
+                            <div class="w-full mb-6">
+                                <img src="صورة1.png" alt="Header Banner" class="w-full object-contain" onerror="this.style.display='none'">
+                            </div>
+
+                            <!-- بيانات الفاتورة والباركود (معكوسة لتكون البيانات يسار والـ QR يمين) -->
+                            <div class="flex justify-between items-start w-full" dir="ltr">
+                                
+                                <!-- يسار: بيانات الفاتورة -->
+                                <div class="text-left font-bold text-gray-900 space-y-2 text-[15px] flex-1">
+                                    <div class="underline underline-offset-4 font-bold text-black">${t.invLabel} ${invNo}</div>
+                                    <div class="underline underline-offset-4 font-bold text-black">${t.dateLabel} ${patient.date}</div>
+                                    <div class="underline underline-offset-4 font-bold text-black">VARNO:301033762700003</div>
+                                </div>
+                                
+                                <!-- يمين: الباركود -->
+                                <div class="flex-none">
+                                    <div id="${qrId}" class="p-1 border border-gray-300 bg-white"></div>
+                                </div>
+                            </div>
+
+                            <!-- عنوان الفحص -->
+                            <div class="text-center font-bold text-black text-[22px] mt-10 mb-4">
+                                ${t.examTitle}
+                            </div>
+
+                            <!-- جدول التفاصيل -->
+                            <div class="w-full">
+                                <table class="invoice-table" dir="${lang === 'ar' ? 'rtl' : 'ltr'}">
+                                    <thead>
+                                        <tr>
+                                            ${lang === 'ar' ? `
+                                                <th class="w-1/3">${t.colName}</th>
+                                                <th>${t.colPrice}</th>
+                                                <th>${t.colVat}</th>
+                                                <th>${t.colQty}</th>
+                                                <th>${t.colAmount}</th>
+                                                <th>${t.colTax}</th>
+                                                <th>${t.colTotal}</th>
+                                            ` : `
+                                                <th>${t.colTotal}</th>
+                                                <th>${t.colTax}</th>
+                                                <th>${t.colAmount}</th>
+                                                <th>${t.colQty}</th>
+                                                <th>${t.colVat}</th>
+                                                <th>${t.colPrice}</th>
+                                                <th class="w-1/3">${t.colName}</th>
+                                            `}
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr>
+                                            ${lang === 'ar' ? `
+                                                <td class="py-6 leading-relaxed">
+                                                    <div class="font-extrabold text-[16px]">${patient.name}</div>
+                                                    <div class="font-bold text-[15px] mt-2">${patient.id}</div>
+                                                </td>
+                                                <td>${formatNum(baseAmount)}</td>
+                                                <td>15%</td>
+                                                <td>1</td>
+                                                <td>${formatNum(baseAmount)}</td>
+                                                <td>${formatNum(taxAmount)}</td>
+                                                <td class="font-extrabold text-[16px]">${formatNum(totalAmount)}</td>
+                                            ` : `
+                                                <td class="font-extrabold text-[16px]">${formatNum(totalAmount)}</td>
+                                                <td>${formatNum(taxAmount)}</td>
+                                                <td>${formatNum(baseAmount)}</td>
+                                                <td>1</td>
+                                                <td>15%</td>
+                                                <td>${formatNum(baseAmount)}</td>
+                                                <td class="py-6 leading-relaxed">
+                                                    <div class="font-extrabold text-[16px]">${patient.name}</div>
+                                                    <div class="font-bold text-[15px] mt-2">${patient.id}</div>
+                                                </td>
+                                            `}
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+
+                            <div class="font-extrabold text-black text-xl mt-16 mb-4 px-2 ${lang === 'ar' ? 'text-right' : 'text-left'}" dir="${lang === 'ar' ? 'rtl' : 'ltr'}">
+                                ${t.finance}
+                            </div>
+
+                            <!-- التذييل السفلي يمتد للنهاية (صورة2.png) -->
+                            <div class="mt-auto flex justify-center w-full">
+                                <img src="صورة2.png" alt="Footer" class="w-full object-contain" onerror="this.style.display='none'">
+                            </div>
+                        </div>
+                    `;
+                });
+
+                container.innerHTML = allInvoicesHTML;
+
+                // رسم الباركودات بشكل مجدول لضمان عدم سقوط أي منها في الأعداد الكبيرة
+                setTimeout(() => {
+                    qrTasks.forEach(task => {
+                        const qrContainer = document.getElementById(task.id);
+                        if (qrContainer) {
+                            new QRCode(qrContainer, {
+                                text: task.text,
+                                width: 110,
+                                height: 110,
+                                colorDark : "#000000",
+                                colorLight : "#ffffff",
+                                correctLevel : QRCode.CorrectLevel.M
+                            });
+                        }
+                    });
+                }, 500); 
+            }
+        });
+    </script>
+</body>
+</html>
