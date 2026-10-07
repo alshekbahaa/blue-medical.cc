@@ -3,22 +3,24 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>نظام التقارير الطبية المتقدم - أتمتة الـ PDF</title>
+    <title>نظام التقارير الطبية - QR Code Verified</title>
     
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Tajawal:wght@500;700;800&display=swap" rel="stylesheet">
-    
-    <!-- Libraries -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <script src="https://unpkg.com/pdf-lib/dist/pdf-lib.min.js"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 
     <style>
-        body { background-color: #f3f4f6; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+        body {
+            background-color: #f3f4f6; 
+            -webkit-print-color-adjust: exact;
+            print-color-adjust: exact;
+        }
+
         .admin-ui { font-family: 'Tajawal', sans-serif; }
         .english-ui { font-family: 'Inter', sans-serif; }
         
+        /* Table Styles for Patient View - Two-line layout supported */
         .info-table { width: 100%; border-collapse: collapse; font-size: 15px; }
         .info-table tr { border-bottom: 1px solid #e5e7eb; }
         .info-table th { background-color: #f9fafb; color: #374151; font-weight: 600; padding: 14px 16px; text-align: left; width: 35%; font-size: 15px; }
@@ -34,34 +36,50 @@
         .toast-enter { animation: slideInUp 0.3s ease-out forwards; }
         .toast-exit { animation: fadeOut 0.3s ease-out forwards; }
 
-        /* PDF Dropzone Styles */
-        .drop-zone { border: 2px dashed #cbd5e1; transition: all 0.3s ease; background-color: #f8fafc; }
-        .drop-zone.dragover { border-color: #059669; background-color: #ecfdf5; transform: scale(1.02); }
-        .drop-zone.has-file { border-style: solid; border-color: #059669; background-color: #f0fdf4; }
+        .logo-white { filter: brightness(0) invert(1); }
+
+        @media print {
+            body { background: white !important; margin: 0; padding: 0; }
+            .no-print { display: none !important; }
+            
+            #print-card-area {
+                display: block !important;
+                width: 8.5cm;
+                height: 5.4cm;
+                border: 2px solid #000;
+                border-radius: 8px;
+                padding: 10px;
+                margin: 0 auto;
+                text-align: center;
+                page-break-inside: avoid;
+            }
+            #print-card-area h3 { margin: 0 0 5px 0; font-size: 13px; font-family: Arial, sans-serif; }
+            #print-card-area p { margin: 0 0 5px 0; font-size: 9px; color: #555; }
+            #print-qr-container { display: flex; justify-content: center; }
+            #print-qr-container img { width: 85px; height: 85px; }
+            
+            #admin-section, #login-section, #client-section, #qr-modal, #delete-modal, footer { display: none !important; }
+        }
         
-        #hidden-qr-generator { position: absolute; left: -9999px; top: -9999px; }
+        #print-card-area { display: none; }
     </style>
 </head>
-<body class="min-h-screen text-gray-800 flex flex-col items-center p-3 sm:p-6 relative justify-between">
+<body class="min-h-screen text-gray-800 flex flex-col items-center p-3 sm:p-4 lg:p-8 relative justify-between">
 
     <div id="toast-container" class="fixed bottom-4 left-1/2 transform -translate-x-1/2 z-50 flex flex-col gap-2 w-full max-w-sm px-4 pointer-events-none"></div>
 
     <main class="w-full max-w-[1400px] mx-auto flex-1">
         
         <!-- ========================================== -->
-        <!-- 0. واجهة تسجيل الدخول (Backend Auth)       -->
+        <!-- 0. واجهة تسجيل الدخول (الآدمن)             -->
         <!-- ========================================== -->
         <section id="login-section" class="admin-ui hidden bg-white rounded-2xl shadow-xl border border-gray-100 p-8 max-w-md mx-auto mt-12 transform transition-all">
             <div class="text-center mb-8">
                 <div class="inline-flex items-center justify-center w-16 h-16 bg-emerald-50 text-emerald-600 rounded-2xl mb-4 shadow-inner">
-                    <i class="fa-solid fa-server text-3xl"></i>
+                    <i class="fa-solid fa-user-doctor text-3xl"></i>
                 </div>
-                <h2 class="text-2xl font-bold text-gray-800">بوابة الخادم الطبية</h2>
-                <p class="text-sm text-gray-500 mt-2">تسجيل الدخول المشفر لقاعدة البيانات</p>
-                <!-- للمعاينة، يمكنك تسجيل الدخول باستخدام admin و admin123 -->
-                <div class="mt-4 p-3 bg-blue-50 text-blue-700 rounded-lg text-xs font-bold border border-blue-200">
-                    للمعاينة استخدم:<br>اسم المستخدم: admin<br>كلمة المرور: admin123
-                </div>
+                <h2 class="text-2xl font-bold text-gray-800">بوابة الإدارة الطبية</h2>
+                <p class="text-sm text-gray-500 mt-2">يرجى تسجيل الدخول للوصول لقاعدة البيانات</p>
             </div>
             
             <form id="login-form" class="space-y-5">
@@ -69,19 +87,19 @@
                     <label class="block text-sm font-bold text-gray-700 mb-1">اسم المستخدم</label>
                     <div class="relative">
                         <i class="fa-solid fa-user absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400"></i>
-                        <input type="text" id="login-username" required class="w-full pl-10 pr-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 outline-none transition-all" dir="ltr" placeholder="admin">
+                        <input type="text" id="login-username" class="w-full pl-10 pr-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 outline-none transition-all" dir="ltr" placeholder="admin">
                     </div>
                 </div>
                 <div>
                     <label class="block text-sm font-bold text-gray-700 mb-1">كلمة المرور</label>
                     <div class="relative">
                         <i class="fa-solid fa-lock absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400"></i>
-                        <input type="password" id="login-password" required class="w-full pl-10 pr-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 outline-none transition-all" dir="ltr" placeholder="••••••••">
+                        <input type="password" id="login-password" class="w-full pl-10 pr-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 outline-none transition-all" dir="ltr" placeholder="••••••••">
                     </div>
                 </div>
                 <div class="pt-4">
-                    <button type="submit" id="login-btn" class="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-3.5 px-4 rounded-xl transition-all shadow-lg shadow-emerald-600/30 flex justify-center items-center gap-2">
-                        <span>تسجيل الدخول</span> <i class="fa-solid fa-arrow-left"></i>
+                    <button type="submit" class="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-3.5 px-4 rounded-xl transition-all shadow-lg shadow-emerald-600/30 flex justify-center items-center gap-2">
+                        تسجيل الدخول <i class="fa-solid fa-arrow-left"></i>
                     </button>
                 </div>
             </form>
@@ -94,112 +112,108 @@
             <!-- Header -->
             <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-5 mb-6 flex flex-col md:flex-row justify-between items-center gap-4">
                 <div class="flex items-center gap-4">
-                    <div class="w-12 h-12 bg-emerald-600 text-white rounded-xl flex items-center justify-center text-2xl shadow-md">
-                        <i class="fa-solid fa-microchip"></i>
-                    </div>
+                    <img src="Blue.png" alt="Blue Logo" class="h-12 object-contain bg-white" onerror="this.onerror=null; this.src='https://placehold.co/120x40/ffffff/059669?text=Blue+Logo'">
                     <div>
-                        <h2 class="text-xl font-bold text-gray-800">نظام الأتمتة الطبية</h2>
-                        <p class="text-xs text-gray-500">Automated PDF Processing & Secure DB</p>
+                        <h2 class="text-xl font-bold text-gray-800">نظام التقارير الذكي</h2>
                     </div>
                 </div>
                 <div class="flex items-center gap-2 flex-wrap justify-center">
-                    
-                    <!-- أزرار النسخ الاحتياطي والتصدير الجديدة -->
-                    <button id="btn-export-csv" class="bg-blue-50 hover:bg-blue-100 text-blue-700 px-3 py-2 rounded-xl font-bold transition-colors text-xs flex items-center gap-1.5 border border-blue-200">
-                        <i class="fa-solid fa-file-csv"></i> تصدير إكسيل
+                    <button id="export-backup-btn" class="bg-blue-50 hover:bg-blue-100 text-blue-700 px-3.5 py-2.5 rounded-xl font-bold transition-colors text-sm flex items-center gap-2 border border-blue-200" title="تنزيل نسخة احتياطية (Google Drive)">
+                        <i class="fa-solid fa-cloud-arrow-down"></i> حفظ نسخة احتياطية
                     </button>
-                    
-                    <button id="btn-backup" class="bg-indigo-50 hover:bg-indigo-100 text-indigo-700 px-3 py-2 rounded-xl font-bold transition-colors text-xs flex items-center gap-1.5 border border-indigo-200">
-                        <i class="fa-solid fa-download"></i> أخذ نسخة
-                    </button>
-                    
-                    <label class="bg-amber-50 hover:bg-amber-100 text-amber-700 px-3 py-2 rounded-xl font-bold transition-colors text-xs flex items-center gap-1.5 border border-amber-200 cursor-pointer mb-0">
-                        <i class="fa-solid fa-upload"></i> رفع نسخة
-                        <input type="file" id="input-restore" accept=".json" class="hidden">
+                    <label for="import-backup-file" class="bg-indigo-50 hover:bg-indigo-100 text-indigo-700 px-3.5 py-2.5 rounded-xl font-bold transition-colors text-sm flex items-center gap-2 border border-indigo-200 cursor-pointer" title="استعادة السجلات">
+                        <i class="fa-solid fa-cloud-arrow-up"></i> استعادة النسخة
                     </label>
+                    <input type="file" id="import-backup-file" accept=".json" class="hidden">
 
-                    <div class="w-px h-8 bg-gray-200 mx-1 hidden md:block"></div>
-
-                    <button id="logout-btn" class="bg-red-50 hover:bg-red-100 text-red-600 px-4 py-2.5 rounded-xl font-bold transition-colors flex items-center gap-2 text-sm">
+                    <button id="logout-btn" class="bg-red-50 hover:bg-red-100 text-red-600 px-4 py-2.5 rounded-xl font-bold transition-colors flex items-center gap-2">
                         <i class="fa-solid fa-right-from-bracket"></i> خروج
                     </button>
                 </div>
             </div>
 
-            <!-- Stats Dashboard -->
-            <div class="grid grid-cols-2 md:grid-cols-3 xl:grid-cols-6 gap-4 mb-6">
-                <div class="bg-white p-4 rounded-2xl shadow-sm border border-gray-100 flex flex-col gap-2 border-r-4 border-emerald-500">
-                    <div class="flex justify-between items-center"><p class="text-xs text-gray-500 font-bold">إجمالي التقارير</p><i class="fa-solid fa-folder-open text-emerald-500 bg-emerald-50 p-2 rounded-lg"></i></div>
-                    <h3 id="stat-total" class="text-2xl font-bold text-gray-800">0</h3>
+            <!-- Dashboard Stats -->
+            <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4 mb-6">
+                <!-- 1 -->
+                <div class="bg-white p-4 rounded-2xl shadow-sm border border-gray-100 flex flex-col gap-2 border-b-4 border-gray-400">
+                    <div class="flex justify-between items-center">
+                        <p class="text-[11px] sm:text-xs text-gray-500 font-bold">إجمالي التقارير</p>
+                        <div class="w-7 h-7 bg-gray-50 text-gray-600 rounded-lg flex items-center justify-center text-xs"><i class="fa-solid fa-folder-open"></i></div>
+                    </div>
+                    <h3 id="stat-total" class="text-xl font-bold text-gray-800">0</h3>
                 </div>
-                <div class="bg-white p-4 rounded-2xl shadow-sm border border-gray-100 flex flex-col gap-2 border-r-4 border-green-500">
-                    <div class="flex justify-between items-center"><p class="text-xs text-gray-500 font-bold">تقارير نشطة</p><i class="fa-solid fa-shield-check text-green-500 bg-green-50 p-2 rounded-lg"></i></div>
-                    <h3 id="stat-active" class="text-2xl font-bold text-gray-800">0</h3>
+                <!-- 2 -->
+                <div class="bg-white p-4 rounded-2xl shadow-sm border border-gray-100 flex flex-col gap-2 border-b-4 border-green-500">
+                    <div class="flex justify-between items-center">
+                        <p class="text-[11px] sm:text-xs text-gray-500 font-bold">تقارير نشطة</p>
+                        <div class="w-7 h-7 bg-green-50 text-green-600 rounded-lg flex items-center justify-center text-xs"><i class="fa-solid fa-check-circle"></i></div>
+                    </div>
+                    <h3 id="stat-active" class="text-xl font-bold text-gray-800">0</h3>
                 </div>
-                <div class="bg-white p-4 rounded-2xl shadow-sm border border-gray-100 flex flex-col gap-2 border-r-4 border-red-500">
-                    <div class="flex justify-between items-center"><p class="text-xs text-gray-500 font-bold">تقارير منتهية</p><i class="fa-solid fa-clock text-red-500 bg-red-50 p-2 rounded-lg"></i></div>
-                    <h3 id="stat-expired" class="text-2xl font-bold text-gray-800">0</h3>
+                <!-- 3 -->
+                <div class="bg-white p-4 rounded-2xl shadow-sm border border-gray-100 flex flex-col gap-2 border-b-4 border-red-500">
+                    <div class="flex justify-between items-center">
+                        <p class="text-[11px] sm:text-xs text-gray-500 font-bold">تقارير منتهية</p>
+                        <div class="w-7 h-7 bg-red-50 text-red-600 rounded-lg flex items-center justify-center text-xs"><i class="fa-solid fa-clock"></i></div>
+                    </div>
+                    <h3 id="stat-expired" class="text-xl font-bold text-gray-800">0</h3>
                 </div>
-                <div class="bg-white p-4 rounded-2xl shadow-sm border border-gray-100 flex flex-col gap-2 border-r-4 border-blue-500">
-                    <div class="flex justify-between items-center"><p class="text-xs text-gray-500 font-bold">تقارير هذا الشهر</p><i class="fa-solid fa-calendar-day text-blue-500 bg-blue-50 p-2 rounded-lg"></i></div>
-                    <h3 id="stat-month" class="text-2xl font-bold text-gray-800">0</h3>
+                <!-- 4 -->
+                <div class="bg-white p-4 rounded-2xl shadow-sm border border-gray-100 flex flex-col gap-2 border-b-4 border-blue-500">
+                    <div class="flex justify-between items-center">
+                        <p class="text-[11px] sm:text-xs text-gray-500 font-bold">تقارير هذا الشهر</p>
+                        <div class="w-7 h-7 bg-blue-50 text-blue-600 rounded-lg flex items-center justify-center text-xs"><i class="fa-solid fa-calendar-day"></i></div>
+                    </div>
+                    <h3 id="stat-month" class="text-xl font-bold text-gray-800">0</h3>
                 </div>
-                <div class="bg-white p-4 rounded-2xl shadow-sm border border-gray-100 flex flex-col gap-2 border-r-4 border-orange-500">
-                    <div class="flex justify-between items-center"><p class="text-xs text-gray-500 font-bold">قريبة من الانتهاء</p><i class="fa-solid fa-bell text-orange-500 bg-orange-50 p-2 rounded-lg"></i></div>
-                    <h3 id="stat-expiring-soon" class="text-2xl font-bold text-gray-800">0</h3>
+                <!-- 5 -->
+                <div class="bg-white p-4 rounded-2xl shadow-sm border border-gray-100 flex flex-col gap-2 border-b-4 border-orange-500">
+                    <div class="flex justify-between items-center">
+                        <p class="text-[11px] sm:text-xs text-gray-500 font-bold">قريبة من الانتهاء</p>
+                        <div class="w-7 h-7 bg-orange-50 text-orange-600 rounded-lg flex items-center justify-center text-xs"><i class="fa-solid fa-bell"></i></div>
+                    </div>
+                    <h3 id="stat-soon" class="text-xl font-bold text-gray-800">0</h3>
                 </div>
-                <div class="bg-white p-4 rounded-2xl shadow-sm border border-gray-100 flex flex-col gap-2 border-r-4 border-purple-500">
-                    <div class="flex justify-between items-center"><p class="text-xs text-gray-500 font-bold">عمليات التحقق QR</p><i class="fa-solid fa-qrcode text-purple-500 bg-purple-50 p-2 rounded-lg"></i></div>
-                    <h3 id="stat-scans" class="text-2xl font-bold text-gray-800">0</h3>
+                <!-- 6 -->
+                <div id="card-duplicates" class="bg-white p-4 rounded-2xl shadow-sm border border-gray-100 flex flex-col gap-2 border-b-4 border-amber-400 cursor-pointer hover:bg-amber-50 transition-colors" title="انقر لتصفية السجلات المكررة">
+                    <div class="flex justify-between items-center">
+                        <p class="text-[11px] sm:text-xs text-amber-600 font-bold">تكرار بالهوية</p>
+                        <div class="w-7 h-7 bg-amber-100 text-amber-600 rounded-lg flex items-center justify-center text-xs"><i class="fa-solid fa-triangle-exclamation"></i></div>
+                    </div>
+                    <h3 id="stat-duplicates" class="text-xl font-bold text-gray-800">0</h3>
                 </div>
             </div>
 
-            <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-6">
-                <!-- Create Form (The Automated Pipeline) -->
-                <div class="lg:col-span-1 bg-white rounded-2xl shadow-sm border border-gray-100 p-6 relative overflow-hidden h-fit">
-                    <div class="absolute top-0 right-0 w-1.5 h-full bg-emerald-600"></div>
-                    <h3 class="text-lg font-bold text-gray-800 mb-5 flex items-center gap-2">
-                        <i class="fa-solid fa-file-pdf text-emerald-600"></i> إصدار تقرير جديد
+            <div class="flex flex-col lg:flex-row gap-6 mb-6 w-full">
+                
+                <!-- Create / Edit Form -->
+                <div class="w-full lg:w-[350px] xl:w-[400px] bg-white rounded-2xl shadow-sm border border-gray-100 p-6 relative overflow-hidden h-fit flex-shrink-0">
+                    <div id="form-indicator" class="absolute top-0 right-0 w-1.5 h-full bg-emerald-600"></div>
+                    <h3 id="form-title" class="text-lg font-bold text-gray-800 mb-5 flex items-center gap-2">
+                        <i class="fa-solid fa-plus-circle text-emerald-600"></i> إضافة تقرير جديد
                     </h3>
                     
                     <form id="create-form" class="space-y-4">
-                        <!-- File Upload Area (Core Requirement) -->
-                        <div class="mb-4">
-                            <label class="block text-xs font-bold text-gray-700 mb-2">رفع التقرير الطبي PDF <span class="text-red-500">*</span></label>
-                            <div id="drop-zone" class="drop-zone rounded-xl p-6 text-center cursor-pointer flex flex-col items-center justify-center gap-3">
-                                <i id="drop-icon" class="fa-solid fa-cloud-arrow-up text-3xl text-emerald-500"></i>
-                                <div id="drop-text">
-                                    <span class="block text-sm font-bold text-gray-700">اسحب ملف التقرير أو اضغط للاختيار</span>
-                                    <span class="block text-[10px] text-gray-400 mt-1">يجب أن يكون الملف بصيغة PDF (الحد الأقصى 10MB)</span>
-                                </div>
-                                <input type="file" id="pdf-upload" accept="application/pdf" class="hidden" required>
-                            </div>
-                            <!-- Progress Bar -->
-                            <div id="upload-progress-container" class="hidden w-full bg-gray-200 rounded-full h-1.5 mt-3 overflow-hidden">
-                                <div id="upload-progress-bar" class="bg-emerald-600 h-1.5 rounded-full transition-all duration-300" style="width: 0%"></div>
-                            </div>
-                            <p id="upload-status-text" class="text-[10px] text-center text-gray-500 mt-1 hidden">جاري المعالجة...</p>
-                        </div>
-
+                        <input type="hidden" id="edit-record-id" value="">
                         <div>
-                            <label class="block text-xs font-bold text-gray-700 mb-1">اسم العيادة / المنشأة</label>
-                            <input type="text" id="input-clinic" required class="w-full px-3 py-2.5 border border-gray-200 rounded-lg focus:ring-2 focus:ring-emerald-500 outline-none text-sm" value="Blue Medical Center" dir="ltr">
+                            <label class="block text-xs font-bold text-gray-700 mb-1">اسم العيادة (Clinic)</label>
+                            <input type="text" id="input-clinic" required class="w-full px-3 py-2.5 border border-gray-200 rounded-lg focus:ring-2 focus:ring-emerald-500 outline-none text-sm" value="Blue Medical Field Complex" dir="ltr">
                         </div>
                         
                         <div>
-                            <label class="block text-xs font-bold text-gray-700 mb-1">رقم التقرير (أو الهوية) <span class="text-red-500">*</span></label>
-                            <input type="text" id="input-id" required class="w-full px-3 py-2.5 border border-gray-200 rounded-lg focus:ring-2 focus:ring-emerald-500 outline-none bg-gray-50 text-sm font-mono" placeholder="MR-2026-..." dir="ltr">
+                            <label class="block text-xs font-bold text-gray-700 mb-1">رقم الهوية (ID) <span class="text-red-500">*</span></label>
+                            <input type="text" id="input-id" required class="w-full px-3 py-2.5 border border-gray-200 rounded-lg focus:ring-2 focus:ring-emerald-500 outline-none bg-gray-50 text-sm font-mono" placeholder="e.g. 10xxxxxxxx" dir="ltr">
                         </div>
                         
                         <div>
                             <label class="block text-xs font-bold text-gray-700 mb-1">اسم المريض الكامل <span class="text-red-500">*</span></label>
-                            <input type="text" id="input-name" required class="w-full px-3 py-2.5 border border-gray-200 rounded-lg focus:ring-2 focus:ring-emerald-500 outline-none bg-gray-50 text-sm" placeholder="Patient Name" dir="ltr">
+                            <input type="text" id="input-name" required class="w-full px-3 py-2.5 border border-gray-200 rounded-lg focus:ring-2 focus:ring-emerald-500 outline-none bg-gray-50 text-sm" placeholder="e.g. ZAFAR IQBAL ABBASI" dir="ltr">
                         </div>
                         
                         <div class="grid grid-cols-2 gap-3">
                             <div>
                                 <label class="block text-xs font-bold text-gray-700 mb-1">العمر</label>
-                                <input type="text" id="input-age" required class="w-full px-3 py-2.5 border border-gray-200 rounded-lg focus:ring-2 focus:ring-emerald-500 outline-none text-sm" placeholder="45" dir="ltr">
+                                <input type="text" id="input-age" required class="w-full px-3 py-2.5 border border-gray-200 rounded-lg focus:ring-2 focus:ring-emerald-500 outline-none text-sm" placeholder="49 Y" dir="ltr">
                             </div>
                             <div>
                                 <label class="block text-xs font-bold text-gray-700 mb-1">الجنس</label>
@@ -211,60 +225,82 @@
                         </div>
 
                         <div>
-                            <label class="block text-xs font-bold text-gray-700 mb-1">صلاحية التقرير</label>
+                            <label class="block text-xs font-bold text-gray-700 mb-1">صلاحية التقرير (أمان)</label>
                             <select id="input-validity" class="w-full px-3 py-2.5 border border-gray-200 rounded-lg focus:ring-2 focus:ring-emerald-500 outline-none bg-white text-sm cursor-pointer">
-                                <option value="365">سنة كاملة</option>
-                                <option value="180">6 أشهر</option>
-                                <option value="90">3 أشهر</option>
+                                <option value="365">سنة كاملة (موصى به)</option>
                                 <option value="30">30 يوماً</option>
+                                <option value="7">7 أيام</option>
+                                <option value="90">3 أشهر</option>
                             </select>
                         </div>
 
-                        <div class="pt-3">
-                            <button type="submit" id="submit-btn" class="w-full bg-gray-900 hover:bg-gray-800 text-white font-bold py-3.5 px-4 rounded-xl transition-all shadow-lg flex justify-center items-center gap-2">
-                                <i class="fa-solid fa-gears"></i> <span id="submit-btn-text">إصدار التقرير الآلي</span>
+                        <div>
+                            <label class="block text-xs font-bold text-gray-700 mb-1">رابط ملف PDF (اختياري)</label>
+                            <input type="url" id="input-file-url" class="w-full px-3 py-2.5 border border-gray-200 rounded-lg focus:ring-2 focus:ring-emerald-500 outline-none text-sm" placeholder="https://..." dir="ltr">
+                        </div>
+
+                        <div class="pt-2 flex gap-2">
+                            <button type="submit" id="submit-btn" class="flex-1 bg-gray-900 hover:bg-gray-800 text-white font-bold py-3 px-4 rounded-xl transition-colors shadow-md flex justify-center items-center gap-2">
+                                <i class="fa-solid fa-qrcode"></i> إنشاء البيانات
+                            </button>
+                            <button type="button" id="cancel-edit-btn" class="hidden bg-gray-200 hover:bg-gray-300 text-gray-700 font-bold py-3 px-4 rounded-xl transition-colors">
+                                إلغاء
                             </button>
                         </div>
                     </form>
                 </div>
 
-                <!-- Database & Chart -->
-                <div class="lg:col-span-2 flex flex-col gap-6">
-                    <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-5 relative">
-                        <h3 class="text-sm font-bold text-gray-800 mb-4 flex items-center gap-2">
-                            <i class="fa-solid fa-chart-line text-emerald-600"></i> نشاط التقارير وعمليات التحقق
+                <div class="w-full flex-1 bg-white rounded-2xl shadow-sm border border-gray-100 p-4 sm:p-6 relative overflow-hidden flex flex-col min-w-0">
+                    <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-5 gap-4">
+                        <h3 class="text-lg font-bold text-gray-800 flex items-center gap-2">
+                            <i class="fa-solid fa-database text-emerald-600"></i> قاعدة البيانات المحلية
                         </h3>
-                        <div class="w-full h-[200px]"><canvas id="activityChart"></canvas></div>
-                    </div>
-
-                    <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 relative flex flex-col flex-1">
-                        <div class="flex justify-between items-center mb-5 gap-4">
-                            <h3 class="text-lg font-bold text-gray-800 flex items-center gap-2">
-                                <i class="fa-solid fa-server text-emerald-600"></i> قاعدة بيانات التقارير
-                            </h3>
-                            <button id="refresh-db-btn" class="bg-emerald-50 hover:bg-emerald-100 text-emerald-700 px-3 py-2 rounded-lg transition-colors border border-emerald-200" title="تحديث">
+                        <div class="flex gap-2 w-full sm:w-auto flex-wrap sm:flex-nowrap">
+                            <div id="export-selected-container" class="hidden w-full sm:w-auto">
+                                <button id="export-selected-btn" class="w-full bg-purple-50 hover:bg-purple-100 text-purple-700 px-4 py-2 rounded-lg font-bold transition-colors text-sm flex items-center justify-center gap-2 border border-purple-200">
+                                    <i class="fa-solid fa-link"></i> تحميل الروابط (<span id="selected-count">0</span>)
+                                </button>
+                            </div>
+                            <button id="export-csv-btn" class="flex-1 sm:flex-none bg-green-50 hover:bg-green-100 text-green-700 px-4 py-2 rounded-lg font-bold transition-colors text-sm flex items-center justify-center gap-2 border border-green-200">
+                                <i class="fa-solid fa-file-excel"></i> إكسيل
+                            </button>
+                            <button id="refresh-db-btn" class="bg-emerald-50 hover:bg-emerald-100 text-emerald-700 px-3 py-2 rounded-lg transition-colors border border-emerald-200" title="تحديث القائمة">
                                 <i class="fa-solid fa-rotate"></i>
                             </button>
                         </div>
+                    </div>
 
-                        <div class="mb-4 relative">
+                    <div class="mb-4">
+                        <div class="relative">
                             <i class="fa-solid fa-search absolute right-4 top-1/2 transform -translate-y-1/2 text-gray-400"></i>
-                            <input type="text" id="search-input" class="w-full pr-10 pl-4 py-2.5 border border-gray-200 rounded-lg focus:ring-2 focus:ring-emerald-500 outline-none bg-gray-50 text-sm" placeholder="ابحث برقم التقرير أو اسم المريض...">
+                            <input type="text" id="search-input" class="w-full pr-10 pl-4 py-2.5 border border-gray-200 rounded-lg focus:ring-2 focus:ring-emerald-500 outline-none bg-gray-50 text-sm" placeholder="ابحث باسم المريض أو رقم الهوية...">
                         </div>
+                    </div>
 
-                        <div class="flex-1 overflow-x-auto rounded-xl border border-gray-200 h-[300px] relative">
-                            <table class="w-full text-sm text-right text-gray-600">
-                                <thead class="text-xs text-gray-700 uppercase bg-gray-50 border-b sticky top-0 z-10 shadow-sm">
-                                    <tr>
-                                        <th class="px-3 py-3 text-center w-20">الحالة</th>
-                                        <th class="px-3 py-3">رقم التقرير</th>
-                                        <th class="px-3 py-3">اسم المريض</th>
-                                        <th class="px-3 py-3 text-center w-36">Drive Sync</th>
-                                        <th class="px-3 py-3 text-center w-24">الإجراءات</th>
-                                    </tr>
-                                </thead>
-                                <tbody id="records-tbody" class="divide-y divide-gray-100 bg-white"></tbody>
-                            </table>
+                    <div class="flex-1 overflow-x-auto rounded-xl border border-gray-200 h-[450px] relative">
+                        <table class="w-full text-sm text-right text-gray-600 min-w-[900px]">
+                            <thead class="text-xs text-gray-700 uppercase bg-gray-50 border-b sticky top-0 z-10 shadow-sm">
+                                <tr>
+                                    <th class="px-3 py-3 text-center w-10 sticky right-0 bg-gray-50 z-20">
+                                        <input type="checkbox" id="select-all" class="w-4 h-4 rounded border-gray-300 text-emerald-600 focus:ring-emerald-500 cursor-pointer">
+                                    </th>
+                                    <th class="px-3 py-3 text-center w-12 sticky right-10 bg-gray-50 z-20 border-l border-gray-200">#</th>
+                                    <th class="px-3 py-3 text-center w-24">الحالة</th>
+                                    <th class="px-3 py-3 w-32">تاريخ الإنشاء</th>
+                                    <th class="px-3 py-3 w-28 text-center">المدة المختارة</th>
+                                    <th class="px-3 py-3 w-32">تاريخ الانتهاء</th>
+                                    <th class="px-3 py-3 min-w-[150px]">اسم المريض</th>
+                                    <th class="px-3 py-3 w-32 text-center">رقم الهوية</th>
+                                    <th class="px-3 py-3 text-center w-40 sticky left-0 bg-gray-50 z-20 border-r border-gray-200">الإجراءات</th>
+                                </tr>
+                            </thead>
+                            <tbody id="records-tbody" class="divide-y divide-gray-100 bg-white">
+                                <!-- Rows injected via JS -->
+                            </tbody>
+                        </table>
+                        <div id="no-records-msg" class="hidden absolute inset-0 flex flex-col items-center justify-center text-gray-500 bg-gray-50/90 z-20">
+                            <i class="fa-solid fa-folder-open text-4xl mb-3 text-gray-300"></i>
+                            <p class="font-bold">لا توجد سجلات حالياً.</p>
                         </div>
                     </div>
                 </div>
@@ -272,623 +308,818 @@
         </section>
 
         <!-- ========================================== -->
-        <!-- 2. واجهة العميل (صفحة التحقق)              -->
+        <!-- 2. واجهة العميل (المريض) - إنجليزي         -->
         <!-- ========================================== -->
         <section id="client-section" class="english-ui hidden w-full max-w-xl mx-auto mt-4 px-2 sm:px-0">
-            <div id="client-loading" class="text-center py-12 hidden">
-                <i class="fa-solid fa-circle-notch fa-spin text-4xl text-emerald-600 mb-4"></i>
-                <p class="text-gray-600 font-medium">Verifying Secure Token...</p>
-            </div>
-
-            <!-- Valid View -->
+            
+            <!-- Valid Report View -->
             <div id="client-success-view" class="hidden bg-white rounded-2xl shadow-2xl shadow-emerald-950/5 border border-gray-100 overflow-hidden flex flex-col w-full" dir="ltr">
+                
+                <!-- White Header with Colored Logo -->
                 <div class="bg-white py-6 px-6 text-center text-gray-900 relative border-b border-gray-100 flex flex-col items-center justify-center gap-3">
-                    <div class="w-16 h-16 bg-emerald-600 text-white rounded-2xl flex items-center justify-center text-3xl shadow-lg mb-2">
-                        <i class="fa-solid fa-shield-check"></i>
-                    </div>
-                    <div class="inline-flex items-center gap-2 bg-emerald-50 text-emerald-800 border border-emerald-200 px-4 py-2 rounded-full font-bold text-sm tracking-wide shadow-sm">
-                        <i class="fa-solid fa-circle-check text-emerald-600"></i> Authentic Medical Report
+                    <img src="Blue.png" alt="Clinic Logo" class="h-16 sm:h-20 object-contain bg-transparent" onerror="this.onerror=null; this.src='https://placehold.co/180x60/ffffff/059669?text=Clinic+Logo'">
+                    
+                    <!-- Soft Green Header Box with Check Icon -->
+                    <div class="inline-flex items-center gap-2.5 bg-emerald-50 text-emerald-800 border border-emerald-200 px-5 py-2.5 rounded-full font-bold text-sm tracking-wide shadow-sm mt-1">
+                        <i class="fa-solid fa-circle-check text-emerald-600 text-base"></i> QR Code Verified
                     </div>
                 </div>
 
-                <div class="p-6 w-full overflow-hidden">
-                    <table class="info-table mb-6">
-                        <tbody>
-                            <tr><th>Facility</th><td id="c-clinic"></td></tr>
-                            <tr><th>Report No.</th><td id="c-id" class="font-mono text-emerald-700 font-bold"></td></tr>
-                            <tr><th>Patient Name</th><td id="c-name" class="font-bold"></td></tr>
-                            <tr><th>Age / Gender</th><td><span id="c-age"></span> / <span id="c-gender"></span></td></tr>
-                            <tr><th>Issue Date</th><td id="c-date"></td></tr>
-                            <tr><th>Expiry Date</th><td id="c-exp"></td></tr>
-                        </tbody>
-                    </table>
+                <!-- Data Section -->
+                <div class="p-4 sm:p-8 w-full overflow-hidden">
+                    <!-- Date -->
+                    <div class="flex items-center justify-center text-xs text-gray-500 mb-6 pb-4 border-b border-gray-100 font-medium gap-1.5">
+                        <i class="fa-regular fa-calendar text-gray-400"></i> Generated on: <span id="c-date"></span>
+                    </div>
 
-                    <a id="c-download-btn" href="#" target="_blank" class="w-full bg-gray-900 hover:bg-gray-800 text-white py-3.5 px-4 rounded-xl font-bold transition-colors shadow-lg flex justify-center items-center gap-2">
-                        <i class="fa-brands fa-google-drive text-lg"></i> Download Original Verified PDF
-                    </a>
+                    <!-- Info Table Container -->
+                    <div class="w-full pb-2 overflow-x-auto">
+                        <table class="info-table mb-8 whitespace-nowrap">
+                            <tbody>
+                                <tr><th>Clinic</th><td id="c-clinic"></td></tr>
+                                <tr><th>ID</th><td id="c-id"></td></tr>
+                                <tr><th>Patient Name</th><td id="c-name" class="whitespace-normal"></td></tr>
+                                <tr><th>Age</th><td id="c-age"></td></tr>
+                                <tr><th>Gender</th><td id="c-gender"></td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <!-- Download Button Only -->
+                    <div class="flex flex-col gap-3 no-print mt-2">
+                        <a id="c-download-btn" href="#" target="_blank" class="hidden w-full bg-emerald-600 hover:bg-emerald-700 text-white py-3.5 px-4 rounded-xl font-bold transition-colors shadow-lg shadow-emerald-600/30 flex justify-center items-center gap-2">
+                            <i class="fa-solid fa-file-pdf text-lg"></i> Download Original PDF
+                        </a>
+                    </div>
                 </div>
             </div>
 
-            <!-- Invalid View -->
+            <!-- Expired / Error View -->
             <div id="client-error-view" class="hidden bg-white rounded-2xl shadow-xl border border-gray-100 p-8 text-center w-full" dir="ltr">
                 <div class="w-24 h-24 bg-red-50 text-red-500 rounded-full flex items-center justify-center mx-auto mb-5 border-4 border-white shadow-sm">
                     <i class="fa-solid fa-circle-xmark text-5xl"></i>
                 </div>
-                <h1 id="error-title" class="text-2xl font-bold text-gray-900 mb-2">Verification Failed</h1>
-                <p id="error-desc" class="text-gray-500 text-sm mb-6">The report does not exist or the token has expired.</p>
+                <h1 class="text-2xl font-bold text-gray-900 mb-2">Report Unavailable</h1>
+                <p class="text-gray-500 text-sm mb-6 leading-relaxed">For patient privacy and security, this medical report link has expired or the data is invalid. Please contact the clinic for an updated record.</p>
+                <div class="bg-gray-50 p-3 rounded-lg border border-gray-200 text-xs text-gray-400 font-mono">
+                    ERR_DATA_INVALID_OR_EXPIRED
+                </div>
             </div>
         </section>
 
     </main>
 
-    <!-- Modals -->
-    <!-- نافذة النجاح النهائية المطلوبة -->
-    <div id="success-modal" class="hidden fixed inset-0 z-50 flex items-center justify-center bg-gray-900/70 backdrop-blur-sm admin-ui">
-        <div class="bg-white p-6 rounded-2xl shadow-2xl w-[95%] max-w-md transform transition-all border border-gray-100">
-            <div class="text-center mb-5">
-                <div class="w-16 h-16 bg-emerald-100 text-emerald-600 rounded-full flex items-center justify-center mx-auto mb-3 shadow-inner">
-                    <i class="fa-solid fa-check-double text-3xl"></i>
-                </div>
-                <h3 class="text-2xl font-bold text-gray-800">تم إصدار التقرير بنجاح</h3>
-                <p class="text-sm text-gray-500 mt-1">العملية تمت آلياً بالكامل وتم الرفع السحابي</p>
-            </div>
+    <!-- Footer Signature -->
+    <footer class="w-full text-center py-4 text-xs text-gray-500 font-bold admin-ui no-print">
+        Designed by Eng. Bahaa Al-Sheikh
+    </footer>
 
-            <div class="bg-gray-50 rounded-xl p-4 mb-5 border border-gray-200">
-                <div class="flex justify-between border-b border-gray-200 pb-2 mb-2">
-                    <span class="text-gray-500 text-xs font-bold">رقم التقرير</span>
-                    <span id="sm-id" class="text-gray-900 text-xs font-mono font-bold"></span>
-                </div>
-                <div class="flex justify-between border-b border-gray-200 pb-2 mb-2">
-                    <span class="text-gray-500 text-xs font-bold">اسم المريض</span>
-                    <span id="sm-name" class="text-gray-900 text-xs font-bold"></span>
-                </div>
-                <div class="flex justify-between border-b border-gray-200 pb-2 mb-2">
-                    <span class="text-gray-500 text-xs font-bold">تاريخ الإصدار</span>
-                    <span id="sm-date" class="text-gray-900 text-xs"></span>
-                </div>
-                <div class="flex justify-between">
-                    <span class="text-gray-500 text-xs font-bold">حالة الرفع</span>
-                    <span class="text-emerald-600 text-xs font-bold"><i class="fa-solid fa-cloud-arrow-up"></i> Google Drive</span>
-                </div>
+    <!-- QR Display Modal (Admin) -->
+    <div id="qr-modal" class="hidden fixed inset-0 z-50 flex items-center justify-center bg-gray-900/60 backdrop-blur-sm admin-ui">
+        <div class="bg-white p-6 rounded-2xl shadow-2xl w-[90%] max-w-sm text-center transform transition-all border border-gray-100">
+            <div class="w-12 h-12 bg-emerald-50 text-emerald-600 rounded-full flex items-center justify-center mx-auto mb-3">
+                <i class="fa-solid fa-check text-2xl"></i>
             </div>
-
-            <div class="grid grid-cols-2 gap-3 mb-4">
-                <a id="btn-open-pdf" href="#" target="_blank" class="bg-blue-50 text-blue-700 hover:bg-blue-100 py-3 rounded-xl font-bold text-sm flex items-center justify-center gap-2 transition-colors border border-blue-200">
-                    <i class="fa-solid fa-file-pdf"></i> فتح التقرير
-                </a>
-                <a id="btn-open-verify" href="#" target="_blank" class="bg-purple-50 text-purple-700 hover:bg-purple-100 py-3 rounded-xl font-bold text-sm flex items-center justify-center gap-2 transition-colors border border-purple-200">
-                    <i class="fa-solid fa-shield-check"></i> صفحة التحقق
-                </a>
-                <button id="btn-copy-link" class="bg-gray-100 text-gray-700 hover:bg-gray-200 py-3 rounded-xl font-bold text-sm flex items-center justify-center gap-2 transition-colors">
-                    <i class="fa-solid fa-link"></i> نسخ الرابط
-                </button>
-                <button id="btn-download-qr" class="bg-gray-900 text-white hover:bg-gray-800 py-3 rounded-xl font-bold text-sm flex items-center justify-center gap-2 transition-colors shadow-md">
-                    <i class="fa-solid fa-qrcode"></i> تحميل QR
-                </button>
-            </div>
+            <h3 class="text-xl font-bold mb-1 text-gray-800">تم التوليد بنجاح</h3>
+            <p class="text-sm text-gray-500 mb-6">البيانات الآن مدمجة بأمان داخل الرمز المرفق</p>
             
-            <button onclick="document.getElementById('success-modal').classList.add('hidden')" class="w-full text-gray-500 hover:text-gray-800 text-sm font-bold py-2">إغلاق النافذة</button>
+            <div class="flex justify-center mb-6 bg-white p-4 border-2 border-dashed border-gray-200 rounded-2xl">
+                <div id="modal-qrcode-container"></div>
+            </div>
+
+            <div class="flex gap-3">
+                <button id="close-modal-btn" class="flex-1 bg-gray-100 hover:bg-gray-200 text-gray-800 py-3 rounded-xl font-bold transition-colors">إغلاق</button>
+                <button id="print-qr-btn" class="flex-1 bg-emerald-600 hover:bg-emerald-700 text-white py-3 rounded-xl font-bold transition-colors shadow-md flex justify-center items-center gap-2">
+                    <i class="fa-solid fa-print"></i> طباعة البطاقة
+                </button>
+            </div>
         </div>
     </div>
 
-    <!-- Hidden QR Generator -->
-    <div id="hidden-qr-generator"></div>
+    <!-- Custom Delete Confirmation Modal -->
+    <div id="delete-modal" class="hidden fixed inset-0 z-50 flex items-center justify-center bg-gray-900/60 backdrop-blur-sm admin-ui">
+        <div class="bg-white p-6 rounded-2xl shadow-2xl w-[90%] max-w-sm text-center transform transition-all border border-gray-100">
+            <div class="w-16 h-16 bg-red-100 text-red-600 rounded-full flex items-center justify-center mx-auto mb-4">
+                <i class="fa-solid fa-triangle-exclamation text-3xl"></i>
+            </div>
+            <h3 class="text-xl font-bold mb-2 text-gray-800">تأكيد الحذف</h3>
+            <p class="text-sm text-gray-500 mb-6">هل أنت متأكد من حذف هذا السجل نهائياً؟ سيصبح الرمز المرتبط به غير صالح.</p>
+            
+            <div class="flex gap-3">
+                <button id="cancel-delete-btn" class="flex-1 bg-gray-100 hover:bg-gray-200 text-gray-800 py-3 rounded-xl font-bold transition-colors">تراجع</button>
+                <button id="confirm-delete-btn" class="flex-1 bg-red-600 hover:bg-red-700 text-white py-3 rounded-xl font-bold transition-colors shadow-md">نعم، احذف السجل</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Hidden Print Area -->
+    <div id="print-card-area">
+        <div style="display: flex; align-items: center; justify-content: center; gap: 8px; margin-bottom: 5px;">
+            <img src="Blue.png" alt="Logo" style="height: 28px; object-fit: contain; filter: brightness(0) invert(1);" onerror="this.style.display='none'">
+            <h3 id="print-clinic-name" style="margin: 0; font-size: 13px;">Clinic Name</h3>
+        </div>
+        <p>ID: <span id="print-patient-id"></span></p>
+        <div id="print-qr-container"></div>
+        <p style="margin-top:3px; font-weight: bold; font-size: 8px;">Scan to Verify Report</p>
+    </div>
 
     <script>
-        // =====================================================================
-        // المكون الأول: الخادم الوهمي (Mock Backend & Database)
-        // يتم هنا التعامل مع البيانات والمصادقة وإدارة الملفات.
-        // =====================================================================
-        const MockBackend = (function() {
-            // Database Architecture
-            const db = {
-                users: [{ id: 1, username: 'admin', passwordHash: 'hashed_admin123' }],
-                reports: JSON.parse(localStorage.getItem('backend_db_reports')) || [],
-                verifications: JSON.parse(localStorage.getItem('backend_db_verifications')) || [],
-            };
-
-            const saveDB = () => {
-                localStorage.setItem('backend_db_reports', JSON.stringify(db.reports));
-                localStorage.setItem('backend_db_verifications', JSON.stringify(db.verifications));
-            };
-
-            const generateToken = () => 'jwt_sess_' + Math.random().toString(36).substr(2);
-            const generateSecureToken = () => 'vfy_' + crypto.randomUUID().replace(/-/g, '');
-
-            return {
-                async handleRequest(method, url, body = null, headers = {}) {
-                    await new Promise(r => setTimeout(r, 200)); // Network delay simulation
-
-                    // Authentication Middleware
-                    const isProtected = !url.startsWith('/api/auth/login') && !url.startsWith('/api/verify');
-                    if (isProtected) {
-                        const token = headers.Authorization;
-                        if (!token || !token.startsWith('Bearer jwt_')) return { status: 401, error: 'Unauthorized' };
-                    }
-
-                    // Routes
-                    if (method === 'POST' && url === '/api/auth/login') {
-                        if (body.username === 'admin' && body.password === 'admin123') {
-                            return { status: 200, data: { token: generateToken() } };
-                        }
-                        return { status: 401, error: 'Invalid credentials' };
-                    }
-
-                    if (method === 'GET' && url === '/api/reports') {
-                        return { status: 200, data: db.reports.sort((a,b) => b.createdAt - a.createdAt) };
-                    }
-
-                    // Backup endpoint
-                    if (method === 'GET' && url === '/api/system/backup') {
-                        return { status: 200, data: { reports: db.reports, verifications: db.verifications, exportDate: new Date().toISOString() } };
-                    }
-                    
-                    // Restore endpoint
-                    if (method === 'POST' && url === '/api/system/restore') {
-                        let addedReports = 0;
-                        if (body.reports && Array.isArray(body.reports)) {
-                            const existingIds = new Set(db.reports.map(r => r.id));
-                            body.reports.forEach(r => {
-                                if (!existingIds.has(r.id)) { db.reports.push(r); addedReports++; }
-                            });
-                        }
-                        if (body.verifications && Array.isArray(body.verifications)) {
-                            const existingVIds = new Set(db.verifications.map(v => v.id));
-                            body.verifications.forEach(v => {
-                                if (!existingVIds.has(v.id)) { db.verifications.push(v); }
-                            });
-                        }
-                        saveDB();
-                        return { status: 200, message: `تمت استعادة البيانات. أضيف ${addedReports} تقرير جديد لقاعدة البيانات.` };
-                    }
-
-                    // THE AUTOMATION ENDPOINT
-                    if (method === 'POST' && url === '/api/reports/process') {
-                        // 1. Backend generates secure token
-                        const secureToken = generateSecureToken();
-                        
-                        // 2. Simulate Backend generating stamped PDF and uploading to Google Drive
-                        // (In this mock, the client sent the stamped Blob URL, but logically this represents the Drive URL generated by the backend)
-                        const mockDriveFileId = 'gdrive_' + Date.now();
-                        const mockDriveUrl = body.finalFileBlobUrl; // Using the blob URL so the user can actually download it in the browser
-
-                        const newReport = {
-                            id: crypto.randomUUID(),
-                            reportNumber: body.reportNumber,
-                            clinic: body.clinic,
-                            patientName: body.patientName,
-                            age: body.age,
-                            gender: body.gender,
-                            verificationToken: secureToken,
-                            createdAt: Date.now(),
-                            expiresAt: Date.now() + (body.validityDays * 24 * 60 * 60 * 1000),
-                            status: 'active',
-                            googleDriveFileId: mockDriveFileId,
-                            googleDriveUrl: mockDriveUrl,
-                            originalFileName: body.fileName
-                        };
-
-                        db.reports.push(newReport);
-                        saveDB();
-                        return { status: 201, data: newReport };
-                    }
-
-                    if (method === 'GET' && url === '/api/dashboard/stats') {
-                        const now = Date.now();
-                        const monthStart = new Date(new Date().getFullYear(), new Date().getMonth(), 1).getTime();
-                        let active = 0, expired = 0, thisMonth = 0, expiringSoon = 0;
-                        const sevenDaysFromNow = now + (7 * 24 * 60 * 60 * 1000);
-                        
-                        db.reports.forEach(r => {
-                            if (now > r.expiresAt) expired++; else active++;
-                            if (r.createdAt >= monthStart) thisMonth++;
-                            if (r.expiresAt > now && r.expiresAt <= sevenDaysFromNow) expiringSoon++;
-                        });
-                        return { status: 200, data: { total: db.reports.length, active, expired, thisMonth, expiringSoon, scansCount: db.verifications.length }};
-                    }
-
-                    if (method === 'GET' && url === '/api/dashboard/chart') {
-                        const labels = [], reportsData = [], scansData = [];
-                        for(let i=6; i>=0; i--) {
-                            const d = new Date(); d.setDate(d.getDate() - i); d.setHours(0,0,0,0);
-                            const start = d.getTime(), end = start + (24*60*60*1000);
-                            labels.push(d.toLocaleDateString('ar-SA', {weekday: 'short'}));
-                            reportsData.push(db.reports.filter(r => r.createdAt >= start && r.createdAt < end).length);
-                            scansData.push(db.verifications.filter(v => v.timestamp >= start && v.timestamp < end).length);
-                        }
-                        return { status: 200, data: { labels, reports: reportsData, scans: scansData } };
-                    }
-
-                    if (method === 'GET' && url.startsWith('/api/verify/')) {
-                        const token = url.split('/').pop();
-                        const report = db.reports.find(r => r.verificationToken === token);
-                        
-                        // Log the verification
-                        db.verifications.push({
-                            id: crypto.randomUUID(),
-                            reportId: report ? report.id : null,
-                            timestamp: Date.now(),
-                            result: report ? (Date.now() > report.expiresAt ? 'expired' : 'valid') : 'invalid_token',
-                            ipAddress: '192.168.1.' + Math.floor(Math.random()*255) // Mock IP
-                        });
-                        saveDB();
-
-                        if (!report) return { status: 404, error: 'Not found' };
-                        if (Date.now() > report.expiresAt) return { status: 403, error: 'Expired' };
-                        
-                        // Return safe data to public client
-                        return { status: 200, data: {
-                            clinic: report.clinic, reportNumber: report.reportNumber, patientName: report.patientName,
-                            age: report.age, gender: report.gender, createdAt: report.createdAt, expiresAt: report.expiresAt,
-                            googleDriveUrl: report.googleDriveUrl
-                        }};
-                    }
-                    return { status: 404, error: 'Endpoint not found' };
-                }
-            };
-        })();
-
-        // Middleware Fetcher
-        async function apiFetch(endpoint, options = {}) {
-            const method = options.method || 'GET';
-            const body = options.body ? JSON.parse(options.body) : null;
-            const headers = options.headers || {};
-            const token = sessionStorage.getItem('sys_api_token');
-            if (token) headers['Authorization'] = `Bearer ${token}`;
-
-            const response = await MockBackend.handleRequest(method, endpoint, body, headers);
-            if (response.status === 401 && endpoint !== '/api/auth/login') { handleLogout(); throw new Error('Session Expired'); }
-            if (response.status >= 400) throw response;
-            return response.data;
-        }
-
-
-        // =====================================================================
-        // المكون الثاني: الواجهة الأمامية والمنطق (Frontend Logic & PDF Processing)
-        // =====================================================================
+        const ADMIN_USER = "admin";
+        const ADMIN_PASS = "admin123"; 
+        const STORAGE_KEY = "medical_records_local_v3"; 
+        
         const DOM = {
+            toast: document.getElementById('toast-container'),
             loginSec: document.getElementById('login-section'),
             adminSec: document.getElementById('admin-section'),
             clientSec: document.getElementById('client-section'),
             form: document.getElementById('create-form'),
-            pdfUpload: document.getElementById('pdf-upload'),
-            dropZone: document.getElementById('drop-zone'),
-            progressCont: document.getElementById('upload-progress-container'),
-            progressBar: document.getElementById('upload-progress-bar'),
-            statusText: document.getElementById('upload-status-text'),
-            submitBtn: document.getElementById('submit-btn'),
-            successModal: document.getElementById('success-modal'),
-            tbody: document.getElementById('records-tbody')
+            btnSubmit: document.getElementById('submit-btn'),
+            btnCancelEdit: document.getElementById('cancel-edit-btn'),
+            editRecordId: document.getElementById('edit-record-id'),
+            formTitle: document.getElementById('form-title'),
+            formIndicator: document.getElementById('form-indicator'),
+            tbody: document.getElementById('records-tbody'),
+            search: document.getElementById('search-input'),
+            qrModal: document.getElementById('qr-modal'),
+            deleteModal: document.getElementById('delete-modal'),
+            modalQRContainer: document.getElementById('modal-qrcode-container'),
+            printQRContainer: document.getElementById('print-qr-container'),
+            cSuccess: document.getElementById('client-success-view'),
+            cError: document.getElementById('client-error-view'),
+            selectAll: document.getElementById('select-all'),
+            exportSelectedContainer: document.getElementById('export-selected-container'),
+            btnExportSelected: document.getElementById('export-selected-btn'),
+            selectedCount: document.getElementById('selected-count')
         };
 
-        let selectedPdfFile = null;
-        let chartInstance = null;
+        let currentRecords = JSON.parse(localStorage.getItem(STORAGE_KEY)) || [];
+        let recordToDelete = null;
 
-        function showToast(msg, type = 'success') {
+        function showToast(message, type = 'success') {
             const toast = document.createElement('div');
-            const bg = type === 'success' ? 'bg-gray-900 border-emerald-500' : 'bg-red-600 border-red-900';
-            const icon = type === 'success' ? 'fa-circle-check text-emerald-400' : 'fa-circle-exclamation text-white';
-            toast.className = `${bg} border-l-4 text-white p-4 rounded-xl shadow-2xl flex items-center gap-3 toast-enter pointer-events-auto`;
-            toast.innerHTML = `<i class="fa-solid ${icon} text-xl"></i><p class="font-bold text-sm m-0">${msg}</p>`;
-            document.getElementById('toast-container').appendChild(toast);
-            setTimeout(() => { toast.classList.replace('toast-enter', 'toast-exit'); setTimeout(() => toast.remove(), 300); }, 3500);
+            const colors = type === 'success' ? 'bg-gray-900 border-l-4 border-emerald-500' : 
+                          (type === 'error' ? 'bg-red-600 border-l-4 border-red-900' : 'bg-emerald-600 border-l-4 border-emerald-900');
+            const icon = type === 'success' ? 'fa-circle-check text-emerald-400' : 
+                        (type === 'error' ? 'fa-circle-exclamation text-white' : 'fa-info-circle text-white');
+            
+            toast.className = `${colors} text-white p-4 rounded-xl shadow-2xl flex items-center gap-3 toast-enter pointer-events-auto admin-ui`;
+            toast.innerHTML = `<i class="fa-solid ${icon} text-xl"></i><p class="font-bold text-sm m-0">${message}</p>`;
+            
+            DOM.toast.appendChild(toast);
+            setTimeout(() => {
+                toast.classList.replace('toast-enter', 'toast-exit');
+                setTimeout(() => toast.remove(), 300);
+            }, 3500);
         }
 
-        // --- Init ---
-        async function initApp() {
-            const token = new URLSearchParams(window.location.search).get('token');
-            if (token) {
-                document.title = "Verify Medical Report";
-                await loadClientVerification(token);
-            } else if (sessionStorage.getItem('sys_api_token')) {
-                await loadAdminDashboard();
+        function checkDuplicates() {
+            const ids = currentRecords.map(r => r.patientId).filter(id => id);
+            const duplicates = ids.filter((item, index) => ids.indexOf(item) !== index);
+            const uniqueDuplicates = [...new Set(duplicates)];
+            
+            DOM.statDuplicates.textContent = uniqueDuplicates.length;
+            
+            if (uniqueDuplicates.length > 0) {
+                DOM.statCardDuplicates.classList.add('bg-yellow-50');
+                DOM.statCardDuplicates.classList.replace('border-gray-100', 'border-yellow-400');
             } else {
-                DOM.loginSec.classList.remove('hidden');
+                DOM.statCardDuplicates.classList.remove('bg-yellow-50');
+                DOM.statCardDuplicates.classList.replace('border-yellow-400', 'border-gray-100');
             }
         }
 
-        // --- Auth ---
-        document.getElementById('login-form').addEventListener('submit', async (e) => {
-            e.preventDefault();
+        // تصفية الجدول عند النقر على كرت المكررات
+        DOM.statCardDuplicates?.addEventListener('click', () => {
+            const ids = currentRecords.map(r => r.patientId).filter(id => id);
+            const duplicates = ids.filter((item, index) => ids.indexOf(item) !== index);
+            const uniqueDuplicates = [...new Set(duplicates)];
+            
+            if(uniqueDuplicates.length === 0) {
+                showToast('لا توجد سجلات مكررة لعرضها', 'info');
+                renderTable(currentRecords); // عرض الكل
+                return;
+            }
+            
+            const filteredRecords = currentRecords.filter(r => uniqueDuplicates.includes(r.patientId));
+            renderTable(filteredRecords);
+            showToast('تمت تصفية الجدول لعرض السجلات المكررة فقط', 'info');
+        });
+
+        function encodeDataToUrl(obj) {
+            const jsonStr = JSON.stringify(obj);
+            return btoa(encodeURIComponent(jsonStr));
+        }
+
+        function decodeDataFromUrl(encodedStr) {
             try {
-                const data = await apiFetch('/api/auth/login', { method: 'POST', body: JSON.stringify({ username: document.getElementById('login-username').value, password: document.getElementById('login-password').value }) });
-                sessionStorage.setItem('sys_api_token', data.token);
+                const jsonStr = decodeURIComponent(atob(encodedStr));
+                return JSON.parse(jsonStr);
+            } catch (e) {
+                return null;
+            }
+        }
+
+        function initApp() {
+            const urlParams = new URLSearchParams(window.location.search);
+            const encodedData = urlParams.get('d');
+            const legacyVerified = urlParams.get('verified');
+
+            if (encodedData || legacyVerified === 'true') {
+                document.title = "Verified Medical Report";
+                if (encodedData) {
+                    loadClientReport(encodedData);
+                } else {
+                    loadLegacyClientReport(urlParams);
+                }
+            } else {
+                const isLoggedIn = sessionStorage.getItem('admin_session_active');
+                if (isLoggedIn) {
+                    DOM.adminSec.classList.remove('hidden');
+                    renderTable(currentRecords);
+                    updateStats();
+                    checkDuplicates();
+                } else {
+                    DOM.loginSec.classList.remove('hidden');
+                }
+            }
+        }
+
+        function loadLegacyClientReport(params) {
+            DOM.clientSec.classList.remove('hidden');
+            DOM.cSuccess.classList.remove('hidden');
+            
+            document.getElementById('c-clinic').textContent = params.get('clinic') || 'Blue Medical Field Complex';
+            document.getElementById('c-id').textContent = params.get('id') || '-';
+            document.getElementById('c-name').textContent = params.get('name') || '-';
+            document.getElementById('c-age').textContent = params.get('age') || '-';
+            document.getElementById('c-gender').textContent = params.get('gender') || '-';
+            document.getElementById('c-date').textContent = params.get('dateText') || new Date().toLocaleString('en-GB');
+
+            const fileUrl = params.get('file');
+            if(fileUrl) {
+                const btn = document.getElementById('c-download-btn');
+                btn.href = fileUrl;
+                btn.classList.remove('hidden');
+            }
+        }
+
+        function loadClientReport(encodedData) {
+            DOM.clientSec.classList.remove('hidden');
+            const data = decodeDataFromUrl(encodedData);
+
+            if (data) {
+                const now = Date.now();
+                if (now > data.expiresAt) {
+                    DOM.cError.classList.remove('hidden');
+                } else {
+                    DOM.cSuccess.classList.remove('hidden');
+                    
+                    document.getElementById('c-clinic').textContent = data.clinic || '-';
+                    document.getElementById('c-id').textContent = data.patientId || '-';
+                    document.getElementById('c-name').textContent = data.patientName || '-';
+                    document.getElementById('c-age').textContent = data.age || '-';
+                    document.getElementById('c-gender').textContent = data.gender || '-';
+                    
+                    const createdDate = new Date(data.createdAt).toLocaleString('en-GB');
+                    document.getElementById('c-date').textContent = createdDate;
+
+                    if(data.fileUrl) {
+                        const btn = document.getElementById('c-download-btn');
+                        btn.href = data.fileUrl;
+                        btn.classList.remove('hidden');
+                    }
+                }
+            } else {
+                DOM.cError.classList.remove('hidden');
+            }
+        }
+
+        function copyTextToClipboard(text) {
+            const temp = document.createElement('input');
+            temp.value = text;
+            document.body.appendChild(temp);
+            temp.select();
+            document.execCommand('copy');
+            document.body.removeChild(temp);
+        }
+
+        document.getElementById('login-form').addEventListener('submit', (e) => {
+            e.preventDefault();
+            const u = document.getElementById('login-username').value;
+            const p = document.getElementById('login-password').value;
+            
+            if(u === ADMIN_USER && p === ADMIN_PASS) {
+                sessionStorage.setItem('admin_session_active', 'true');
                 DOM.loginSec.classList.add('hidden');
-                await loadAdminDashboard();
-            } catch (err) { showToast('بيانات الدخول غير صحيحة', 'error'); }
+                DOM.adminSec.classList.remove('hidden');
+                renderTable(currentRecords);
+                updateStats();
+                checkDuplicates();
+                showToast('مرحباً بك في لوحة الإدارة');
+            } else {
+                showToast('بيانات الدخول غير صحيحة!', 'error');
+            }
         });
 
-        function handleLogout() {
-            sessionStorage.removeItem('sys_api_token');
-            window.location.reload();
-        }
-        document.getElementById('logout-btn').addEventListener('click', handleLogout);
-
-        // --- PDF Upload Handling ---
-        DOM.dropZone.addEventListener('click', () => DOM.pdfUpload.click());
-        DOM.dropZone.addEventListener('dragover', (e) => { e.preventDefault(); DOM.dropZone.classList.add('dragover'); });
-        DOM.dropZone.addEventListener('dragleave', () => DOM.dropZone.classList.remove('dragover'));
-        DOM.dropZone.addEventListener('drop', (e) => {
-            e.preventDefault(); DOM.dropZone.classList.remove('dragover');
-            if (e.dataTransfer.files.length) handleFileSelect(e.dataTransfer.files[0]);
-        });
-        DOM.pdfUpload.addEventListener('change', (e) => {
-            if (e.target.files.length) handleFileSelect(e.target.files[0]);
+        document.getElementById('logout-btn').addEventListener('click', () => {
+            sessionStorage.removeItem('admin_session_active');
+            DOM.adminSec.classList.add('hidden');
+            DOM.loginSec.classList.remove('hidden');
+            document.getElementById('login-password').value = '';
         });
 
-        function handleFileSelect(file) {
-            if (file.type !== "application/pdf") return showToast('المشروع يقبل ملفات PDF الجاهزة فقط', 'error');
-            if (file.size > 10 * 1024 * 1024) return showToast('حجم الملف يتجاوز 10 ميجابايت', 'error');
-            
-            selectedPdfFile = file;
-            DOM.dropZone.classList.add('has-file');
-            document.getElementById('drop-icon').className = "fa-solid fa-file-pdf text-3xl text-emerald-600";
-            document.getElementById('drop-text').innerHTML = `<span class="block text-sm font-bold text-emerald-700">${file.name}</span><span class="block text-[10px] text-gray-500 mt-1">الملف جاهز للأتمتة (${(file.size/1024/1024).toFixed(2)} MB)</span>`;
-        }
-
-        // --- Automated Processing Logic (Frontend part of the pipeline) ---
-        async function createQRCanvas(text) {
-            return new Promise((resolve) => {
-                const div = document.getElementById('hidden-qr-generator');
-                div.innerHTML = ''; 
-                new QRCode(div, { text: text, width: 250, height: 250, correctLevel: QRCode.CorrectLevel.H });
-                setTimeout(() => resolve(div.querySelector('canvas').toDataURL('image/png')), 100);
-            });
-        }
-
-        async function processAndStampPDF(file, verifyUrl) {
-            const qrBase64 = await createQRCanvas(verifyUrl);
-            const pdfBytes = await file.arrayBuffer();
-            const pdfDoc = await PDFLib.PDFDocument.load(pdfBytes);
-            const qrImage = await pdfDoc.embedPng(qrBase64);
-            const pages = pdfDoc.getPages();
-            const firstPage = pages[0];
-            
-            // Standard A4 dimensions logic, stamp at bottom-right
-            const { width, height } = firstPage.getSize();
-            const qrSize = 90; 
-            const margin = 40;
-
-            // Draw White Background for QR
-            firstPage.drawRectangle({ x: width - qrSize - margin - 5, y: margin - 5, width: qrSize + 10, height: qrSize + 10, color: PDFLib.rgb(1, 1, 1) });
-            // Draw QR
-            firstPage.drawImage(qrImage, { x: width - qrSize - margin, y: margin, width: qrSize, height: qrSize });
-            // Draw English Verification Text
-            firstPage.drawText('Scan to Verify', { x: width - qrSize - margin + 5, y: margin - 15, size: 10, color: PDFLib.rgb(0, 0.5, 0.2) });
-
-            const finalPdfBytes = await pdfDoc.save();
-            return new Blob([finalPdfBytes], { type: 'application/pdf' });
-        }
-
-        function updateProgress(percent, text) {
-            DOM.progressCont.classList.remove('hidden');
-            DOM.statusText.classList.remove('hidden');
-            DOM.progressBar.style.width = `${percent}%`;
-            DOM.statusText.textContent = text;
-        }
-
-        DOM.form.addEventListener('submit', async (e) => {
+        DOM.form.addEventListener('submit', (e) => {
             e.preventDefault();
-            if (!selectedPdfFile) return showToast('الرجاء رفع ملف الـ PDF أولاً', 'error');
 
-            DOM.submitBtn.disabled = true;
-            document.getElementById('submit-btn-text').textContent = "جاري تنفيذ المعالجة الآلية...";
+            const editId = DOM.editRecordId.value;
+            const newPatientId = document.getElementById('input-id').value;
+            const validityDays = parseInt(document.getElementById('input-validity').value);
+            
+            const validityLabels = {
+                "365": "سنة كاملة",
+                "30": "30 يوماً",
+                "7": "7 أيام",
+                "90": "3 أشهر"
+            };
+            const validityText = validityLabels[validityDays] || `${validityDays} يوم`;
+            
+            // Duplicate Check before saving (exclude current record if editing)
+            const isDuplicate = currentRecords.some(r => r.patientId === newPatientId && r.id !== editId);
+            if (isDuplicate) {
+                showToast('خطأ: رقم الهوية مسجل مسبقاً في قاعدة البيانات!', 'error');
+                return; // Stop form submission
+            }
 
-            try {
-                // Pre-generate a token to embed in the PDF
-                const tempToken = 'vfy_' + crypto.randomUUID().replace(/-/g, '');
-                const verifyUrl = `${window.location.origin}${window.location.pathname}?token=${tempToken}`;
-
-                updateProgress(20, "قراءة وتجهيز الـ PDF الأصلي...");
+            if (editId) {
+                const index = currentRecords.findIndex(r => r.id === editId);
+                if (index !== -1) {
+                    currentRecords[index].clinic = document.getElementById('input-clinic').value;
+                    currentRecords[index].patientId = newPatientId;
+                    currentRecords[index].patientName = document.getElementById('input-name').value;
+                    currentRecords[index].age = document.getElementById('input-age').value;
+                    currentRecords[index].gender = document.getElementById('input-gender').value;
+                    currentRecords[index].fileUrl = document.getElementById('input-file-url').value;
+                    // Recalculate expiry based on original creation date and newly selected validity duration
+                    currentRecords[index].validityText = validityText;
+                    currentRecords[index].expiresAt = currentRecords[index].createdAt + (validityDays * 24 * 60 * 60 * 1000);
+                }
+                localStorage.setItem(STORAGE_KEY, JSON.stringify(currentRecords));
+                showToast('تم تحديث السجل بنجاح (الـ QR وتاريخ الإنشاء ثابتان لضمان الصلاحية)');
+                resetFormState();
+                renderTable(currentRecords);
+                updateStats();
+                checkDuplicates();
+                window.viewQR(editId);
+            } else {
+                const docId = crypto.randomUUID ? crypto.randomUUID() : 'id_' + Date.now(); 
+                const now = Date.now();
+                const expiresAt = now + (validityDays * 24 * 60 * 60 * 1000);
                 
-                // 1. Stamp the PDF locally (Simulating Backend Processing)
-                const finalBlob = await processAndStampPDF(selectedPdfFile, verifyUrl);
-                const finalBlobUrl = URL.createObjectURL(finalBlob);
-                updateProgress(60, "تم دمج الـ QR بنجاح، جاري الرفع إلى Google Drive...");
-
-                // 2. Send everything to Backend to finish the job
                 const payload = {
-                    reportNumber: document.getElementById('input-id').value,
+                    id: docId,
                     clinic: document.getElementById('input-clinic').value,
+                    patientId: newPatientId,
                     patientName: document.getElementById('input-name').value,
                     age: document.getElementById('input-age').value,
                     gender: document.getElementById('input-gender').value,
-                    validityDays: parseInt(document.getElementById('input-validity').value),
-                    fileName: selectedPdfFile.name,
-                    finalFileBlobUrl: finalBlobUrl // Passing Blob URL strictly for browser download simulation
+                    fileUrl: document.getElementById('input-file-url').value,
+                    validityText: validityText,
+                    createdAt: now,
+                    expiresAt: expiresAt
                 };
 
-                const savedRecord = await apiFetch('/api/reports/process', { method: 'POST', body: JSON.stringify(payload) });
-                updateProgress(100, "تم الرفع وحفظ السجل بنجاح!");
-
-                // 3. Update UI & Show Success Modal
-                setTimeout(() => {
-                    resetForm();
-                    fetchDashboardData();
-                    showSuccessModal(savedRecord, verifyUrl, finalBlobUrl);
-                }, 800);
-
-            } catch (err) {
-                console.error(err);
-                showToast('حدث خطأ أثناء المعالجة', 'error');
-                DOM.submitBtn.disabled = false;
-                document.getElementById('submit-btn-text').textContent = "إصدار التقرير الآلي";
+                currentRecords.unshift(payload); // Add to beginning
+                localStorage.setItem(STORAGE_KEY, JSON.stringify(currentRecords));
+                
+                showToast('تم التوليد والحفظ بنجاح');
+                resetFormState();
+                renderTable(currentRecords);
+                updateStats();
+                checkDuplicates();
+                window.viewQR(docId);
             }
         });
 
-        function resetForm() {
-            DOM.form.reset();
-            selectedPdfFile = null;
-            DOM.dropZone.classList.remove('has-file');
-            document.getElementById('drop-icon').className = "fa-solid fa-cloud-arrow-up text-3xl text-emerald-500";
-            document.getElementById('drop-text').innerHTML = `<span class="block text-sm font-bold text-gray-700">اسحب ملف التقرير أو اضغط للاختيار</span>`;
-            DOM.progressCont.classList.add('hidden');
-            DOM.statusText.classList.add('hidden');
-            DOM.progressBar.style.width = '0%';
-            DOM.submitBtn.disabled = false;
-            document.getElementById('submit-btn-text').textContent = "إصدار التقرير الآلي";
+        function resetFormState() {
+            DOM.editRecordId.value = '';
+            document.getElementById('input-id').value = '';
+            document.getElementById('input-name').value = '';
+            document.getElementById('input-age').value = '';
+            document.getElementById('input-file-url').value = '';
+            DOM.btnSubmit.innerHTML = `<i class="fa-solid fa-qrcode"></i> إنشاء البيانات`;
+            DOM.formTitle.innerHTML = `<i class="fa-solid fa-plus-circle text-emerald-600"></i> إضافة تقرير جديد`;
+            DOM.formIndicator.className = "absolute top-0 right-0 w-1.5 h-full bg-emerald-600";
+            DOM.btnCancelEdit.classList.add('hidden');
         }
 
-        // --- Success Modal Configuration ---
-        function showSuccessModal(record, verifyUrl, finalPdfUrl) {
-            document.getElementById('sm-id').textContent = record.reportNumber;
-            document.getElementById('sm-name').textContent = record.patientName;
-            document.getElementById('sm-date').textContent = new Date().toLocaleDateString('ar-SA');
+        DOM.btnCancelEdit.addEventListener('click', resetFormState);
+
+        function updateStats() {
+            const now = Date.now();
+            let active = 0, expired = 0, expiringSoon = 0, thisMonth = 0;
+            const sevenDaysMs = 7 * 24 * 60 * 60 * 1000;
             
-            document.getElementById('btn-open-pdf').href = finalPdfUrl; // Opens the stamped PDF
-            document.getElementById('btn-open-verify').href = verifyUrl;
-            
-            document.getElementById('btn-copy-link').onclick = () => {
-                navigator.clipboard.writeText(verifyUrl);
-                showToast('تم نسخ الرابط', 'info');
-            };
+            const currentMonth = new Date().getMonth();
+            const currentYear = new Date().getFullYear();
 
-            document.getElementById('btn-download-qr').onclick = async () => {
-                const b64 = await createQRCanvas(verifyUrl);
-                const a = document.createElement('a');
-                a.href = b64; a.download = `QR_${record.reportNumber}.png`; a.click();
-            };
+            const ids = [];
 
-            DOM.successModal.classList.remove('hidden');
-        }
-
-        // --- Backup, Restore & CSV Actions ---
-        
-        // Backup (JSON)
-        document.getElementById('btn-backup').addEventListener('click', async () => {
-            try {
-                const data = await apiFetch('/api/system/backup');
-                const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
-                const a = document.createElement('a');
-                a.href = URL.createObjectURL(blob);
-                a.download = `Medical_DB_Backup_${new Date().toISOString().split('T')[0]}.json`;
-                a.click();
-                showToast('تم تحميل النسخة الاحتياطية بنجاح', 'success');
-            } catch(e) {
-                showToast('فشل تحميل النسخة الاحتياطية', 'error');
-            }
-        });
-
-        // Restore (JSON)
-        document.getElementById('input-restore').addEventListener('change', (e) => {
-            const file = e.target.files[0];
-            if (!file) return;
-            const reader = new FileReader();
-            reader.onload = async (event) => {
-                try {
-                    const json = JSON.parse(event.target.result);
-                    const response = await apiFetch('/api/system/restore', { method: 'POST', body: JSON.stringify(json) });
-                    showToast(response.message || 'تمت استعادة البيانات بنجاح', 'success');
-                    fetchDashboardData(); // Refresh UI
-                } catch(err) {
-                    showToast('ملف النسخة الاحتياطية غير صالح', 'error');
+            currentRecords.forEach(r => {
+                ids.push(r.patientId);
+                
+                if (now > r.expiresAt) {
+                    expired++;
+                } else {
+                    active++;
+                    // Calculate if expiring within 7 days
+                    if (r.expiresAt - now <= sevenDaysMs) {
+                        expiringSoon++;
+                    }
                 }
-                e.target.value = ''; // Reset input
+
+                const createdDate = new Date(r.createdAt);
+                if (createdDate.getMonth() === currentMonth && createdDate.getFullYear() === currentYear) {
+                    thisMonth++;
+                }
+            });
+
+            // Calculate duplicates
+            const duplicates = ids.filter((item, index) => ids.indexOf(item) !== index);
+            const uniqueDuplicatesCount = [...new Set(duplicates)].length;
+
+            document.getElementById('stat-total').textContent = currentRecords.length;
+            document.getElementById('stat-active').textContent = active;
+            document.getElementById('stat-expired').textContent = expired;
+            
+            const statDup = document.getElementById('stat-duplicates');
+            if(statDup) statDup.textContent = uniqueDuplicatesCount;
+            
+            const statSoon = document.getElementById('stat-soon');
+            if(statSoon) statSoon.textContent = expiringSoon;
+            
+            const statMonth = document.getElementById('stat-month');
+            if(statMonth) statMonth.textContent = thisMonth;
+        }
+
+        function toggleExportSelectedBtn() {
+            const checkedBoxes = document.querySelectorAll('.row-checkbox:checked');
+            const checked = checkedBoxes.length;
+            if (checked > 0) {
+                DOM.exportSelectedContainer.classList.remove('hidden');
+                DOM.selectedCount.textContent = checked;
+            } else {
+                DOM.exportSelectedContainer.classList.add('hidden');
+            }
+        }
+
+        // --- Selection & Actions Events ---
+        DOM.selectAll?.addEventListener('change', (e) => {
+            const checkboxes = document.querySelectorAll('.row-checkbox');
+            checkboxes.forEach(cb => cb.checked = e.target.checked);
+            toggleExportSelectedBtn();
+        });
+
+        DOM.tbody?.addEventListener('change', (e) => {
+            if (e.target.classList.contains('row-checkbox')) {
+                toggleExportSelectedBtn();
+                const allCheckboxes = document.querySelectorAll('.row-checkbox');
+                const allChecked = Array.from(allCheckboxes).every(cb => cb.checked);
+                DOM.selectAll.checked = allCheckboxes.length > 0 && allChecked;
+            }
+        });
+
+        DOM.btnExportSelected?.addEventListener('click', () => {
+            const checkedBoxes = document.querySelectorAll('.row-checkbox:checked');
+            if (checkedBoxes.length === 0) return;
+
+            let textContent = "\uFEFFسجل الروابط المحددة (QR Links)\n====================\n\n";
+
+            checkedBoxes.forEach(cb => {
+                const id = cb.value;
+                const rec = currentRecords.find(r => r.id === id);
+                if (rec) {
+                    const link = window.getRecordUrl(id);
+                    textContent += `المريض: ${rec.patientName}\n`;
+                    textContent += `الهوية: ${rec.patientId}\n`;
+                    textContent += `رابط الـ QR: ${link}\n`;
+                    textContent += `--------------------\n`;
+                }
+            });
+
+            const blob = new Blob([textContent], { type: 'text/plain;charset=utf-8;' });
+            const link = document.createElement("a");
+            const url = URL.createObjectURL(blob);
+            link.setAttribute("href", url);
+            link.setAttribute("download", `Selected_QR_Links_${new Date().getTime()}.txt`);
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+            
+            showToast('تم تحميل الروابط المحددة بنجاح', 'success');
+        });
+
+        // Filter duplicates on card click
+        document.getElementById('card-duplicates')?.addEventListener('click', () => {
+             const ids = currentRecords.map(r => r.patientId);
+             const duplicateIds = [...new Set(ids.filter((item, index) => ids.indexOf(item) !== index))];
+             
+             if (duplicateIds.length === 0) {
+                 showToast('لا يوجد سجلات مكررة', 'info');
+                 return;
+             }
+             
+             const filtered = currentRecords.filter(r => duplicateIds.includes(r.patientId));
+             renderTable(filtered);
+             DOM.search.value = ''; // clear search input
+             showToast('تم تصفية الجدول لعرض السجلات المكررة فقط', 'info');
+        });
+
+        function renderTable(records) {
+            DOM.tbody.innerHTML = '';
+            const noData = document.getElementById('no-records-msg');
+            
+            if(records.length === 0) {
+                noData.classList.remove('hidden');
+                if (DOM.selectAll) DOM.selectAll.checked = false;
+                toggleExportSelectedBtn();
+                return;
+            }
+            noData.classList.add('hidden');
+
+            const now = Date.now();
+
+            records.forEach((rec, index) => {
+                const seqNumber = index + 1; // التسلسل
+                const isExpired = now > rec.expiresAt;
+                const statusBadge = isExpired 
+                    ? `<span class="bg-red-50 text-red-600 border border-red-200 px-2 py-1 rounded text-[11px] font-bold shadow-sm inline-block w-full text-center"><i class="fa-solid fa-clock"></i> منتهي</span>`
+                    : `<span class="bg-green-50 text-green-600 border border-green-200 px-2 py-1 rounded text-[11px] font-bold shadow-sm inline-block w-full text-center"><i class="fa-solid fa-check"></i> نشط</span>`;
+                
+                const dateObj = new Date(rec.createdAt);
+                const dateStr = dateObj.toLocaleDateString('en-GB');
+                const timeStr = dateObj.toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: false });
+                const fullDateTime = `${dateStr} ${timeStr}`;
+
+                const expiryObj = new Date(rec.expiresAt);
+                const expiryStr = `${expiryObj.toLocaleDateString('en-GB')} ${expiryObj.toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit', hour12: false })}`;
+                
+                const validityDisplay = rec.validityText || 'سنة كاملة';
+
+                const tr = document.createElement('tr');
+                tr.className = "hover:bg-emerald-50/50 transition-colors group";
+                tr.innerHTML = `
+                    <td class="px-2 py-3 text-center sticky right-0 bg-white group-hover:bg-emerald-50/50 transition-colors z-10">
+                        <input type="checkbox" class="row-checkbox w-4 h-4 rounded border-gray-300 text-emerald-600 focus:ring-emerald-500 cursor-pointer" value="${rec.id}">
+                    </td>
+                    <td class="px-2 py-3 text-center font-bold text-gray-500 sticky right-8 sm:right-10 bg-white group-hover:bg-emerald-50/50 transition-colors z-10 border-l border-gray-100">${seqNumber}</td>
+                    <td class="px-2 py-3 text-center">${statusBadge}</td>
+                    <td class="px-3 py-3 whitespace-nowrap text-xs font-mono text-gray-700" dir="ltr">${fullDateTime}</td>
+                    <td class="px-3 py-3 text-center text-xs font-semibold text-gray-800">${validityDisplay}</td>
+                    <td class="px-3 py-3 whitespace-nowrap text-xs font-mono text-gray-600" dir="ltr">${expiryStr}</td>
+                    <td class="px-3 py-3 font-bold text-gray-900"><div class="break-words max-w-[180px] sm:max-w-[250px] whitespace-normal leading-tight">${rec.patientName}</div></td>
+                    <td class="px-3 py-3 whitespace-nowrap font-mono text-gray-500 text-xs text-center" dir="ltr">${rec.patientId}</td>
+                    <td class="px-2 py-3 text-center space-x-1 space-x-reverse sticky left-0 bg-white group-hover:bg-emerald-50/50 transition-colors z-10 border-r border-gray-100 whitespace-nowrap">
+                        <button onclick="window.editRecord('${rec.id}')" class="bg-white border border-yellow-200 text-yellow-600 shadow-sm w-7 h-7 sm:w-8 sm:h-8 rounded-md hover:bg-yellow-50 transition-colors inline-flex items-center justify-center" title="تعديل السجل">
+                            <i class="fa-solid fa-pen-to-square text-xs sm:text-sm"></i>
+                        </button>
+                        <button onclick="window.viewQR('${rec.id}')" class="bg-white border border-gray-200 text-gray-700 shadow-sm w-7 h-7 sm:w-8 sm:h-8 rounded-md hover:bg-gray-50 hover:text-emerald-600 transition-colors inline-flex items-center justify-center" title="عرض الرمز">
+                            <i class="fa-solid fa-qrcode text-xs sm:text-sm"></i>
+                        </button>
+                        <button onclick="window.copyLink('${rec.id}')" class="bg-white border border-gray-200 text-gray-700 shadow-sm w-7 h-7 sm:w-8 sm:h-8 rounded-md hover:bg-gray-50 hover:text-purple-600 transition-colors inline-flex items-center justify-center" title="نسخ الرابط">
+                            <i class="fa-solid fa-link text-xs sm:text-sm"></i>
+                        </button>
+                        <button onclick="window.requestDelete('${rec.id}')" class="bg-white border border-red-100 text-red-500 shadow-sm w-7 h-7 sm:w-8 sm:h-8 rounded-md hover:bg-red-50 hover:text-red-700 transition-colors inline-flex items-center justify-center" title="حذف السجل">
+                            <i class="fa-solid fa-trash-can text-xs sm:text-sm"></i>
+                        </button>
+                    </td>
+                `;
+                DOM.tbody.appendChild(tr);
+            });
+        }
+
+        window.getRecordUrl = (id) => {
+            const record = currentRecords.find(r => r.id === id);
+            if(!record) return '';
+            
+            const payloadToEncode = {
+                clinic: record.clinic,
+                patientId: record.patientId,
+                patientName: record.patientName,
+                age: record.age,
+                gender: record.gender,
+                fileUrl: record.fileUrl,
+                createdAt: record.createdAt,
+                expiresAt: record.expiresAt
+            };
+            
+            const encoded = encodeDataToUrl(payloadToEncode);
+            const baseUrl = window.location.href.split('?')[0].split('#')[0];
+            return `${baseUrl}?d=${encoded}`;
+        };
+
+        window.editRecord = (id) => {
+            const record = currentRecords.find(r => r.id === id);
+            if (!record) return;
+
+            DOM.editRecordId.value = record.id;
+            document.getElementById('input-clinic').value = record.clinic || '';
+            document.getElementById('input-id').value = record.patientId || '';
+            document.getElementById('input-name').value = record.patientName || '';
+            document.getElementById('input-age').value = record.age || '';
+            document.getElementById('input-gender').value = record.gender || 'Male';
+            document.getElementById('input-file-url').value = record.fileUrl || '';
+
+            DOM.btnSubmit.innerHTML = `<i class="fa-solid fa-floppy-disk"></i> حفظ التعديلات`;
+            DOM.formTitle.innerHTML = `<i class="fa-solid fa-pen-to-square text-amber-600"></i> تعديل بيانات السجل`;
+            DOM.formIndicator.className = "absolute top-0 right-0 w-1.5 h-full bg-amber-500";
+            DOM.btnCancelEdit.classList.remove('hidden');
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+            showToast('تم تحميل السجل في نموذج التعديل', 'info');
+        };
+
+        window.viewQR = (id) => {
+            const qrUrl = window.getRecordUrl(id);
+            const record = currentRecords.find(r => r.id === id);
+            
+            DOM.modalQRContainer.innerHTML = '';
+            try {
+                new QRCode(DOM.modalQRContainer, { 
+                    text: qrUrl, 
+                    width: 180, 
+                    height: 180, 
+                    colorDark: "#000000", 
+                    colorLight: "#ffffff",
+                    correctLevel: QRCode.CorrectLevel.M
+                });
+            } catch(e) {
+                DOM.modalQRContainer.innerHTML = `<p class="text-red-500 text-xs">تعذر توليد الرمز</p>`;
+            }
+            
+            DOM.printQRContainer.innerHTML = '';
+            try {
+                new QRCode(DOM.printQRContainer, { 
+                    text: qrUrl, 
+                    width: 95, 
+                    height: 95,
+                    colorDark: "#000000",
+                    colorLight: "#ffffff",
+                    correctLevel: QRCode.CorrectLevel.M
+                });
+            } catch(e) {}
+
+            document.getElementById('print-clinic-name').textContent = record ? record.clinic : 'Clinic';
+            document.getElementById('print-patient-id').textContent = record ? record.patientId : id;
+
+            DOM.qrModal.classList.remove('hidden');
+        };
+
+        window.copyLink = (id) => {
+            const qrUrl = window.getRecordUrl(id);
+            copyTextToClipboard(qrUrl);
+            showToast('تم نسخ الرابط الموثق للحافظة', 'success');
+        };
+
+        window.requestDelete = (id) => {
+            recordToDelete = id;
+            DOM.deleteModal.classList.remove('hidden');
+        };
+
+        document.getElementById('cancel-delete-btn').addEventListener('click', () => {
+            recordToDelete = null;
+            DOM.deleteModal.classList.add('hidden');
+        });
+
+        document.getElementById('confirm-delete-btn').addEventListener('click', () => {
+            if(!recordToDelete) return;
+            
+            currentRecords = currentRecords.filter(r => r.id !== recordToDelete);
+            localStorage.setItem(STORAGE_KEY, JSON.stringify(currentRecords));
+            
+            DOM.deleteModal.classList.add('hidden');
+            recordToDelete = null;
+
+            showToast('تم حذف السجل من المتصفح بنجاح');
+            renderTable(currentRecords);
+            updateStats();
+            checkDuplicates();
+        });
+
+        DOM.search.addEventListener('input', (e) => {
+            const term = e.target.value.toLowerCase();
+            const filtered = currentRecords.filter(r => 
+                (r.patientName && r.patientName.toLowerCase().includes(term)) || 
+                (r.patientId && r.patientId.toLowerCase().includes(term))
+            );
+            renderTable(filtered);
+        });
+
+        document.getElementById('close-modal-btn').addEventListener('click', () => DOM.qrModal.classList.add('hidden'));
+        document.getElementById('print-qr-btn').addEventListener('click', () => {
+            DOM.qrModal.classList.add('hidden'); 
+            setTimeout(() => window.print(), 150); 
+        });
+        document.getElementById('refresh-db-btn')?.addEventListener('click', () => {
+            renderTable(currentRecords);
+            updateStats();
+            checkDuplicates();
+            showToast('تم تحديث الجدول', 'info');
+        });
+
+        // Backup & Restore
+        document.getElementById('export-backup-btn').addEventListener('click', () => {
+            if(currentRecords.length === 0) return showToast('لا توجد سجلات لتصديرها كنسخة احتياطية', 'error');
+            
+            const backupData = {
+                version: "3.0",
+                exportDate: new Date().toISOString(),
+                records: currentRecords
+            };
+            
+            const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(backupData, null, 2));
+            const downloadAnchor = document.createElement('a');
+            downloadAnchor.setAttribute("href", dataStr);
+            downloadAnchor.setAttribute("download", `Medical_Backup_${new Date().toISOString().split('T')[0]}.json`);
+            document.body.appendChild(downloadAnchor);
+            downloadAnchor.click();
+            downloadAnchor.remove();
+            
+            showToast('تم تنزيل النسخة الاحتياطية بنجاح', 'success');
+        });
+
+        document.getElementById('import-backup-file').addEventListener('change', (event) => {
+            const file = event.target.files[0];
+            if (!file) return;
+
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                try {
+                    const parsed = JSON.parse(e.target.result);
+                    let importedRecords = [];
+
+                    if (Array.isArray(parsed)) {
+                        importedRecords = parsed;
+                    } else if (parsed && Array.isArray(parsed.records)) {
+                        importedRecords = parsed.records;
+                    } else {
+                        throw new Error("ملف غير صالح");
+                    }
+
+                    if(confirm(`هل تريد دمج واستعادة ${importedRecords.length} سجل في قاعدة البيانات؟`)) {
+                        const existingIds = new Set(currentRecords.map(r => r.id));
+                        let addedCount = 0;
+
+                        importedRecords.forEach(rec => {
+                            if (rec && rec.id && !existingIds.has(rec.id)) {
+                                currentRecords.push(rec);
+                                addedCount++;
+                            }
+                        });
+
+                        localStorage.setItem(STORAGE_KEY, JSON.stringify(currentRecords));
+                        renderTable(currentRecords);
+                        updateStats();
+                        checkDuplicates();
+                        showToast(`تمت استعادة ${addedCount} سجل بنجاح!`, 'success');
+                    }
+                } catch(err) {
+                    showToast('فشل قراءة الملف! تأكد أنه ملف نسخة احتياطية صالح بصيغة JSON.', 'error');
+                }
+                event.target.value = '';
             };
             reader.readAsText(file);
         });
 
-        // Export to CSV
-        document.getElementById('btn-export-csv').addEventListener('click', async () => {
-            try {
-                const reports = await apiFetch('/api/reports');
-                if(reports.length === 0) return showToast('لا توجد بيانات للتصدير', 'error');
+        document.getElementById('export-csv-btn').addEventListener('click', () => {
+            if(currentRecords.length === 0) return showToast('لا توجد بيانات للتصدير', 'error');
+            
+            let csv = '\uFEFF'; 
+            csv += 'DateTime,Validity,ExpiryDate,Status,ID,Patient Name,Age,Gender,Clinic,Report URL\n';
+            
+            const now = Date.now();
+            currentRecords.forEach(r => {
+                const status = now > r.expiresAt ? 'Expired' : 'Active';
+                const dt = new Date(r.createdAt).toLocaleString('en-GB');
+                const exp = new Date(r.expiresAt).toLocaleString('en-GB');
+                const validity = r.validityText || 'سنة كاملة';
+                const name = `"${(r.patientName||'').replace(/"/g, '""')}"`;
+                const clinic = `"${(r.clinic||'').replace(/"/g, '""')}"`;
+                const link = `"${window.getRecordUrl(r.id)}"`;
                 
-                // Add BOM for UTF-8 Arabic support in Excel
-                let csv = '\uFEFFرقم التقرير,العيادة,اسم المريض,العمر,الجنس,تاريخ الإصدار,تاريخ الانتهاء,حالة التقرير,رابط التحقق\n';
-                
-                reports.forEach(r => {
-                    const status = Date.now() > r.expiresAt ? 'منتهي' : 'نشط';
-                    const issueDate = new Date(r.createdAt).toLocaleDateString('ar-SA');
-                    const expDate = new Date(r.expiresAt).toLocaleDateString('ar-SA');
-                    const verifyLink = `${window.location.origin}${window.location.pathname}?token=${r.verificationToken}`;
-                    
-                    csv += `"${r.reportNumber}","${r.clinic}","${r.patientName}","${r.age}","${r.gender}","${issueDate}","${expDate}","${status}","${verifyLink}"\n`;
-                });
+                csv += `"${dt}","${validity}","${exp}",${status},${r.patientId},${name},${r.age},${r.gender},${clinic},${link}\n`;
+            });
 
-                const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
-                const a = document.createElement('a');
-                a.href = URL.createObjectURL(blob);
-                a.download = `Reports_Export_${new Date().toISOString().split('T')[0]}.csv`;
-                a.click();
-                showToast('تم تصدير الإكسيل بنجاح', 'success');
-            } catch(e) {
-                showToast('فشل التصدير', 'error');
-            }
+            const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+            const link = document.createElement("a");
+            const url = URL.createObjectURL(blob);
+            link.setAttribute("href", url);
+            link.setAttribute("download", `Medical_Records_${new Date().toISOString().split('T')[0]}.csv`);
+            link.style.visibility = 'hidden';
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+            showToast('تم تحميل الملف بنجاح', 'success');
         });
-
-        // --- Dashboard Data Fetching ---
-        async function loadAdminDashboard() {
-            DOM.adminSec.classList.remove('hidden');
-            await fetchDashboardData();
-        }
-
-        async function fetchDashboardData() {
-            const reports = await apiFetch('/api/reports');
-            renderTable(reports);
-            
-            const stats = await apiFetch('/api/dashboard/stats');
-            ['total', 'active', 'expired', 'month', 'expiring-soon', 'scans'].forEach(id => {
-                document.getElementById(`stat-${id}`).textContent = stats[id.replace('-soon', 'Soon').replace('month', 'thisMonth').replace('scans', 'scansCount')];
-            });
-
-            const chartData = await apiFetch('/api/dashboard/chart');
-            const ctx = document.getElementById('activityChart').getContext('2d');
-            if(chartInstance) chartInstance.destroy();
-            Chart.defaults.font.family = "'Tajawal', sans-serif";
-            chartInstance = new Chart(ctx, {
-                type: 'bar',
-                data: { labels: chartData.labels, datasets: [{ label: 'تقارير جديدة', data: chartData.reports, backgroundColor: '#059669' }, { label: 'عمليات تحقق', data: chartData.scans, backgroundColor: '#8b5cf6' }] },
-                options: { responsive: true, maintainAspectRatio: false, scales: { y: { beginAtZero: true, ticks: { stepSize: 1 } } } }
-            });
-        }
-
-        function renderTable(records) {
-            DOM.tbody.innerHTML = records.map(rec => {
-                const status = Date.now() > rec.expiresAt ? `<span class="bg-red-50 text-red-600 px-2 py-1 rounded text-xs font-bold w-full inline-block">منتهي</span>` : `<span class="bg-green-50 text-green-600 px-2 py-1 rounded text-xs font-bold w-full inline-block">نشط</span>`;
-                return `
-                <tr class="hover:bg-gray-50 border-b">
-                    <td class="px-3 py-3 text-center">${status}</td>
-                    <td class="px-3 py-3 font-mono text-xs font-bold text-gray-700" dir="ltr">${rec.reportNumber}</td>
-                    <td class="px-3 py-3 font-bold text-gray-900">${rec.patientName}</td>
-                    <td class="px-3 py-3 text-center">
-                        <span class="bg-blue-50 text-blue-600 text-[10px] px-2 py-1 rounded-full font-bold inline-flex items-center gap-1"><i class="fa-brands fa-google-drive"></i> تم الرفع</span>
-                    </td>
-                    <td class="px-3 py-3 text-center">
-                        <a href="${window.location.origin}${window.location.pathname}?token=${rec.verificationToken}" target="_blank" class="text-emerald-600 hover:text-emerald-800 bg-emerald-50 p-2 rounded-lg transition-colors text-xs" title="صفحة التحقق"><i class="fa-solid fa-arrow-up-right-from-square"></i></a>
-                    </td>
-                </tr>`;
-            }).join('');
-        }
-
-        document.getElementById('refresh-db-btn').addEventListener('click', fetchDashboardData);
-
-        // --- Client Verification Logic ---
-        async function loadClientVerification(token) {
-            DOM.clientSec.classList.remove('hidden');
-            DOM.clientSec.querySelector('#client-loading').classList.remove('hidden');
-            
-            try {
-                const data = await apiFetch(`/api/verify/${token}`);
-                DOM.clientSec.querySelector('#client-loading').classList.add('hidden');
-                document.getElementById('client-success-view').classList.remove('hidden');
-                
-                document.getElementById('c-clinic').textContent = data.clinic;
-                document.getElementById('c-id').textContent = data.reportNumber;
-                document.getElementById('c-name').textContent = data.patientName;
-                document.getElementById('c-age').textContent = data.age;
-                document.getElementById('c-gender').textContent = data.gender;
-                document.getElementById('c-date').textContent = new Date(data.createdAt).toLocaleDateString('en-GB');
-                document.getElementById('c-exp').textContent = new Date(data.expiresAt).toLocaleDateString('en-GB');
-                
-                // Set Download link to the generated Google Drive URL
-                document.getElementById('c-download-btn').href = data.googleDriveUrl;
-
-            } catch (err) {
-                DOM.clientSec.querySelector('#client-loading').classList.add('hidden');
-                document.getElementById('client-error-view').classList.remove('hidden');
-            }
-        }
 
         window.addEventListener('DOMContentLoaded', initApp);
     </script>
