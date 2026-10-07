@@ -127,6 +127,10 @@
                     </label>
                     <input type="file" id="import-backup-file" accept=".json" class="hidden">
 
+                    <button id="clear-db-btn" class="bg-rose-50 hover:bg-rose-100 text-rose-700 px-3.5 py-2.5 rounded-xl font-bold transition-colors text-sm flex items-center gap-2 border border-rose-200" title="مسح جميع السجلات الحالية للبدء من جديد">
+                        <i class="fa-solid fa-broom"></i> تصفير البيانات
+                    </button>
+
                     <button id="logout-btn" class="bg-red-50 hover:bg-red-100 text-red-600 px-4 py-2.5 rounded-xl font-bold transition-colors flex items-center gap-2">
                         <i class="fa-solid fa-right-from-bracket"></i> خروج
                     </button>
@@ -429,6 +433,24 @@
         </div>
     </div>
 
+    <!-- Clear Database Confirmation Modal -->
+    <div id="clear-all-modal" class="hidden fixed inset-0 z-50 flex items-center justify-center bg-gray-900/60 backdrop-blur-sm admin-ui">
+        <div class="bg-white p-6 rounded-2xl shadow-2xl w-[90%] max-w-md text-center transform transition-all border border-gray-100">
+            <div class="w-16 h-16 bg-rose-100 text-rose-600 rounded-full flex items-center justify-center mx-auto mb-4">
+                <i class="fa-solid fa-broom text-3xl"></i>
+            </div>
+            <h3 class="text-xl font-bold mb-2 text-gray-800">تصفير قاعدة البيانات</h3>
+            <p class="text-sm text-gray-500 mb-6">هل أنت متأكد من رغبتك في مسح <strong>جميع السجلات الحالية</strong> للبدء بجلسة جديدة؟<br>يُرجى التأكد من أنك قمت بحفظ "نسخة احتياطية" للقسم الحالي أولاً.</p>
+            
+            <div class="flex gap-3">
+                <button id="cancel-clear-btn" class="flex-1 bg-gray-100 hover:bg-gray-200 text-gray-800 py-3 rounded-xl font-bold transition-colors">لا، تراجع</button>
+                <button id="confirm-clear-btn" class="flex-1 bg-rose-600 hover:bg-rose-700 text-white py-3 rounded-xl font-bold transition-colors shadow-md flex justify-center items-center gap-2">
+                    <i class="fa-solid fa-trash-can"></i> نعم، امسح كل شيء
+                </button>
+            </div>
+        </div>
+    </div>
+
     <!-- Hidden Print Area -->
     <div id="print-card-area">
         <div style="display: flex; align-items: center; justify-content: center; gap: 8px; margin-bottom: 5px;">
@@ -467,7 +489,11 @@
             selectAll: document.getElementById('select-all'),
             exportSelectedContainer: document.getElementById('export-selected-container'),
             btnExportSelected: document.getElementById('export-selected-btn'),
-            selectedCount: document.getElementById('selected-count')
+            selectedCount: document.getElementById('selected-count'),
+            clearAllModal: document.getElementById('clear-all-modal'),
+            btnClearDb: document.getElementById('clear-db-btn'),
+            btnConfirmClear: document.getElementById('confirm-clear-btn'),
+            btnCancelClear: document.getElementById('cancel-clear-btn')
         };
 
         let currentRecords = JSON.parse(localStorage.getItem(STORAGE_KEY)) || [];
@@ -1188,6 +1214,33 @@
             link.click();
             document.body.removeChild(link);
             showToast('تم تحميل الملف بنجاح', 'success');
+        });
+
+        // --- كود مسح البيانات (البدء من جديد) ---
+        DOM.btnClearDb?.addEventListener('click', () => {
+            if (currentRecords.length === 0) {
+                showToast('قاعدة البيانات فارغة بالفعل!', 'info');
+                return;
+            }
+            DOM.clearAllModal.classList.remove('hidden');
+        });
+        
+        DOM.btnCancelClear?.addEventListener('click', () => {
+            DOM.clearAllModal.classList.add('hidden');
+        });
+        
+        DOM.btnConfirmClear?.addEventListener('click', () => {
+            currentRecords = []; // إفراغ المصفوفة
+            localStorage.setItem(STORAGE_KEY, JSON.stringify(currentRecords)); // حفظ التغيير محلياً
+            DOM.clearAllModal.classList.add('hidden'); // إخفاء النافذة
+            
+            renderTable(currentRecords); // إعادة رسم الجدول (سيكون فارغاً)
+            updateStats(); // تصفير الإحصائيات
+            checkDuplicates(); // تصفير التكرارات
+            if(DOM.selectAll) DOM.selectAll.checked = false; // إزالة التحديد
+            toggleExportSelectedBtn(); // إخفاء زر تحميل الروابط المحددة
+            
+            showToast('تم مسح جميع السجلات بنجاح. يمكنك الآن بدء جلسة جديدة.', 'success');
         });
 
         window.addEventListener('DOMContentLoaded', initApp);
