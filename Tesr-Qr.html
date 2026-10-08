@@ -3,14 +3,16 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>نظام التقارير الطبية - V7 المطور</title>
+    <title>نظام التقارير الطبية - QR Code Verified</title>
     
+    <!-- STREAMING_CHUNK: Loading External Libraries -->
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Tajawal:wght@500;700;800&display=swap" rel="stylesheet">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
     <script src="https://unpkg.com/pdf-lib@1.17.1/dist/pdf-lib.min.js"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 
+    <!-- STREAMING_CHUNK: Base Styles and Print Settings -->
     <style>
         body {
             background-color: #f3f4f6; 
@@ -21,13 +23,11 @@
         .admin-ui { font-family: 'Tajawal', sans-serif; }
         .english-ui { font-family: 'Inter', sans-serif; }
         
-        /* Table Styles for Patient View */
         .info-table { width: 100%; border-collapse: collapse; font-size: 15px; }
         .info-table tr { border-bottom: 1px solid #e5e7eb; }
         .info-table th { background-color: #f9fafb; color: #374151; font-weight: 600; padding: 14px 16px; text-align: left; width: 35%; font-size: 15px; }
         .info-table td { color: #111827; padding: 14px 16px; text-align: left; font-weight: 500; font-size: 15px; word-break: break-word; }
 
-        /* Custom Scrollbars */
         ::-webkit-scrollbar { width: 6px; height: 8px; }
         ::-webkit-scrollbar-track { background: transparent; }
         ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 4px; }
@@ -39,7 +39,7 @@
         .toast-enter { animation: slideInUp 0.3s ease-out forwards; }
         .toast-exit { animation: fadeOut 0.3s ease-out forwards; }
 
-        /* Print Settings */
+        /* Print Settings with Name and Age Additions */
         @media print {
             body { background: white !important; margin: 0; padding: 0; }
             .no-print { display: none !important; }
@@ -56,9 +56,9 @@
                 page-break-inside: avoid;
             }
             #print-card-area h3 { margin: 0 0 5px 0; font-size: 13px; font-family: Arial, sans-serif; }
-            #print-card-area p { margin: 0 0 5px 0; font-size: 9px; color: #555; }
-            #print-qr-container { display: flex; justify-content: center; }
-            #print-qr-container img { width: 85px; height: 85px; }
+            #print-card-area p { margin: 0 0 3px 0; font-size: 10px; color: #333; }
+            #print-qr-container { display: flex; justify-content: center; margin-top: 5px; }
+            #print-qr-container img { width: 85px; height: 85px; margin: 0 auto; }
             
             #admin-section, #login-section, #client-section, #qr-modal, #delete-modal, #clear-all-modal, footer { display: none !important; }
         }
@@ -68,17 +68,16 @@
 </head>
 <body class="min-h-screen text-gray-800 flex flex-col items-center p-2 sm:p-4 relative justify-between">
 
-    <!-- Toast Notifications Container -->
+    <!-- Toast Notifications -->
     <div id="toast-container" class="fixed bottom-4 left-1/2 transform -translate-x-1/2 z-[9999] flex flex-col gap-2 w-full max-w-sm px-4 pointer-events-none"></div>
 
     <main class="w-full max-w-[1600px] mx-auto flex-1">
         
+        <!-- STREAMING_CHUNK: Login Interface -->
         <!-- 0. واجهة تسجيل الدخول (مخفية افتراضياً) -->
         <section id="login-section" class="admin-ui hidden bg-white rounded-2xl shadow-xl border border-gray-100 p-8 max-w-md mx-auto mt-12 transform transition-all">
             <div class="text-center mb-8">
-                <div class="inline-flex items-center justify-center w-16 h-16 bg-emerald-50 text-emerald-600 rounded-2xl mb-4 shadow-inner">
-                    <i class="fa-solid fa-user-doctor text-3xl"></i>
-                </div>
+                <img src="Blue.png" alt="Logo" class="h-16 object-contain mx-auto mb-4" onerror="this.onerror=null; this.src='https://placehold.co/120x40/ffffff/059669?text=Logo'">
                 <h2 class="text-2xl font-bold text-gray-800">بوابة الإدارة الطبية</h2>
                 <p class="text-sm text-gray-500 mt-2">يرجى تسجيل الدخول للوصول لقاعدة البيانات</p>
             </div>
@@ -106,14 +105,13 @@
             </form>
         </section>
 
+        <!-- STREAMING_CHUNK: Admin Dashboard Header & Stats -->
         <!-- 1. لوحة تحكم الآدمن -->
         <section id="admin-section" class="admin-ui hidden w-full fade-in">
             <!-- Header -->
             <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-5 mb-6 flex flex-col md:flex-row justify-between items-center gap-4">
                 <div class="flex items-center gap-4">
-                    <div class="w-12 h-12 bg-emerald-50 text-emerald-600 rounded-xl flex items-center justify-center text-2xl shadow-sm">
-                        <i class="fa-solid fa-notes-medical"></i>
-                    </div>
+                    <img src="Blue.png" alt="Logo" class="h-12 object-contain bg-white" onerror="this.onerror=null; this.src='https://placehold.co/120x40/ffffff/059669?text=Logo'">
                     <div>
                         <h2 class="text-xl font-bold text-gray-800">نظام التقارير الذكي</h2>
                     </div>
@@ -183,6 +181,7 @@
                 </div>
             </div>
 
+            <!-- STREAMING_CHUNK: Batch Processing Form -->
             <div class="flex flex-col xl:flex-row gap-6 mb-6 w-full">
                 
                 <!-- Create / Edit Form (Batch Processing) -->
@@ -242,6 +241,7 @@
                     </div>
                 </div>
 
+                <!-- STREAMING_CHUNK: Admin Table and Date Filter -->
                 <div class="w-full flex-1 min-w-0 bg-white rounded-2xl shadow-sm border border-gray-100 p-4 sm:p-6 relative overflow-hidden flex flex-col">
                     
                     <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-5 gap-4">
@@ -310,6 +310,7 @@
             </div>
         </section>
 
+        <!-- STREAMING_CHUNK: Client Verification View -->
         <!-- 2. واجهة العميل (المريض) - إنجليزي -->
         <section id="client-section" class="english-ui hidden w-full max-w-xl mx-auto mt-4 px-2 sm:px-0">
             
@@ -318,8 +319,7 @@
                 
                 <!-- White Header with Colored Logo -->
                 <div class="bg-white py-6 px-6 text-center text-gray-900 relative border-b border-gray-100 flex flex-col items-center justify-center gap-3">
-                    <!-- استخدام شعار افتراضي متوفر دائماً للواجهة العامة -->
-                    <img src="https://placehold.co/180x60/ffffff/059669?text=Clinic+Logo" alt="Clinic Logo" class="h-16 sm:h-20 object-contain bg-transparent">
+                    <img src="Blue.png" alt="Clinic Logo" class="h-16 sm:h-20 object-contain bg-transparent" onerror="this.onerror=null; this.src='https://placehold.co/180x60/ffffff/059669?text=Clinic+Logo'">
                     
                     <div class="inline-flex items-center gap-2.5 bg-emerald-50 text-emerald-800 border border-emerald-200 px-5 py-2.5 rounded-full font-bold text-sm tracking-wide shadow-sm mt-1">
                         <i class="fa-solid fa-circle-check text-emerald-600 text-base"></i> QR Code Verified
@@ -372,6 +372,7 @@
         Designed by Eng. Bahaa Al-Sheikh
     </footer>
 
+    <!-- STREAMING_CHUNK: Modals and Print Area -->
     <!-- QR Display Modal -->
     <div id="qr-modal" class="hidden fixed inset-0 z-[60] flex items-center justify-center bg-gray-900/60 backdrop-blur-sm admin-ui">
         <div class="bg-white p-6 rounded-2xl shadow-2xl w-[90%] max-w-sm text-center transform transition-all border border-gray-100 relative">
@@ -428,17 +429,19 @@
         </div>
     </div>
 
-    <!-- Hidden Print Area -->
+    <!-- Hidden Print Area (Updated with Name & Age) -->
     <div id="print-card-area">
         <div style="display: flex; align-items: center; justify-content: center; gap: 8px; margin-bottom: 5px;">
-            <img src="https://placehold.co/120x40/ffffff/059669?text=Clinic+Logo" alt="Logo" style="height: 28px; object-fit: contain; filter: brightness(0) invert(1);">
+            <img src="Blue.png" alt="Logo" style="height: 28px; object-fit: contain; filter: brightness(0) invert(1);" onerror="this.style.display='none'">
             <h3 id="print-clinic-name" style="margin: 0; font-size: 13px;">Clinic Name</h3>
         </div>
-        <p>ID: <span id="print-patient-id"></span></p>
+        <p style="font-size: 10px; margin: 0 0 2px 0;">Name: <span id="print-patient-name" style="font-weight: bold;"></span></p>
+        <p style="font-size: 10px; margin: 0 0 2px 0;">ID: <span id="print-patient-id" style="font-weight: bold;"></span> | Age: <span id="print-patient-age" style="font-weight: bold;"></span></p>
         <div id="print-qr-container"></div>
         <p style="margin-top:3px; font-weight: bold; font-size: 8px;">Scan to Verify Report</p>
     </div>
 
+    <!-- STREAMING_CHUNK: Application Logic & Batch Processing Setup -->
     <script>
         const ADMIN_USER = "admin";
         const ADMIN_PASS = "admin123"; 
@@ -494,6 +497,7 @@
             }, 3500);
         }
 
+        // --- Batch Processing UI Logic ---
         function addRequestBlock(data = null) {
             requestCount++;
             const block = document.createElement('div');
@@ -531,7 +535,7 @@
                         </div>
                     </div>
                     <div>
-                        <label class="block text-[11px] font-bold text-gray-700 mb-1">رابط جوجل درايف (اختياري)</label>
+                        <label class="block text-[11px] font-bold text-gray-700 mb-1">رابط Google Drive (اختياري)</label>
                         <input type="url" class="req-url w-full px-3 py-2 border border-gray-200 rounded-lg outline-none text-xs focus:ring-2 focus:ring-emerald-500" placeholder="https://drive.google.com/..." dir="ltr" value="${data ? (data.fileUrl || '') : ''}">
                     </div>
                     <div class="bg-emerald-50/50 border border-emerald-100 rounded-lg p-3 relative mt-2 group hover:bg-emerald-50 transition-colors">
@@ -559,16 +563,15 @@
             if(count === 0 && !DOM.editRecordId.value) addRequestBlock();
         }
 
-        // ضغط وتقليل الحجم لمنع انهيار الـ QR ومعالجة الـ '+' بذكاء
+        // STREAMING_CHUNK: QR Payload Minification and Logic
+        // حماية علامة الجمع (+) وتشفير الروابط الطويلة
         function encodeDataToUrl(obj) {
             const jsonStr = JSON.stringify(obj);
-            // استخدام encodeURIComponent مرتين يحمي الرموز الخاصة وعلامة + عند الارسال
             return encodeURIComponent(btoa(encodeURIComponent(jsonStr)));
         }
 
         function decodeDataFromUrl(encodedStr) {
             try {
-                // إصلاح مشكلة المتصفحات التي تحول الزائد إلى مسافة فارغة
                 const safeStr = decodeURIComponent(encodedStr).replace(/ /g, '+');
                 const jsonStr = decodeURIComponent(atob(safeStr));
                 return JSON.parse(jsonStr);
@@ -578,7 +581,7 @@
         }
 
         window.getRecordUrlFromPayload = (payload) => {
-            // تحويل المفاتيح الطويلة إلى رموز قصيرة لتقليل استهلاك مساحة الباركود
+            // Minification mapping
             const minifiedPayload = {
                 c: payload.clinic,
                 i: payload.patientId,
@@ -643,7 +646,7 @@
                 const blob = new Blob([modifiedPdfBytes], { type: 'application/pdf' });
                 const link = document.createElement('a');
                 link.href = URL.createObjectURL(blob);
-                link.download = `${patientId}.pdf`; // ينزل باسم رقم هوية المريض
+                link.download = `${patientId}.pdf`; 
                 document.body.appendChild(link);
                 link.click();
                 document.body.removeChild(link);
@@ -654,12 +657,12 @@
             }
         }
 
+        // STREAMING_CHUNK: Filtering & Batch Submission
         function populateDateFilter() {
             const currentVal = DOM.dateFilter.value;
             const dates = currentRecords.map(r => new Date(r.createdAt).toLocaleDateString('en-GB'));
             const uniqueDates = [...new Set(dates)];
             
-            // ترتيب تنازلي
             uniqueDates.sort((a, b) => {
                 const [da, ma, ya] = a.split('/');
                 const [db, mb, yb] = b.split('/');
@@ -752,7 +755,6 @@
                     const success = await processPDF(pdfInput.files[0], qrUrl, payload.patientId);
                     if (!success) showToast(`فشل دمج الملف للمريض ${patientName}`, 'error');
                     
-                    // Delay to prevent sequential download pop-up blocking
                     await new Promise(res => setTimeout(res, 850)); 
                 }
 
@@ -781,12 +783,12 @@
             updateStats();
             checkDuplicates();
             
-            // Show QR if it was a single addition and no PDF was attached (for manual printing)
             if (successCount === 1 && lastGeneratedId && !cards[0].querySelector('.req-pdf').files.length) {
                 window.viewQR(lastGeneratedId);
             }
         });
 
+        // STREAMING_CHUNK: State Management and UI Updates
         function resetFormState() {
             DOM.editRecordId.value = '';
             DOM.reqContainer.innerHTML = '';
@@ -910,6 +912,7 @@
             });
         }
 
+        // STREAMING_CHUNK: Viewing and Printing Implementation
         window.viewQR = (id) => {
             const qrUrl = window.getRecordUrl(id);
             const record = currentRecords.find(r => r.id === id);
@@ -933,7 +936,10 @@
             }
 
             document.getElementById('print-clinic-name').textContent = record ? record.clinic : 'Clinic Name';
+            document.getElementById('print-patient-name').textContent = record ? record.patientName : '-';
             document.getElementById('print-patient-id').textContent = record ? record.patientId : id;
+            document.getElementById('print-patient-age').textContent = record ? record.age : '-';
+
             DOM.qrModal.classList.remove('hidden');
         };
 
@@ -1040,13 +1046,13 @@
             showToast('تم تحديث الجدول', 'info');
         });
 
+        // STREAMING_CHUNK: Client View and App Initialization
         document.getElementById('login-form').addEventListener('submit', (e) => {
             e.preventDefault();
             const u = document.getElementById('login-username').value;
             const p = document.getElementById('login-password').value;
             
             if(u === ADMIN_USER && p === ADMIN_PASS) {
-                // Ensure session is set properly as string
                 sessionStorage.setItem('admin_session_active', 'true');
                 DOM.loginSec.classList.add('hidden');
                 DOM.adminSec.classList.remove('hidden');
@@ -1109,7 +1115,6 @@
             const encodedData = urlParams.get('d');
             const legacyVerified = urlParams.get('verified'); 
 
-            // Ensure Admin & Login are hidden initially
             DOM.loginSec.classList.add('hidden');
             DOM.adminSec.classList.add('hidden');
             DOM.clientSec.classList.add('hidden');
@@ -1119,7 +1124,6 @@
                 if (encodedData) {
                     loadClientReport(encodedData);
                 } else {
-                    // Legacy Support mode
                     DOM.cSuccess.classList.remove('hidden');
                     document.getElementById('c-clinic').textContent = urlParams.get('clinic') || '-';
                     document.getElementById('c-id').textContent = urlParams.get('id') || '-';
@@ -1139,7 +1143,6 @@
                 }
                 DOM.clientSec.classList.remove('hidden');
             } else {
-                // Admin Mode logic
                 const isLoggedIn = sessionStorage.getItem('admin_session_active');
                 if (isLoggedIn === 'true') {
                     DOM.adminSec.classList.remove('hidden');
