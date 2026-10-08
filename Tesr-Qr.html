@@ -105,8 +105,9 @@
                 </div>
             </form>
         </section>
-
-        <!-- 1. لوحة تحكم الآدمن -->
+        <!-- ========================================== -->
+        <!-- 1. لوحة تحكم الآدمن                        -->
+        <!-- ========================================== -->
         <section id="admin-section" class="admin-ui hidden w-full fade-in">
             <!-- Header -->
             <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-5 mb-6 flex flex-col md:flex-row justify-between items-center gap-4">
@@ -115,8 +116,7 @@
                         <i class="fa-solid fa-notes-medical"></i>
                     </div>
                     <div>
-                        <h2 class="text-xl font-bold text-gray-800">نظام التقارير الذكي</h2>
-                        <p class="text-xs text-gray-500">إصدار الإدخال المتعدد الشامل</p>
+                        <h2 class="text-xl font-bold text-gray-800">نظام التقارير </h2>
                     </div>
                 </div>
                 <div class="flex items-center gap-2 flex-wrap justify-center">
@@ -307,18 +307,18 @@
                             <p class="font-bold mt-2">لا توجد سجلات حالياً تطابق الفلتر.</p>
                         </div>
                     </div>
-                </div>
-            </div>
-        </section>
-
-        <!-- 2. واجهة العميل (المريض) - إنجليزي (مخفية افتراضياً) -->
+        <!-- ========================================== -->
+        <!-- 2. واجهة العميل (المريض) - إنجليزي         -->
+        <!-- ========================================== -->
         <section id="client-section" class="english-ui hidden w-full max-w-xl mx-auto mt-4 px-2 sm:px-0">
             
             <!-- Valid Report View -->
             <div id="client-success-view" class="hidden bg-white rounded-2xl shadow-2xl shadow-emerald-950/5 border border-gray-100 overflow-hidden flex flex-col w-full" dir="ltr">
+                
                 <!-- White Header with Colored Logo -->
                 <div class="bg-white py-6 px-6 text-center text-gray-900 relative border-b border-gray-100 flex flex-col items-center justify-center gap-3">
-                    <img src="Blue.png" alt="Clinic Logo" class="h-16 sm:h-20 object-contain bg-transparent" onerror="this.onerror=null; this.src='https://placehold.co/180x60/ffffff/059669?text=Clinic+Logo'">
+                    <img src="https://placehold.co/180x60/ffffff/059669?text=Clinic+Logo" alt="Clinic Logo" class="h-16 sm:h-20 object-contain bg-transparent">
+                    
                     <!-- Soft Green Header Box with Check Icon -->
                     <div class="inline-flex items-center gap-2.5 bg-emerald-50 text-emerald-800 border border-emerald-200 px-5 py-2.5 rounded-full font-bold text-sm tracking-wide shadow-sm mt-1">
                         <i class="fa-solid fa-circle-check text-emerald-600 text-base"></i> QR Code Verified
@@ -409,33 +409,33 @@
         </div>
     </div>
 
-    <!-- Clear All Confirmation Modal -->
-    <div id="clear-all-modal" class="hidden fixed inset-0 z-[60] flex items-center justify-center bg-gray-900/60 backdrop-blur-sm admin-ui">
+    <!-- Clear Database Confirmation Modal -->
+    <div id="clear-all-modal" class="hidden fixed inset-0 z-50 flex items-center justify-center bg-gray-900/60 backdrop-blur-sm admin-ui">
         <div class="bg-white p-6 rounded-2xl shadow-2xl w-[90%] max-w-md text-center transform transition-all border border-gray-100">
             <div class="w-16 h-16 bg-rose-100 text-rose-600 rounded-full flex items-center justify-center mx-auto mb-4">
                 <i class="fa-solid fa-broom text-3xl"></i>
             </div>
             <h3 class="text-xl font-bold mb-2 text-gray-800">تصفير قاعدة البيانات</h3>
-            <p class="text-sm text-gray-500 mb-6">هل أنت متأكد من رغبتك في مسح <strong>جميع السجلات</strong> للبدء بجلسة جديدة؟<br>يُرجى حفظ "نسخة احتياطية" أولاً.</p>
+            <p class="text-sm text-gray-500 mb-6">هل أنت متأكد من رغبتك في مسح <strong>جميع السجلات الحالية</strong> للبدء بجلسة جديدة؟<br>يُرجى التأكد من أنك قمت بحفظ "نسخة احتياطية" للقسم الحالي أولاً.</p>
             
             <div class="flex gap-3">
-                <button id="cancel-clear-btn" class="flex-1 bg-gray-100 hover:bg-gray-200 text-gray-800 py-3 rounded-xl font-bold transition-colors">تراجع</button>
+                <button id="cancel-clear-btn" class="flex-1 bg-gray-100 hover:bg-gray-200 text-gray-800 py-3 rounded-xl font-bold transition-colors">لا، تراجع</button>
                 <button id="confirm-clear-btn" class="flex-1 bg-rose-600 hover:bg-rose-700 text-white py-3 rounded-xl font-bold transition-colors shadow-md flex justify-center items-center gap-2">
-                    <i class="fa-solid fa-trash-can"></i> مسح كل شيء
+                    <i class="fa-solid fa-trash-can"></i> نعم، امسح كل شيء
                 </button>
             </div>
         </div>
     </div>
 
-    <!-- Hidden Print Area (For Card Printing) -->
+    <!-- Hidden Print Area -->
     <div id="print-card-area">
         <div style="display: flex; align-items: center; justify-content: center; gap: 8px; margin-bottom: 5px;">
-            <img src="Blue.png" alt="Logo" style="height: 28px; object-fit: contain; filter: brightness(0) invert(1);" onerror="this.style.display='none'">
+            <img src="https://placehold.co/120x40/ffffff/059669?text=Clinic+Logo" alt="Logo" style="height: 28px; object-fit: contain; filter: brightness(0) invert(1);">
             <h3 id="print-clinic-name" style="margin: 0; font-size: 13px;">Clinic Name</h3>
         </div>
-        <p>ID: <span id="print-patient-id" style="font-weight: bold; font-size: 11px;"></span></p>
+        <p>ID: <span id="print-patient-id"></span></p>
         <div id="print-qr-container"></div>
-        <p style="margin-top:5px; font-weight: bold; font-size: 9px;">SCAN TO VERIFY</p>
+        <p style="margin-top:3px; font-weight: bold; font-size: 8px;">Scan to Verify Report</p>
     </div>
 
     <script>
