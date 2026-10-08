@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>نظام التقارير الطبية - V7</title>
+    <title>نظام التقارير الطبية - V7 المطور</title>
     
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Tajawal:wght@500;700;800&display=swap" rel="stylesheet">
@@ -73,7 +73,7 @@
 
     <main class="w-full max-w-[1600px] mx-auto flex-1">
         
-        <!-- 0. واجهة تسجيل الدخول (مخفية افتراضياً لمنع الظهور للمريض) -->
+        <!-- 0. واجهة تسجيل الدخول (مخفية افتراضياً) -->
         <section id="login-section" class="admin-ui hidden bg-white rounded-2xl shadow-xl border border-gray-100 p-8 max-w-md mx-auto mt-12 transform transition-all">
             <div class="text-center mb-8">
                 <div class="inline-flex items-center justify-center w-16 h-16 bg-emerald-50 text-emerald-600 rounded-2xl mb-4 shadow-inner">
@@ -105,9 +105,8 @@
                 </div>
             </form>
         </section>
-        <!-- ========================================== -->
-        <!-- 1. لوحة تحكم الآدمن                        -->
-        <!-- ========================================== -->
+
+        <!-- 1. لوحة تحكم الآدمن -->
         <section id="admin-section" class="admin-ui hidden w-full fade-in">
             <!-- Header -->
             <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-5 mb-6 flex flex-col md:flex-row justify-between items-center gap-4">
@@ -116,7 +115,7 @@
                         <i class="fa-solid fa-notes-medical"></i>
                     </div>
                     <div>
-                        <h2 class="text-xl font-bold text-gray-800">نظام التقارير </h2>
+                        <h2 class="text-xl font-bold text-gray-800">نظام التقارير الذكي</h2>
                     </div>
                 </div>
                 <div class="flex items-center gap-2 flex-wrap justify-center">
@@ -232,7 +231,7 @@
                         </div>
                     </form>
 
-                    <!-- Submit Buttons Container (Sticky Bottom) -->
+                    <!-- Submit Buttons Container -->
                     <div class="pt-4 border-t border-gray-100 flex flex-col sm:flex-row gap-2 bg-white mt-auto">
                         <button type="submit" form="create-form" id="submit-btn" class="flex-1 bg-gray-900 hover:bg-gray-800 text-white font-bold py-3.5 px-4 rounded-xl transition-colors shadow-md flex justify-center items-center gap-2">
                             <i class="fa-solid fa-rocket"></i> إنشاء الدفعة بالكامل
@@ -307,9 +306,11 @@
                             <p class="font-bold mt-2">لا توجد سجلات حالياً تطابق الفلتر.</p>
                         </div>
                     </div>
-        <!-- ========================================== -->
-        <!-- 2. واجهة العميل (المريض) - إنجليزي         -->
-        <!-- ========================================== -->
+                </div>
+            </div>
+        </section>
+
+        <!-- 2. واجهة العميل (المريض) - إنجليزي -->
         <section id="client-section" class="english-ui hidden w-full max-w-xl mx-auto mt-4 px-2 sm:px-0">
             
             <!-- Valid Report View -->
@@ -317,9 +318,9 @@
                 
                 <!-- White Header with Colored Logo -->
                 <div class="bg-white py-6 px-6 text-center text-gray-900 relative border-b border-gray-100 flex flex-col items-center justify-center gap-3">
+                    <!-- استخدام شعار افتراضي متوفر دائماً للواجهة العامة -->
                     <img src="https://placehold.co/180x60/ffffff/059669?text=Clinic+Logo" alt="Clinic Logo" class="h-16 sm:h-20 object-contain bg-transparent">
                     
-                    <!-- Soft Green Header Box with Check Icon -->
                     <div class="inline-flex items-center gap-2.5 bg-emerald-50 text-emerald-800 border border-emerald-200 px-5 py-2.5 rounded-full font-bold text-sm tracking-wide shadow-sm mt-1">
                         <i class="fa-solid fa-circle-check text-emerald-600 text-base"></i> QR Code Verified
                     </div>
@@ -558,14 +559,22 @@
             if(count === 0 && !DOM.editRecordId.value) addRequestBlock();
         }
 
-        // الضغط وتقليل الحجم لمنع انهيار الـ QR بسبب الروابط الطويلة
+        // ضغط وتقليل الحجم لمنع انهيار الـ QR ومعالجة الـ '+' بذكاء
         function encodeDataToUrl(obj) {
-            return btoa(encodeURIComponent(JSON.stringify(obj)));
+            const jsonStr = JSON.stringify(obj);
+            // استخدام encodeURIComponent مرتين يحمي الرموز الخاصة وعلامة + عند الارسال
+            return encodeURIComponent(btoa(encodeURIComponent(jsonStr)));
         }
 
         function decodeDataFromUrl(encodedStr) {
-            try { return JSON.parse(decodeURIComponent(atob(encodedStr))); } 
-            catch { return null; }
+            try {
+                // إصلاح مشكلة المتصفحات التي تحول الزائد إلى مسافة فارغة
+                const safeStr = decodeURIComponent(encodedStr).replace(/ /g, '+');
+                const jsonStr = decodeURIComponent(atob(safeStr));
+                return JSON.parse(jsonStr);
+            } catch (e) {
+                return null;
+            }
         }
 
         window.getRecordUrlFromPayload = (payload) => {
@@ -615,6 +624,7 @@
                 const pdfBytes = await file.arrayBuffer();
                 const pdfDoc = await PDFLib.PDFDocument.load(pdfBytes);
                 const firstPage = pdfDoc.getPages()[0];
+                
                 const qrBase64 = await getQrBase64(qrUrl);
                 if (!qrBase64) throw new Error("فشل التوليد بسبب حجم البيانات");
 
@@ -633,7 +643,7 @@
                 const blob = new Blob([modifiedPdfBytes], { type: 'application/pdf' });
                 const link = document.createElement('a');
                 link.href = URL.createObjectURL(blob);
-                link.download = `${patientId}.pdf`; 
+                link.download = `${patientId}.pdf`; // ينزل باسم رقم هوية المريض
                 document.body.appendChild(link);
                 link.click();
                 document.body.removeChild(link);
@@ -646,7 +656,6 @@
 
         function populateDateFilter() {
             const currentVal = DOM.dateFilter.value;
-            // استخراج التواريخ من حقل createdAt الأصلي الذي يُحفظ تلقائياً
             const dates = currentRecords.map(r => new Date(r.createdAt).toLocaleDateString('en-GB'));
             const uniqueDates = [...new Set(dates)];
             
@@ -739,7 +748,7 @@
                 const qrUrl = window.getRecordUrlFromPayload(payload);
 
                 if (pdfInput.files && pdfInput.files.length > 0) {
-                    showToast(`جاري دمج ملف المريض: ${patientName}...`, 'info');
+                    showToast(`جاري دمج وتنزيل ملف: ${patientName}...`, 'info');
                     const success = await processPDF(pdfInput.files[0], qrUrl, payload.patientId);
                     if (!success) showToast(`فشل دمج الملف للمريض ${patientName}`, 'error');
                     
@@ -920,10 +929,10 @@
                 new QRCode(DOM.printQRContainer, { ...qrConfig, width: 95, height: 95 });
             } catch(e) {
                 console.error("QR Error", e);
-                DOM.modalQRContainer.innerHTML = `<p class="text-red-500 text-xs font-bold text-center">عذراً، محتوى الرابط كبير جداً على الرمز.</p>`;
+                DOM.modalQRContainer.innerHTML = `<p class="text-red-500 text-xs font-bold text-center mt-2">عذراً، محتوى الرابط كبير جداً على الرمز.</p>`;
             }
 
-            document.getElementById('print-clinic-name').textContent = record ? record.clinic : 'Clinic';
+            document.getElementById('print-clinic-name').textContent = record ? record.clinic : 'Clinic Name';
             document.getElementById('print-patient-id').textContent = record ? record.patientId : id;
             DOM.qrModal.classList.remove('hidden');
         };
@@ -1031,19 +1040,17 @@
             showToast('تم تحديث الجدول', 'info');
         });
 
-        // Login Logic - Fixed session persistence and hiding logic
         document.getElementById('login-form').addEventListener('submit', (e) => {
             e.preventDefault();
             const u = document.getElementById('login-username').value;
             const p = document.getElementById('login-password').value;
             
             if(u === ADMIN_USER && p === ADMIN_PASS) {
-                // Ensure session is set properly
+                // Ensure session is set properly as string
                 sessionStorage.setItem('admin_session_active', 'true');
                 DOM.loginSec.classList.add('hidden');
                 DOM.adminSec.classList.remove('hidden');
                 
-                // Initialize view
                 resetFormState();
                 populateDateFilter();
                 filterTable();
@@ -1062,10 +1069,45 @@
             document.getElementById('login-password').value = '';
         });
 
+        function loadClientReport(encodedData) {
+            const data = decodeDataFromUrl(encodedData);
+
+            if (data) {
+                const expiry = data.e || data.expiresAt;
+                if (Date.now() > expiry) {
+                    DOM.cError.classList.remove('hidden');
+                } else {
+                    DOM.cSuccess.classList.remove('hidden');
+                    document.getElementById('c-clinic').textContent = data.c || data.clinic || '-';
+                    document.getElementById('c-id').textContent = data.i || data.patientId || '-';
+                    document.getElementById('c-name').textContent = data.n || data.patientName || '-';
+                    document.getElementById('c-age').textContent = data.a || data.age || '-';
+                    document.getElementById('c-gender').textContent = data.g || data.gender || '-';
+                    
+                    const created = data.t || data.createdAt;
+                    document.getElementById('c-date').textContent = created ? new Date(created).toLocaleString('en-GB') : '-';
+
+                    const driveUrl = data.u || data.fileUrl;
+                    const btn = document.getElementById('c-download-btn');
+                    const btnContainer = document.getElementById('c-download-container');
+                    
+                    if(driveUrl) {
+                        btn.href = driveUrl;
+                        btnContainer.classList.remove('hidden');
+                        btn.classList.remove('hidden');
+                    } else {
+                        btnContainer.classList.add('hidden');
+                    }
+                }
+            } else {
+                DOM.cError.classList.remove('hidden');
+            }
+        }
+
         function initApp() {
             const urlParams = new URLSearchParams(window.location.search);
             const encodedData = urlParams.get('d');
-            const legacyVerified = urlParams.get('verified'); // For backward compatibility
+            const legacyVerified = urlParams.get('verified'); 
 
             // Ensure Admin & Login are hidden initially
             DOM.loginSec.classList.add('hidden');
@@ -1073,41 +1115,9 @@
             DOM.clientSec.classList.add('hidden');
 
             if (encodedData || legacyVerified === 'true') {
-                // We are in Client View mode
                 document.title = "Verified Medical Report";
                 if (encodedData) {
-                    const data = decodeDataFromUrl(encodedData);
-                    if (data) {
-                        // Check expiry (compatible with full key 'expiresAt' or minified 'e')
-                        const expiry = data.e || data.expiresAt;
-                        if (Date.now() > expiry) {
-                            DOM.cError.classList.remove('hidden');
-                        } else {
-                            DOM.cSuccess.classList.remove('hidden');
-                            document.getElementById('c-clinic').textContent = data.c || data.clinic || '-';
-                            document.getElementById('c-id').textContent = data.i || data.patientId || '-';
-                            document.getElementById('c-name').textContent = data.n || data.patientName || '-';
-                            document.getElementById('c-age').textContent = data.a || data.age || '-';
-                            document.getElementById('c-gender').textContent = data.g || data.gender || '-';
-                            
-                            const created = data.t || data.createdAt;
-                            document.getElementById('c-date').textContent = created ? new Date(created).toLocaleString('en-GB') : '-';
-
-                            const driveUrl = data.u || data.fileUrl;
-                            const btn = document.getElementById('c-download-btn');
-                            const btnContainer = document.getElementById('c-download-container');
-                            
-                            if(driveUrl) {
-                                btn.href = driveUrl;
-                                btnContainer.classList.remove('hidden');
-                                btn.classList.remove('hidden');
-                            } else {
-                                btnContainer.classList.add('hidden');
-                            }
-                        }
-                    } else {
-                        DOM.cError.classList.remove('hidden');
-                    }
+                    loadClientReport(encodedData);
                 } else {
                     // Legacy Support mode
                     DOM.cSuccess.classList.remove('hidden');
@@ -1121,7 +1131,6 @@
                     const driveUrl = urlParams.get('file');
                     const btn = document.getElementById('c-download-btn');
                     const btnContainer = document.getElementById('c-download-container');
-                    
                     if(driveUrl) {
                         btn.href = driveUrl;
                         btnContainer.classList.remove('hidden');
@@ -1169,21 +1178,19 @@
                     const parsed = JSON.parse(e.target.result);
                     let imported = Array.isArray(parsed) ? parsed : (parsed.records || []);
                     
-                    // إزالة confirm المزعج ووضع الإشعار مباشرة
                     const existingIds = new Set(currentRecords.map(r => r.id));
                     let added = 0;
                     imported.forEach(rec => { 
-                        // الميزة: تواريخ createdAt القديمة ستدخل المصفوفة كما هي ولن يتم تحديثها، مما يحافظ على التواريخ الأصلية!
                         if (rec.id && !existingIds.has(rec.id)) { 
                             currentRecords.push(rec); 
                             added++; 
                         }
                     });
                     localStorage.setItem(STORAGE_KEY, JSON.stringify(currentRecords));
-                    populateDateFilter(); // ستقوم هذه الدالة بإعادة قراءة التواريخ القديمة وإدراجها في القائمة!
+                    populateDateFilter();
                     filterTable();
                     updateStats();
-                    showToast(`تم استعادة ${added} سجل بنجاح! التواريخ والأيام القديمة محفوظة.`, 'success');
+                    showToast(`تم استعادة ${added} سجل بنجاح! التواريخ الأصلية محفوظة.`, 'success');
                     
                 } catch(err) { 
                     showToast('ملف غير صالح', 'error'); 
