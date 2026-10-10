@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>نظام التقارير الطبية - النسخة المدمجة والمستقرة</title>
+    <title>نظام التقارير الطبية - النسخة المدمجة والمستقرة V9</title>
     
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Tajawal:wght@500;700;800&display=swap" rel="stylesheet">
@@ -91,14 +91,14 @@
                 </div>
                 <div class="flex items-center gap-2 flex-wrap justify-center">
                     <button id="export-backup-btn" class="bg-blue-50 hover:bg-blue-100 text-blue-700 px-3.5 py-2.5 rounded-xl font-bold transition-colors text-sm flex items-center gap-2 border border-blue-200" title="تنزيل نسخة احتياطية">
-                        <i class="fa-solid fa-cloud-arrow-down"></i> نسخة
+                        <i class="fa-solid fa-cloud-arrow-down"></i> نسخة احتياطية
                     </button>
                     <label for="import-backup-file" class="bg-indigo-50 hover:bg-indigo-100 text-indigo-700 px-3.5 py-2.5 rounded-xl font-bold transition-colors text-sm flex items-center gap-2 border border-indigo-200 cursor-pointer" title="استعادة السجلات">
                         <i class="fa-solid fa-cloud-arrow-up"></i> استعادة
                     </label>
                     <input type="file" id="import-backup-file" accept=".json" class="hidden">
                     <button id="clear-db-btn" class="bg-rose-50 hover:bg-rose-100 text-rose-700 px-3.5 py-2.5 rounded-xl font-bold transition-colors text-sm flex items-center gap-2 border border-rose-200"><i class="fa-solid fa-broom"></i> تصفير</button>
-                    <button id="logout-btn" class="bg-gray-100 hover:bg-gray-200 text-gray-600 px-4 py-2.5 rounded-xl font-bold transition-colors flex items-center gap-2"><i class="fa-solid fa-right-from-bracket"></i></button>
+                    <button id="logout-btn" class="bg-gray-100 hover:bg-gray-200 text-gray-600 px-4 py-2.5 rounded-xl font-bold transition-colors flex items-center gap-2" title="تسجيل الخروج"><i class="fa-solid fa-right-from-bracket"></i></button>
                 </div>
             </div>
 
@@ -124,7 +124,7 @@
                     <div class="flex justify-between items-center"><p class="text-[11px] sm:text-xs text-gray-500 font-bold">قريبة من الانتهاء</p><i class="fa-solid fa-bell text-orange-500"></i></div>
                     <h3 id="stat-soon" class="text-lg font-bold text-gray-800">0</h3>
                 </div>
-                <div id="card-duplicates" class="bg-white p-3.5 rounded-xl shadow-sm border border-gray-100 flex flex-col gap-1 border-b-4 border-amber-400 cursor-pointer hover:bg-amber-50">
+                <div id="card-duplicates" class="bg-white p-3.5 rounded-xl shadow-sm border border-gray-100 flex flex-col gap-1 border-b-4 border-amber-400 cursor-pointer hover:bg-amber-50" title="انقر لتصفية المكرر">
                     <div class="flex justify-between items-center"><p class="text-[11px] sm:text-xs text-amber-600 font-bold">تكرار بالهوية</p><i class="fa-solid fa-triangle-exclamation text-amber-500"></i></div>
                     <h3 id="stat-duplicates" class="text-lg font-bold text-gray-800">0</h3>
                 </div>
@@ -134,14 +134,14 @@
             <div class="flex flex-col xl:flex-row gap-6 mb-6 w-full items-start">
                 
                 <!-- Fixed Form (Docked on Right) -->
-                <div class="w-full xl:w-[420px] flex-shrink-0 bg-white rounded-2xl shadow-sm border border-gray-100 p-5 sm:p-6 relative overflow-hidden flex flex-col max-h-[85vh]">
+                <div class="w-full xl:w-[440px] flex-shrink-0 bg-white rounded-2xl shadow-sm border border-gray-100 p-5 sm:p-6 relative overflow-hidden flex flex-col max-h-[85vh]">
                     <div id="form-indicator" class="absolute top-0 right-0 w-1.5 h-full bg-emerald-600 transition-colors"></div>
                     
-                    <div class="flex justify-between items-center mb-5 border-b border-gray-100 pb-3">
+                    <div class="flex justify-between items-center mb-4 border-b border-gray-100 pb-3">
                         <h3 id="form-title" class="text-lg font-bold text-gray-800 flex items-center gap-2">
                             <i class="fa-solid fa-bolt text-emerald-600"></i> الإضافة السريعة (Batch)
                         </h3>
-                        <span class="bg-emerald-50 text-emerald-700 text-[10px] font-bold px-2.5 py-1 rounded-full border border-emerald-100 shadow-sm" id="batch-counter">طلب واحد</span>
+                        <span class="bg-emerald-50 text-emerald-700 text-[11px] font-bold px-2.5 py-1 rounded-full border border-emerald-100 shadow-sm" id="batch-counter">طلب واحد</span>
                     </div>
                     
                     <form id="create-form" class="space-y-4 overflow-y-auto pr-2 custom-scrollbar flex-1 pb-2">
@@ -158,13 +158,14 @@
                                     <label class="block text-[11px] font-bold text-gray-600 mb-1">صلاحية التقرير</label>
                                     <select id="input-validity" required class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 outline-none bg-white text-sm cursor-pointer font-bold">
                                         <option value="365">سنة كاملة</option>
+                                        <option value="90">3 أشهر</option>
                                         <option value="30">30 يوماً</option>
                                         <option value="7">7 أيام</option>
                                     </select>
                                 </div>
                                 <div>
                                     <label class="block text-[11px] font-bold text-gray-600 mb-1">الجنس (للجميع)</label>
-                                    <select id="input-global-gender" required class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 outline-none bg-white text-sm font-bold english-ui" dir="ltr">
+                                    <select id="input-global-gender" required class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 outline-none bg-white text-sm font-bold english-ui cursor-pointer" dir="ltr">
                                         <option value="Male">Male</option>
                                         <option value="Female">Female</option>
                                     </select>
@@ -210,7 +211,7 @@
                             </div>
                             
                             <button id="export-csv-btn" class="flex-1 sm:flex-none bg-green-50 hover:bg-green-100 text-green-700 px-4 py-2.5 rounded-xl font-bold transition-colors text-sm flex items-center justify-center gap-2 border border-green-200"><i class="fa-solid fa-file-excel"></i> إكسيل</button>
-                            <button id="refresh-db-btn" class="bg-gray-100 hover:bg-gray-200 text-gray-600 px-4 py-2.5 rounded-xl transition-colors font-bold"><i class="fa-solid fa-rotate"></i></button>
+                            <button id="refresh-db-btn" class="bg-gray-100 hover:bg-gray-200 text-gray-600 px-4 py-2.5 rounded-xl transition-colors font-bold" title="تحديث"><i class="fa-solid fa-rotate"></i></button>
                         </div>
                     </div>
 
@@ -253,7 +254,7 @@
                             <tbody id="records-tbody" class="divide-y divide-gray-100 bg-white"></tbody>
                         </table>
                         <div id="no-records-msg" class="hidden absolute inset-0 flex flex-col items-center justify-center text-gray-500 bg-white/90 z-20">
-                            <i class="fa-solid fa-folder-open text-5xl mb-3 text-gray-300"></i><p class="font-bold text-base mt-2">لا توجد سجلات.</p>
+                            <i class="fa-solid fa-folder-open text-5xl mb-3 text-gray-300"></i><p class="font-bold text-base mt-2">لا توجد سجلات مطابقة.</p>
                         </div>
                     </div>
 
@@ -379,7 +380,36 @@
             btnExportSelected: document.getElementById('export-selected-btn'), btnPrintSelected: document.getElementById('print-selected-btn'), selectedCount: document.getElementById('selected-count')
         };
 
-        let currentRecords = JSON.parse(localStorage.getItem(STORAGE_KEY)) || [];
+        // دمج تلقائي لأي سجلات قديمة محفوظة في المتصفح من الإصدارات السابقة لضمان عدم ضياع أي بيانات بعد التحديث
+        function loadAndMigrateRecords() {
+            let records = JSON.parse(localStorage.getItem(STORAGE_KEY)) || [];
+            const oldKeys = ["medical_records_local_v3", "medical_records_local_v5", "medical_records_local_v7"];
+            const existingIds = new Set(records.map(r => r.id));
+            let migrated = false;
+
+            oldKeys.forEach(key => {
+                try {
+                    const oldData = JSON.parse(localStorage.getItem(key));
+                    if (Array.isArray(oldData)) {
+                        oldData.forEach(rec => {
+                            if (rec && rec.id && !existingIds.has(rec.id)) {
+                                records.push(rec);
+                                existingIds.add(rec.id);
+                                migrated = true;
+                            }
+                        });
+                    }
+                } catch (e) {}
+            });
+
+            if (migrated) {
+                records.sort((a, b) => (b.createdAt || 0) - (a.createdAt || 0));
+                localStorage.setItem(STORAGE_KEY, JSON.stringify(records));
+            }
+            return records;
+        }
+
+        let currentRecords = loadAndMigrateRecords();
         let filteredRecords = []; 
         let recordToDelete = null; 
         let requestCount = 0; 
@@ -492,7 +522,6 @@
         window.getRecordUrlFromPayload = (payload) => {
             const minifiedPayload = { c: payload.clinic, i: payload.patientId, n: payload.patientName, a: payload.age, g: payload.gender, u: payload.fileUrl, t: payload.createdAt, e: payload.expiresAt };
             const encoded = encodeDataToUrl(minifiedPayload);
-            // Uses current host automatically, so wherever you deploy or change domain, old links remain fully functional!
             return `${window.location.origin}${window.location.pathname}?d=${encoded}`;
         };
 
@@ -644,7 +673,7 @@
             e.preventDefault();
             const editId = DOM.editRecordId.value; const clinic = document.getElementById('input-clinic').value.trim();
             const validityDays = parseInt(document.getElementById('input-validity').value); const globalGender = document.getElementById('input-global-gender').value;
-            const validityText = { "365": "سنة كاملة", "30": "30 يوماً", "7": "7 أيام" }[validityDays] || `${validityDays} يوم`;
+            const validityText = { "365": "سنة كاملة", "90": "3 أشهر", "30": "30 يوماً", "7": "7 أيام" }[validityDays] || `${validityDays} يوم`;
 
             const cards = document.querySelectorAll('.request-card'); if(cards.length === 0) return;
 
@@ -653,7 +682,10 @@
             let successCount = 0; let lastGeneratedId = null;
 
             for (let i = 0; i < cards.length; i++) {
-                const card = cards[i]; const newPatientId = card.querySelector('.req-id').value.trim(); const patientName = card.querySelector('.req-name').value.trim(); const pdfInput = card.querySelector('.req-pdf');
+                const card = cards[i]; 
+                const newPatientId = card.querySelector('.req-id').value.trim(); 
+                const patientName = card.querySelector('.req-name').value.trim(); 
+                const pdfInput = card.querySelector('.req-pdf');
                 
                 if (currentRecords.some(r => r.patientId === newPatientId && r.id !== editId)) { 
                     showToast(`تخطي: الهوية (${newPatientId}) مسجلة مسبقاً!`, 'error'); 
@@ -705,8 +737,8 @@
             DOM.reqContainer.innerHTML = ''; requestCount = 0; addRequestBlock(record); 
             DOM.btnAddRequestContainer.classList.add('hidden'); 
             DOM.formTitle.innerHTML = `<i class="fa-solid fa-pen-to-square text-amber-600"></i> تعديل بيانات المريض`; DOM.btnSubmit.innerHTML = `<i class="fa-solid fa-floppy-disk"></i> حفظ التعديلات`; DOM.formIndicator.className = "absolute top-0 right-0 w-1.5 h-full bg-amber-500"; DOM.btnCancelEdit.classList.remove('hidden');
-            
-            showToast('تم تحميل السجل للتعديل. تنبيه: تعديل البيانات سيغير رابط ورمز الـ QR الخاص بالسجل!', 'info');
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+            showToast('تم تحميل السجل للتعديل. تنبيه: تعديل البيانات سيحدث رابط ورمز الـ QR!', 'info');
         };
 
         function updateStats() {
@@ -732,15 +764,10 @@
         window.copyLink = async (id) => { 
             const qrUrl = window.getRecordUrl(id); 
             try {
-                if (navigator.clipboard && window.isSecureContext) {
-                    await navigator.clipboard.writeText(qrUrl);
-                } else {
-                    const temp = document.createElement('input'); temp.value = qrUrl; 
-                    document.body.appendChild(temp); temp.select(); document.execCommand('copy'); document.body.removeChild(temp); 
-                }
+                const temp = document.createElement('input'); temp.value = qrUrl; 
+                document.body.appendChild(temp); temp.select(); document.execCommand('copy'); document.body.removeChild(temp); 
                 showToast('تم نسخ الرابط بنجاح', 'success');
             } catch (err) {
-                console.error("Clipboard Error:", err);
                 showToast('فشل نسخ الرابط، الرجاء المحاولة يدوياً', 'error');
             }
         };
@@ -756,7 +783,14 @@
             showToast('تم حذف السجل بنجاح'); 
             currentPage = 1; filterTable(); updateStats(); checkDuplicates(); 
         });
+        
         document.getElementById('close-modal-btn').addEventListener('click', () => DOM.qrModal.classList.add('hidden'));
+        
+        // FIXED: Added missing print event listener for single QR card print button
+        document.getElementById('print-qr-btn').addEventListener('click', () => {
+            DOM.qrModal.classList.add('hidden');
+            setTimeout(() => window.print(), 200);
+        });
 
         function toggleExportSelectedBtn() {
             const checkedBoxes = document.querySelectorAll('.row-checkbox:checked'); const checked = checkedBoxes.length;
@@ -833,7 +867,7 @@
 
         function runMatrixScramble() {
             const el = document.getElementById('footer-signature'); if(!el) return;
-            const originalText = "Designed by Eng. Bahaa Al-Sheikh"; const chars = "!<>-_\\\\/[]{}—=+*^?#________"; let frameRequest; let frame = 0; const queue = [];
+            const originalText = "Designed by Eng. Bahaa Al-Sheikh"; const chars = "!<>-_\\/[]{}—=+*^?#________"; let frameRequest; let frame = 0; const queue = [];
             for (let i = 0; i < originalText.length; i++) { queue.push({ from: chars[Math.floor(Math.random() * chars.length)], to: originalText[i], start: Math.floor(Math.random() * 40), end: Math.floor(Math.random() * 40) + 40, char: '' }); }
             const update = () => {
                 let output = ''; let complete = 0;
@@ -848,9 +882,31 @@
 
         function initApp() {
             const urlParams = new URLSearchParams(window.location.search); const encodedData = urlParams.get('d');
+            const legacyVerified = urlParams.get('verified');
             DOM.loginSec.classList.add('hidden'); DOM.adminSec.classList.add('hidden'); DOM.clientSec.classList.add('hidden');
             runMatrixScramble(); 
-            if (encodedData) { document.title = "Verified Medical Report"; loadClientReport(encodedData); DOM.clientSec.classList.remove('hidden'); } else {
+            if (encodedData || legacyVerified === 'true') { 
+                document.title = "Verified Medical Report"; 
+                if (encodedData) {
+                    loadClientReport(encodedData); 
+                } else {
+                    DOM.cSuccess.classList.remove('hidden');
+                    document.getElementById('c-clinic').textContent = urlParams.get('clinic') || 'Blue Medical Field Complex';
+                    document.getElementById('c-id').textContent = urlParams.get('id') || '-';
+                    document.getElementById('c-name').textContent = urlParams.get('name') || '-';
+                    document.getElementById('c-age').textContent = urlParams.get('age') || '-';
+                    document.getElementById('c-gender').textContent = urlParams.get('gender') || '-';
+                    document.getElementById('c-date').textContent = urlParams.get('dateText') || '-';
+                    const fileUrl = urlParams.get('file');
+                    if (fileUrl) {
+                        const btn = document.getElementById('c-download-btn');
+                        btn.href = fileUrl;
+                        document.getElementById('c-download-container').classList.remove('hidden');
+                        btn.classList.remove('hidden');
+                    }
+                }
+                DOM.clientSec.classList.remove('hidden'); 
+            } else {
                 const isLoggedIn = sessionStorage.getItem('admin_session_active');
                 if (isLoggedIn === 'true') { DOM.adminSec.classList.remove('hidden'); resetFormState(); initFlatpickr(); filterTable(); updateStats(); checkDuplicates(); } else { DOM.loginSec.classList.remove('hidden'); }
             }
@@ -877,7 +933,7 @@
                 try {
                     const parsed = JSON.parse(e.target.result); let imported = Array.isArray(parsed) ? parsed : (parsed.records || []); const existingIds = new Set(currentRecords.map(r => r.id)); let added = 0;
                     imported.forEach(rec => { if (rec.id && !existingIds.has(rec.id)) { currentRecords.push(rec); added++; } });
-                    localStorage.setItem(STORAGE_KEY, JSON.stringify(currentRecords)); filterTable(); updateStats(); showToast(`تم دمج واستعادة ${added} سجل بنجاح!`, 'success');
+                    localStorage.setItem(STORAGE_KEY, JSON.stringify(currentRecords)); filterTable(); updateStats(); checkDuplicates(); showToast(`تم دمج واستعادة ${added} سجل بنجاح!`, 'success');
                 } catch(err) { showToast('ملف غير صالح', 'error'); } event.target.value = '';
             }; reader.readAsText(file);
         });
