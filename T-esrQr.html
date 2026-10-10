@@ -1,0 +1,898 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>نظام التقارير الطبية - النسخة المدمجة والمستقرة</title>
+    
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Tajawal:wght@500;700;800&display=swap" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+    <script src="https://unpkg.com/pdf-lib@1.17.1/dist/pdf-lib.min.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+
+    <style>
+        body { background-color: #f3f4f6; -webkit-print-color-adjust: exact; print-color-adjust: exact; font-family: 'Tajawal', sans-serif; }
+        .english-ui { font-family: 'Inter', sans-serif; }
+        
+        .info-table { width: 100%; border-collapse: collapse; }
+        .info-table tr { border-bottom: 1px solid #e5e7eb; }
+        .info-table th { background-color: #f9fafb; color: #374151; font-weight: 600; padding: 12px; text-align: left; width: 35%; font-size: 14px; }
+        .info-table td { color: #111827; padding: 12px; text-align: left; font-weight: 500; font-size: 14px; word-break: break-word; }
+
+        ::-webkit-scrollbar { width: 6px; height: 8px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 4px; }
+        .custom-scrollbar::-webkit-scrollbar-track { background: #f8fafc; }
+
+        @keyframes slideInUp { from { transform: translateY(100%); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+        @keyframes fadeOut { from { opacity: 1; } to { opacity: 0; } }
+        .toast-enter { animation: slideInUp 0.3s ease-out forwards; }
+        .toast-exit { animation: fadeOut 0.3s ease-out forwards; }
+
+        @media print {
+            body { background: white !important; margin: 0; padding: 0; }
+            .no-print { display: none !important; }
+            #print-card-area { display: block !important; width: 8.5cm; height: 5.4cm; border: 2px solid #000; border-radius: 8px; padding: 10px; margin: 0 auto; text-align: center; page-break-inside: avoid; }
+            #print-card-area h3 { margin: 0 0 5px 0; font-size: 13px; font-family: Arial, sans-serif; }
+            #print-card-area p { margin: 0 0 3px 0; font-size: 10px; color: #333; }
+            #print-qr-container { display: flex; justify-content: center; margin-top: 5px; }
+            #print-qr-container img { width: 85px; height: 85px; margin: 0 auto; }
+            #admin-section, #login-section, #client-section, #qr-modal, #delete-modal, #clear-all-modal, footer { display: none !important; }
+        }
+        #print-card-area { display: none; }
+    </style>
+</head>
+<body class="min-h-screen text-gray-800 flex flex-col items-center p-2 sm:p-4 relative justify-between">
+
+    <div id="toast-container" class="fixed bottom-4 left-1/2 transform -translate-x-1/2 z-[9999] flex flex-col gap-2 w-full max-w-sm px-4 pointer-events-none"></div>
+
+    <main class="w-full max-w-[1600px] mx-auto flex-1 flex flex-col relative">
+        
+        <!-- Login Section -->
+        <section id="login-section" class="hidden bg-white rounded-2xl shadow-xl border border-gray-100 p-8 max-w-md mx-auto mt-12 transform transition-all">
+            <div class="text-center mb-8">
+                <img src="Blue.png" alt="Logo" class="h-16 object-contain mx-auto mb-4" onerror="this.onerror=null; this.src='https://placehold.co/120x40/ffffff/059669?text=Logo'">
+                <h2 class="text-2xl font-bold text-gray-800">بوابة الإدارة الطبية</h2>
+                <p class="text-sm text-gray-500 mt-2">يرجى تسجيل الدخول للوصول لقاعدة البيانات</p>
+            </div>
+            <form id="login-form" class="space-y-5">
+                <div>
+                    <label class="block text-sm font-bold text-gray-700 mb-1">اسم المستخدم</label>
+                    <div class="relative">
+                        <i class="fa-solid fa-user absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400"></i>
+                        <input type="text" id="login-username" class="w-full pl-10 pr-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-emerald-500 outline-none" dir="ltr" placeholder="admin" required>
+                    </div>
+                </div>
+                <div>
+                    <label class="block text-sm font-bold text-gray-700 mb-1">كلمة المرور</label>
+                    <div class="relative">
+                        <i class="fa-solid fa-lock absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400"></i>
+                        <input type="password" id="login-password" class="w-full pl-10 pr-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-emerald-500 outline-none" dir="ltr" placeholder="••••••••" required>
+                    </div>
+                </div>
+                <div class="pt-4">
+                    <button type="submit" class="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-3.5 px-4 rounded-xl transition-all shadow-lg flex justify-center items-center gap-2">
+                        تسجيل الدخول <i class="fa-solid fa-arrow-left"></i>
+                    </button>
+                </div>
+            </form>
+        </section>
+
+        <!-- Admin Section -->
+        <section id="admin-section" class="hidden w-full flex-1 flex flex-col relative">
+            <!-- Header -->
+            <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-5 mb-4 flex flex-col md:flex-row justify-between items-center gap-4">
+                <div class="flex items-center gap-4">
+                    <img src="Blue.png" alt="Logo" class="h-12 object-contain bg-white" onerror="this.onerror=null; this.src='https://placehold.co/120x40/ffffff/059669?text=Logo'">
+                    <div><h2 class="text-xl font-bold text-gray-800 hidden sm:block">نظام التقارير الذكي</h2></div>
+                </div>
+                <div class="flex items-center gap-2 flex-wrap justify-center">
+                    <button id="export-backup-btn" class="bg-blue-50 hover:bg-blue-100 text-blue-700 px-3.5 py-2.5 rounded-xl font-bold transition-colors text-sm flex items-center gap-2 border border-blue-200" title="تنزيل نسخة احتياطية">
+                        <i class="fa-solid fa-cloud-arrow-down"></i> نسخة
+                    </button>
+                    <label for="import-backup-file" class="bg-indigo-50 hover:bg-indigo-100 text-indigo-700 px-3.5 py-2.5 rounded-xl font-bold transition-colors text-sm flex items-center gap-2 border border-indigo-200 cursor-pointer" title="استعادة السجلات">
+                        <i class="fa-solid fa-cloud-arrow-up"></i> استعادة
+                    </label>
+                    <input type="file" id="import-backup-file" accept=".json" class="hidden">
+                    <button id="clear-db-btn" class="bg-rose-50 hover:bg-rose-100 text-rose-700 px-3.5 py-2.5 rounded-xl font-bold transition-colors text-sm flex items-center gap-2 border border-rose-200"><i class="fa-solid fa-broom"></i> تصفير</button>
+                    <button id="logout-btn" class="bg-gray-100 hover:bg-gray-200 text-gray-600 px-4 py-2.5 rounded-xl font-bold transition-colors flex items-center gap-2"><i class="fa-solid fa-right-from-bracket"></i></button>
+                </div>
+            </div>
+
+            <!-- Stats -->
+            <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-3 mb-4">
+                <div class="bg-white p-3.5 rounded-xl shadow-sm border border-gray-100 flex flex-col gap-1 border-b-4 border-gray-400">
+                    <div class="flex justify-between items-center"><p class="text-[11px] sm:text-xs text-gray-500 font-bold">إجمالي التقارير</p><i class="fa-solid fa-folder-open text-gray-400"></i></div>
+                    <h3 id="stat-total" class="text-lg font-bold text-gray-800">0</h3>
+                </div>
+                <div class="bg-white p-3.5 rounded-xl shadow-sm border border-gray-100 flex flex-col gap-1 border-b-4 border-green-500">
+                    <div class="flex justify-between items-center"><p class="text-[11px] sm:text-xs text-gray-500 font-bold">تقارير نشطة</p><i class="fa-solid fa-check-circle text-green-500"></i></div>
+                    <h3 id="stat-active" class="text-lg font-bold text-gray-800">0</h3>
+                </div>
+                <div class="bg-white p-3.5 rounded-xl shadow-sm border border-gray-100 flex flex-col gap-1 border-b-4 border-red-500">
+                    <div class="flex justify-between items-center"><p class="text-[11px] sm:text-xs text-gray-500 font-bold">تقارير منتهية</p><i class="fa-solid fa-clock text-red-500"></i></div>
+                    <h3 id="stat-expired" class="text-lg font-bold text-gray-800">0</h3>
+                </div>
+                <div class="bg-white p-3.5 rounded-xl shadow-sm border border-gray-100 flex flex-col gap-1 border-b-4 border-blue-500">
+                    <div class="flex justify-between items-center"><p class="text-[11px] sm:text-xs text-gray-500 font-bold">تقارير هذا الشهر</p><i class="fa-solid fa-calendar-day text-blue-500"></i></div>
+                    <h3 id="stat-month" class="text-lg font-bold text-gray-800">0</h3>
+                </div>
+                <div class="bg-white p-3.5 rounded-xl shadow-sm border border-gray-100 flex flex-col gap-1 border-b-4 border-orange-500">
+                    <div class="flex justify-between items-center"><p class="text-[11px] sm:text-xs text-gray-500 font-bold">قريبة من الانتهاء</p><i class="fa-solid fa-bell text-orange-500"></i></div>
+                    <h3 id="stat-soon" class="text-lg font-bold text-gray-800">0</h3>
+                </div>
+                <div id="card-duplicates" class="bg-white p-3.5 rounded-xl shadow-sm border border-gray-100 flex flex-col gap-1 border-b-4 border-amber-400 cursor-pointer hover:bg-amber-50">
+                    <div class="flex justify-between items-center"><p class="text-[11px] sm:text-xs text-amber-600 font-bold">تكرار بالهوية</p><i class="fa-solid fa-triangle-exclamation text-amber-500"></i></div>
+                    <h3 id="stat-duplicates" class="text-lg font-bold text-gray-800">0</h3>
+                </div>
+            </div>
+
+            <!-- Workspace: Docked Split Layout -->
+            <div class="flex flex-col xl:flex-row gap-6 mb-6 w-full items-start">
+                
+                <!-- Fixed Form (Docked on Right) -->
+                <div class="w-full xl:w-[420px] flex-shrink-0 bg-white rounded-2xl shadow-sm border border-gray-100 p-5 sm:p-6 relative overflow-hidden flex flex-col max-h-[85vh]">
+                    <div id="form-indicator" class="absolute top-0 right-0 w-1.5 h-full bg-emerald-600 transition-colors"></div>
+                    
+                    <div class="flex justify-between items-center mb-5 border-b border-gray-100 pb-3">
+                        <h3 id="form-title" class="text-lg font-bold text-gray-800 flex items-center gap-2">
+                            <i class="fa-solid fa-bolt text-emerald-600"></i> الإضافة السريعة (Batch)
+                        </h3>
+                        <span class="bg-emerald-50 text-emerald-700 text-[10px] font-bold px-2.5 py-1 rounded-full border border-emerald-100 shadow-sm" id="batch-counter">طلب واحد</span>
+                    </div>
+                    
+                    <form id="create-form" class="space-y-4 overflow-y-auto pr-2 custom-scrollbar flex-1 pb-2">
+                        <input type="hidden" id="edit-record-id" value="">
+                        
+                        <!-- Global Setup -->
+                        <div class="bg-gray-50 p-4 rounded-xl border border-gray-200 space-y-3 shadow-sm mb-2">
+                            <div>
+                                <label class="block text-[11px] font-bold text-gray-600 mb-1">اسم العيادة / المستشفى</label>
+                                <input type="text" id="input-clinic" required class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 outline-none text-sm bg-white font-bold" value="Blue Medical Field Complex" dir="ltr">
+                            </div>
+                            <div class="grid grid-cols-2 gap-3">
+                                <div>
+                                    <label class="block text-[11px] font-bold text-gray-600 mb-1">صلاحية التقرير</label>
+                                    <select id="input-validity" required class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 outline-none bg-white text-sm cursor-pointer font-bold">
+                                        <option value="365">سنة كاملة</option>
+                                        <option value="30">30 يوماً</option>
+                                        <option value="7">7 أيام</option>
+                                    </select>
+                                </div>
+                                <div>
+                                    <label class="block text-[11px] font-bold text-gray-600 mb-1">الجنس (للجميع)</label>
+                                    <select id="input-global-gender" required class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 outline-none bg-white text-sm font-bold english-ui" dir="ltr">
+                                        <option value="Male">Male</option>
+                                        <option value="Female">Female</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Dynamic Requests Container -->
+                        <div id="requests-container" class="space-y-4"></div>
+                        
+                        <!-- Add New Record Button (Dashed) -->
+                        <div class="pt-2 pb-1" id="add-request-btn-container">
+                            <button type="button" id="add-request-btn" class="w-full border-2 border-dashed border-emerald-400 bg-emerald-50 hover:bg-emerald-100 text-emerald-700 font-bold py-3 px-4 rounded-xl transition-colors flex justify-center items-center gap-2 text-sm shadow-sm">
+                                <i class="fa-solid fa-plus"></i> إضافة مريض آخر (أو اضغط Enter)
+                            </button>
+                        </div>
+                    </form>
+
+                    <div class="pt-4 border-t border-gray-100 flex flex-col gap-2 bg-white mt-auto">
+                        <button type="submit" form="create-form" id="submit-btn" class="w-full bg-gray-900 hover:bg-gray-800 text-white font-bold py-3.5 px-4 rounded-xl transition-all shadow-md flex justify-center items-center gap-2 text-sm">
+                            <i class="fa-solid fa-rocket"></i> تنفيذ العملية والحفظ
+                        </button>
+                        <button type="button" id="cancel-edit-btn" class="hidden w-full bg-gray-100 hover:bg-gray-200 text-gray-700 font-bold py-3 px-4 rounded-xl transition-colors text-sm">
+                            إلغاء التعديل
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Table Container (Left Side) -->
+                <div class="flex-1 w-full min-w-0 bg-white rounded-2xl shadow-sm border border-gray-100 p-4 sm:p-5 flex flex-col min-h-[500px]">
+                    <div class="flex flex-col lg:flex-row justify-between items-start lg:items-center mb-4 gap-4">
+                        <h3 class="text-xl font-bold text-gray-800 flex items-center gap-2">
+                            <i class="fa-solid fa-database text-emerald-600"></i> السجلات الموثقة
+                        </h3>
+                        <div class="flex gap-2 w-full lg:w-auto flex-wrap sm:flex-nowrap">
+                            <div id="export-selected-container" class="hidden w-full sm:w-auto flex-row gap-2">
+                                <button id="export-selected-btn" class="flex-1 bg-purple-50 hover:bg-purple-100 text-purple-700 px-3 py-2.5 rounded-xl font-bold transition-colors text-xs flex items-center justify-center gap-2 border border-purple-200">
+                                    <i class="fa-solid fa-link"></i> روابط (<span id="selected-count">0</span>)
+                                </button>
+                                <button id="print-selected-btn" class="flex-1 bg-gray-900 hover:bg-gray-800 text-white px-3 py-2.5 rounded-xl font-bold transition-colors text-xs flex items-center justify-center gap-2 shadow-sm">
+                                    <i class="fa-solid fa-print"></i> طباعة البطاقات
+                                </button>
+                            </div>
+                            
+                            <button id="export-csv-btn" class="flex-1 sm:flex-none bg-green-50 hover:bg-green-100 text-green-700 px-4 py-2.5 rounded-xl font-bold transition-colors text-sm flex items-center justify-center gap-2 border border-green-200"><i class="fa-solid fa-file-excel"></i> إكسيل</button>
+                            <button id="refresh-db-btn" class="bg-gray-100 hover:bg-gray-200 text-gray-600 px-4 py-2.5 rounded-xl transition-colors font-bold"><i class="fa-solid fa-rotate"></i></button>
+                        </div>
+                    </div>
+
+                    <!-- Filters & Pagination Bar -->
+                    <div class="mb-4 flex flex-col md:flex-row gap-3 bg-gray-50 p-3 rounded-xl border border-gray-200">
+                        <div class="flex items-center gap-2 text-sm font-bold text-gray-700 whitespace-nowrap">
+                            <span>عرض:</span>
+                            <select id="rows-per-page" class="border border-gray-300 rounded-lg px-2 py-2 outline-none focus:ring-2 focus:ring-emerald-500 bg-white cursor-pointer">
+                                <option value="10">10</option>
+                                <option value="20" selected>20</option>
+                                <option value="50">50</option>
+                                <option value="all">الكل</option>
+                            </select>
+                        </div>
+                        <div class="relative flex-1">
+                            <i class="fa-solid fa-search absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400"></i>
+                            <input type="text" id="search-input" class="w-full pr-10 pl-3 py-2 border border-gray-300 rounded-lg outline-none focus:ring-2 focus:ring-emerald-500 bg-white text-sm" placeholder="ابحث بالاسم أو الهوية...">
+                        </div>
+                        <div class="relative w-full md:w-1/3 min-w-[220px]">
+                            <i class="fa-regular fa-calendar absolute right-3 top-1/2 transform -translate-y-1/2 text-emerald-600"></i>
+                            <input type="text" id="date-filter" class="w-full pr-10 pl-3 py-2 border border-gray-300 rounded-lg outline-none focus:ring-2 focus:ring-emerald-500 bg-white text-sm cursor-pointer font-bold placeholder-gray-500" placeholder="تصفية بالتاريخ (نطاق)...">
+                            <i id="clear-date-btn" class="fa-solid fa-xmark absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-red-500 cursor-pointer hidden"></i>
+                        </div>
+                    </div>
+
+                    <!-- Table -->
+                    <div class="flex-1 overflow-x-auto rounded-xl border border-gray-200 relative custom-scrollbar bg-white">
+                        <table class="w-full text-sm text-right text-gray-600 min-w-[900px]">
+                            <thead class="text-xs text-gray-700 uppercase bg-gray-100 border-b sticky top-0 z-10 shadow-sm">
+                                <tr>
+                                    <th class="px-3 py-3.5 text-center w-12 sticky right-0 bg-gray-100 z-20"><input type="checkbox" id="select-all" class="w-4 h-4 rounded border-gray-300 text-emerald-600 focus:ring-emerald-500 cursor-pointer"></th>
+                                    <th class="px-3 py-3.5 text-center w-12 sticky right-12 bg-gray-100 z-20 border-l border-gray-200">#</th>
+                                    <th class="px-3 py-3.5 text-center w-24">الحالة</th>
+                                    <th class="px-3 py-3.5 text-center w-36">تاريخ الإنشاء</th>
+                                    <th class="px-3 py-3.5 text-center">اسم المريض</th>
+                                    <th class="px-3 py-3.5 text-center w-32">رقم الهوية</th>
+                                    <th class="px-3 py-3.5 text-center w-40 sticky left-0 bg-gray-100 z-20 border-r border-gray-200">الإجراءات</th>
+                                </tr>
+                            </thead>
+                            <tbody id="records-tbody" class="divide-y divide-gray-100 bg-white"></tbody>
+                        </table>
+                        <div id="no-records-msg" class="hidden absolute inset-0 flex flex-col items-center justify-center text-gray-500 bg-white/90 z-20">
+                            <i class="fa-solid fa-folder-open text-5xl mb-3 text-gray-300"></i><p class="font-bold text-base mt-2">لا توجد سجلات.</p>
+                        </div>
+                    </div>
+
+                    <!-- Pagination -->
+                    <div id="pagination-container" class="mt-4 flex flex-col sm:flex-row items-center justify-between border-t border-gray-100 pt-4 gap-4">
+                        <div class="text-sm text-gray-500 font-bold">إظهار <span id="page-info-start" class="text-gray-900">0</span> إلى <span id="page-info-end" class="text-gray-900">0</span> من <span id="page-info-total" class="text-gray-900">0</span> سجل</div>
+                        <nav aria-label="Pagination" class="inline-flex -space-x-px rounded-lg shadow-sm bg-white" id="pagination-nav"></nav>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Client Section -->
+        <section id="client-section" class="english-ui hidden w-full max-w-xl mx-auto mt-4 px-2 sm:px-0">
+            <div id="client-success-view" class="hidden bg-white rounded-2xl shadow-2xl shadow-emerald-950/5 border border-gray-100 overflow-hidden flex flex-col w-full" dir="ltr">
+                <div class="bg-white py-6 px-6 text-center text-gray-900 relative border-b border-gray-100 flex flex-col items-center justify-center gap-3">
+                    <img src="Blue.png" alt="Clinic Logo" class="h-16 sm:h-20 object-contain bg-transparent" onerror="this.onerror=null; this.src='https://placehold.co/180x60/ffffff/059669?text=Clinic+Logo'">
+                    <div class="inline-flex items-center gap-2.5 bg-emerald-50 text-emerald-800 border border-emerald-200 px-5 py-2.5 rounded-full font-bold text-sm tracking-wide shadow-sm mt-1">
+                        <i class="fa-solid fa-circle-check text-emerald-600 text-base"></i> QR Code Verified
+                    </div>
+                </div>
+
+                <div class="p-4 sm:p-8 w-full overflow-hidden">
+                    <div class="flex items-center justify-center text-sm text-gray-500 mb-6 pb-4 border-b border-gray-100 font-medium gap-2">
+                        <i class="fa-regular fa-calendar text-gray-400"></i> Generated on: <span id="c-date" class="font-bold text-gray-700"></span>
+                    </div>
+                    <div class="w-full pb-2 overflow-x-auto">
+                        <table class="info-table mb-8 whitespace-nowrap">
+                            <tbody>
+                                <tr><th>Clinic</th><td id="c-clinic"></td></tr>
+                                <tr><th>Patient ID</th><td id="c-id" class="font-mono text-emerald-700 font-bold"></td></tr>
+                                <tr><th>Patient Name</th><td id="c-name" class="whitespace-normal uppercase font-bold text-gray-900"></td></tr>
+                                <tr><th>Age</th><td id="c-age"></td></tr>
+                                <tr><th>Gender</th><td id="c-gender"></td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    <div id="c-download-container" class="hidden flex flex-col gap-3 no-print mt-2">
+                        <a id="c-download-btn" href="#" target="_blank" class="w-full bg-emerald-600 hover:bg-emerald-700 text-white py-4 px-4 rounded-xl font-bold transition-all shadow-lg flex justify-center items-center gap-2 text-lg">
+                            <i class="fa-solid fa-cloud-arrow-down"></i> Download Report
+                        </a>
+                    </div>
+                </div>
+            </div>
+
+            <div id="client-error-view" class="hidden bg-white rounded-2xl shadow-xl border border-gray-100 p-8 text-center w-full" dir="ltr">
+                <div class="w-24 h-24 bg-red-50 text-red-500 rounded-full flex items-center justify-center mx-auto mb-5 border-4 border-white shadow-sm"><i class="fa-solid fa-circle-xmark text-5xl"></i></div>
+                <h1 class="text-2xl font-bold text-gray-900 mb-2">Report Unavailable</h1>
+                <p class="text-gray-500 text-sm mb-6 leading-relaxed">For patient privacy and security, this medical report link has expired or the data is invalid. Please contact the clinic for an updated record.</p>
+                <div class="bg-gray-50 p-3 rounded-lg border border-gray-200 text-xs text-gray-400 font-mono">ERR_DATA_INVALID_OR_EXPIRED</div>
+            </div>
+        </section>
+    </main>
+
+    <footer class="w-full text-center py-4 text-xs text-gray-500 font-bold admin-ui no-print"><span id="footer-signature">Designed by Eng. Bahaa Al-Sheikh</span></footer>
+
+    <!-- Modals -->
+    <div id="qr-modal" class="hidden fixed inset-0 z-[60] flex items-center justify-center bg-gray-900/60 backdrop-blur-sm admin-ui">
+        <div class="bg-white p-6 rounded-2xl shadow-2xl w-[90%] max-w-sm text-center border border-gray-100 relative">
+            <div class="w-14 h-14 bg-emerald-50 text-emerald-600 rounded-full flex items-center justify-center mx-auto mb-3"><i class="fa-solid fa-qrcode text-3xl"></i></div>
+            <h3 class="text-xl font-bold mb-1 text-gray-800">تم التوليد بنجاح</h3>
+            <p class="text-sm text-gray-500 mb-6">يمكنك طباعة البطاقة أو نسخ الرابط الموثق.</p>
+            <div class="flex justify-center mb-6 bg-white p-4 border-2 border-dashed border-gray-200 rounded-2xl"><div id="modal-qrcode-container"></div></div>
+            <div class="flex gap-3">
+                <button id="close-modal-btn" class="flex-1 bg-gray-100 hover:bg-gray-200 text-gray-800 py-3 rounded-xl font-bold transition-colors">إغلاق</button>
+                <button id="print-qr-btn" class="flex-1 bg-emerald-600 hover:bg-emerald-700 text-white py-3 rounded-xl font-bold transition-colors shadow-md flex justify-center items-center gap-2"><i class="fa-solid fa-print"></i> طباعة البطاقة</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="delete-modal" class="hidden fixed inset-0 z-[60] flex items-center justify-center bg-gray-900/60 backdrop-blur-sm admin-ui">
+        <div class="bg-white p-6 rounded-2xl shadow-2xl w-[90%] max-w-sm text-center border border-gray-100">
+            <div class="w-16 h-16 bg-red-100 text-red-600 rounded-full flex items-center justify-center mx-auto mb-4"><i class="fa-solid fa-triangle-exclamation text-4xl"></i></div>
+            <h3 class="text-xl font-bold mb-2 text-gray-800">تأكيد الحذف</h3>
+            <p class="text-sm text-gray-500 mb-6">هل أنت متأكد من حذف هذا السجل نهائياً؟ سيصبح الرمز المرتبط به غير صالح.</p>
+            <div class="flex gap-3">
+                <button id="cancel-delete-btn" class="flex-1 bg-gray-100 hover:bg-gray-200 text-gray-800 py-3.5 rounded-xl font-bold transition-colors">تراجع</button>
+                <button id="confirm-delete-btn" class="flex-1 bg-red-600 hover:bg-red-700 text-white py-3.5 rounded-xl font-bold transition-colors shadow-md">نعم، احذف</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="clear-all-modal" class="hidden fixed inset-0 z-[60] flex items-center justify-center bg-gray-900/60 backdrop-blur-sm admin-ui">
+        <div class="bg-white p-6 rounded-2xl shadow-2xl w-[90%] max-w-md text-center border border-gray-100">
+            <div class="w-16 h-16 bg-rose-100 text-rose-600 rounded-full flex items-center justify-center mx-auto mb-4"><i class="fa-solid fa-broom text-4xl"></i></div>
+            <h3 class="text-xl font-bold mb-2 text-gray-800">تصفير قاعدة البيانات</h3>
+            <p class="text-sm text-gray-500 mb-6">هل أنت متأكد من مسح جميع السجلات الحالية؟ يُرجى التأكد من حفظ "نسخة احتياطية" أولاً.</p>
+            <div class="flex gap-3">
+                <button id="cancel-clear-btn" class="flex-1 bg-gray-100 hover:bg-gray-200 text-gray-800 py-3.5 rounded-xl font-bold transition-colors">لا، تراجع</button>
+                <button id="confirm-clear-btn" class="flex-1 bg-rose-600 hover:bg-rose-700 text-white py-3.5 rounded-xl font-bold transition-colors shadow-md flex justify-center items-center gap-2"><i class="fa-solid fa-trash-can"></i> نعم، امسح كل شيء</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Hidden Print Area -->
+    <div id="print-card-area">
+        <div style="display: flex; align-items: center; justify-content: center; gap: 8px; margin-bottom: 5px;">
+            <img src="Blue.png" alt="Logo" style="height: 28px; object-fit: contain; filter: brightness(0) invert(1);" onerror="this.style.display='none'">
+            <h3 id="print-clinic-name" style="margin: 0; font-size: 13px;">Clinic Name</h3>
+        </div>
+        <p style="font-size: 10px; margin: 0 0 2px 0;">Name: <span id="print-patient-name" style="font-weight: bold;"></span></p>
+        <p style="font-size: 10px; margin: 0 0 2px 0;">ID: <span id="print-patient-id" style="font-weight: bold;"></span> | Age: <span id="print-patient-age" style="font-weight: bold;"></span></p>
+        <div id="print-qr-container"></div>
+        <p style="margin-top:3px; font-weight: bold; font-size: 8px;">Scan to Verify Report</p>
+    </div>
+
+    <script>
+        const ADMIN_USER = localStorage.getItem('custom_admin_user') || "admin";
+        const ADMIN_PASS = localStorage.getItem('custom_admin_pass') || "admin123"; 
+        const STORAGE_KEY = "medical_records_local_v8"; 
+        
+        const DOM = {
+            toast: document.getElementById('toast-container'), loginSec: document.getElementById('login-section'), adminSec: document.getElementById('admin-section'),
+            clientSec: document.getElementById('client-section'), form: document.getElementById('create-form'), btnSubmit: document.getElementById('submit-btn'),
+            btnCancelEdit: document.getElementById('cancel-edit-btn'), editRecordId: document.getElementById('edit-record-id'), formTitle: document.getElementById('form-title'),
+            formIndicator: document.getElementById('form-indicator'), reqContainer: document.getElementById('requests-container'), btnAddRequest: document.getElementById('add-request-btn'),
+            btnAddRequestContainer: document.getElementById('add-request-btn-container'), batchCounter: document.getElementById('batch-counter'), tbody: document.getElementById('records-tbody'), search: document.getElementById('search-input'),
+            dateFilter: document.getElementById('date-filter'), clearDateBtn: document.getElementById('clear-date-btn'), rowsPerPageSelect: document.getElementById('rows-per-page'),
+            paginationNav: document.getElementById('pagination-nav'), pageInfoStart: document.getElementById('page-info-start'), pageInfoEnd: document.getElementById('page-info-end'),
+            pageInfoTotal: document.getElementById('page-info-total'), qrModal: document.getElementById('qr-modal'), deleteModal: document.getElementById('delete-modal'),
+            modalQRContainer: document.getElementById('modal-qrcode-container'), printQRContainer: document.getElementById('print-qr-container'), cSuccess: document.getElementById('client-success-view'),
+            cError: document.getElementById('client-error-view'), selectAll: document.getElementById('select-all'), exportSelectedContainer: document.getElementById('export-selected-container'),
+            btnExportSelected: document.getElementById('export-selected-btn'), btnPrintSelected: document.getElementById('print-selected-btn'), selectedCount: document.getElementById('selected-count')
+        };
+
+        let currentRecords = JSON.parse(localStorage.getItem(STORAGE_KEY)) || [];
+        let filteredRecords = []; 
+        let recordToDelete = null; 
+        let requestCount = 0; 
+        let currentPage = 1; 
+        let rowsPerPage = 20; 
+        let fpInstance;
+
+        function addRequestBlock(data = null) {
+            requestCount++;
+            const block = document.createElement('div');
+            block.className = 'request-card bg-white border border-gray-200 rounded-xl p-4 relative shadow-sm border-r-4 border-r-emerald-500 transition-all';
+            block.id = `req-block-${requestCount}`;
+            
+            const showRemove = (!data && DOM.editRecordId.value === '') || requestCount > 1;
+            const removeBtn = showRemove ? `<button type="button" tabindex="-1" onclick="removeRequestBlock('${block.id}')" class="text-gray-400 hover:text-red-600 w-6 h-6 flex items-center justify-center rounded-md hover:bg-red-50 transition-colors" title="إزالة"><i class="fa-solid fa-trash-can text-sm"></i></button>` : '';
+
+            block.innerHTML = `
+                <div class="flex justify-between items-center mb-3 border-b border-gray-100 pb-2">
+                    <span class="bg-gray-100 text-gray-700 text-[11px] font-bold px-2 py-1 rounded shadow-sm">المريض #${requestCount}</span>
+                    ${removeBtn}
+                </div>
+                <div class="grid grid-cols-12 gap-3">
+                    <div class="col-span-12 sm:col-span-7">
+                        <label class="block text-[11px] font-bold text-gray-700 mb-1">اسم المريض الكامل <span class="text-red-500">*</span></label>
+                        <input type="text" class="req-name w-full px-3 py-2 border border-gray-200 rounded-lg outline-none bg-gray-50 text-sm focus:ring-2 focus:ring-emerald-500 uppercase transition-all" placeholder="e.g. AHMAD ALI" dir="ltr" required value="${data ? data.patientName : ''}">
+                    </div>
+                    <div class="col-span-12 sm:col-span-5">
+                        <label class="block text-[11px] font-bold text-gray-700 mb-1">رقم الإقامة / الهوية <span class="text-red-500">*</span></label>
+                        <input type="text" class="req-id w-full px-3 py-2 border border-gray-200 rounded-lg outline-none bg-gray-50 text-sm font-mono focus:ring-2 focus:ring-emerald-500 transition-all" placeholder="e.g. 10xxxxxxxx" dir="ltr" required value="${data ? data.patientId : ''}">
+                    </div>
+                    <div class="col-span-4 sm:col-span-3">
+                        <label class="block text-[11px] font-bold text-gray-700 mb-1">العمر <span class="text-red-500">*</span></label>
+                        <input type="text" class="req-age w-full px-3 py-2 border border-gray-200 rounded-lg outline-none text-sm focus:ring-2 focus:ring-emerald-500 transition-all" placeholder="30 Y" dir="ltr" required value="${data ? data.age : ''}">
+                    </div>
+                    <div class="col-span-8 sm:col-span-9">
+                        <label class="block text-[11px] font-bold text-gray-700 mb-1">رابط Google Drive <span class="text-red-500">*</span></label>
+                        <input type="url" class="req-url w-full px-3 py-2 border border-gray-200 rounded-lg outline-none text-xs focus:ring-2 focus:ring-emerald-500 transition-all" placeholder="https://drive.google.com/..." dir="ltr" required value="${data ? (data.fileUrl || '') : ''}">
+                    </div>
+                    <div class="col-span-12 bg-emerald-50/50 border border-emerald-100 rounded-lg p-2 mt-1 relative group hover:bg-emerald-50 transition-colors flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+                        <label class="text-[11px] font-bold text-emerald-800 flex items-center gap-1.5 whitespace-nowrap"><i class="fa-solid fa-file-pdf text-red-500"></i> دمج الـ QR في PDF <span class="text-red-500">*</span></label>
+                        <input type="file" accept=".pdf" ${!data ? 'required' : ''} class="req-pdf w-full sm:w-auto flex-1 text-[10px] text-gray-700 file:mr-2 file:py-1 file:px-3 file:rounded-md file:border-0 file:text-[10px] file:font-bold file:bg-emerald-600 file:text-white hover:file:bg-emerald-700 bg-white border border-emerald-200 rounded-md p-1 cursor-pointer transition-all" onkeydown="handleEnterKey(event)">
+                    </div>
+                </div>
+            `;
+            DOM.reqContainer.appendChild(block);
+            updateBatchCounter();
+            setTimeout(() => block.scrollIntoView({ behavior: 'smooth', block: 'end' }), 50);
+            
+            if(!data && requestCount > 1) {
+                block.querySelector('.req-name').focus();
+            }
+        }
+
+        function showToast(message, type = 'success') {
+            const toast = document.createElement('div');
+            const colors = type === 'success' ? 'bg-gray-900 border-l-4 border-emerald-500' : 
+                          (type === 'error' ? 'bg-red-600 border-l-4 border-red-900' : 'bg-emerald-600 border-l-4 border-emerald-900');
+            const icon = type === 'success' ? 'fa-circle-check text-emerald-400' : 
+                        (type === 'error' ? 'fa-triangle-exclamation text-white' : 'fa-info-circle text-white');
+            
+            toast.className = `${colors} text-white p-4 rounded-2xl shadow-2xl flex items-center gap-3 toast-enter pointer-events-auto admin-ui`;
+            toast.innerHTML = `<i class="fa-solid ${icon} text-xl"></i><p class="font-bold text-sm m-0">${message}</p>`;
+            
+            DOM.toast.appendChild(toast);
+            setTimeout(() => {
+                toast.classList.replace('toast-enter', 'toast-exit');
+                setTimeout(() => toast.remove(), 300);
+            }, 3000);
+        }
+
+        window.handleEnterKey = (event) => {
+            if (event.key === 'Enter') {
+                event.preventDefault(); 
+                if(!DOM.editRecordId.value) { addRequestBlock(); }
+            }
+        };
+
+        window.removeRequestBlock = (id) => {
+            const block = document.getElementById(id);
+            if(block) block.remove();
+            updateBatchCounter();
+        };
+
+        function updateBatchCounter() {
+            const count = document.querySelectorAll('.request-card').length;
+            DOM.batchCounter.innerText = count === 1 ? 'طلب واحد' : `${count} طلبات`;
+            if(count === 0 && !DOM.editRecordId.value) addRequestBlock();
+        }
+
+        DOM.btnAddRequest?.addEventListener('click', () => {
+            if(!DOM.editRecordId.value) addRequestBlock();
+        });
+
+        function encodeDataToUrl(obj) {
+            const jsonStr = JSON.stringify(obj);
+            return encodeURIComponent(btoa(encodeURIComponent(jsonStr)));
+        }
+
+        function decodeDataFromUrl(encodedStr) {
+            try {
+                const safeStr = decodeURIComponent(encodedStr).replace(/ /g, '+');
+                const jsonStr = decodeURIComponent(atob(safeStr));
+                return JSON.parse(jsonStr);
+            } catch (e) {
+                console.error("Failed to decode data:", e);
+                return null; 
+            }
+        }
+
+        window.getRecordUrlFromPayload = (payload) => {
+            const minifiedPayload = { c: payload.clinic, i: payload.patientId, n: payload.patientName, a: payload.age, g: payload.gender, u: payload.fileUrl, t: payload.createdAt, e: payload.expiresAt };
+            const encoded = encodeDataToUrl(minifiedPayload);
+            // Uses current host automatically, so wherever you deploy or change domain, old links remain fully functional!
+            return `${window.location.origin}${window.location.pathname}?d=${encoded}`;
+        };
+
+        window.getRecordUrl = (id) => {
+            const record = currentRecords.find(r => r.id === id);
+            return record ? window.getRecordUrlFromPayload(record) : '';
+        };
+
+        async function getQrBase64(text) {
+            return new Promise((resolve) => {
+                const tempDiv = document.createElement('div');
+                try {
+                    new QRCode(tempDiv, { text: text, width: 200, height: 200, colorDark: "#000000", colorLight: "#ffffff", correctLevel: QRCode.CorrectLevel.L });
+                    setTimeout(() => { 
+                        const canvas = tempDiv.querySelector('canvas'); 
+                        resolve(canvas ? canvas.toDataURL("image/png") : null); 
+                    }, 300); 
+                } catch(e) { resolve(null); }
+            });
+        }
+
+        async function processPDF(file, qrUrl, patientId) {
+            try {
+                const pdfBytes = await file.arrayBuffer(); 
+                const pdfDoc = await PDFLib.PDFDocument.load(pdfBytes); 
+                const firstPage = pdfDoc.getPages()[0];
+                const qrBase64 = await getQrBase64(qrUrl); 
+                if (!qrBase64) throw new Error("فشل توليد QR الباركود");
+                
+                const qrImage = await pdfDoc.embedPng(qrBase64); 
+                const qrSize = 75; 
+                const { width, height } = firstPage.getSize();
+                firstPage.drawImage(qrImage, { x: width - qrSize - 30, y: height - qrSize - 60, width: qrSize, height: qrSize });
+                
+                const modifiedPdfBytes = await pdfDoc.save(); 
+                const blob = new Blob([modifiedPdfBytes], { type: 'application/pdf' });
+                const link = document.createElement('a'); link.href = URL.createObjectURL(blob); link.download = `${patientId}.pdf`; 
+                document.body.appendChild(link); link.click(); document.body.removeChild(link); 
+                return true;
+            } catch (err) { 
+                console.error("PDF Processing Error:", err); 
+                showToast(`خطأ في معالجة ملف PDF للمريض ${patientId}. تأكد أن الملف غير محمي بكلمة مرور.`, 'error');
+                return false; 
+            }
+        }
+
+        function initFlatpickr() {
+            fpInstance = flatpickr("#date-filter", {
+                mode: "range", dateFormat: "Y-m-d", disableMobile: "true", 
+                onChange: function(selectedDates) {
+                    DOM.clearDateBtn.classList.toggle('hidden', selectedDates.length === 0);
+                    filterTable();
+                }
+            });
+            DOM.clearDateBtn.addEventListener('click', () => { fpInstance.clear(); DOM.clearDateBtn.classList.add('hidden'); });
+        }
+
+        function filterTable() {
+            const term = DOM.search.value.toLowerCase(); const selectedDates = fpInstance ? fpInstance.selectedDates : [];
+            filteredRecords = currentRecords.filter(r => {
+                const matchSearch = (r.patientName && r.patientName.toLowerCase().includes(term)) || (r.patientId && r.patientId.toLowerCase().includes(term));
+                let matchDate = true;
+                if (selectedDates.length === 1) { const d = new Date(r.createdAt); matchDate = d.getFullYear() === selectedDates[0].getFullYear() && d.getMonth() === selectedDates[0].getMonth() && d.getDate() === selectedDates[0].getDate(); } 
+                else if (selectedDates.length === 2) { const d = new Date(r.createdAt); matchDate = d >= selectedDates[0] && d <= new Date(selectedDates[1].getTime() + 86400000); }
+                return matchSearch && matchDate;
+            });
+            currentPage = 1; renderTable();
+        }
+
+        DOM.search.addEventListener('input', filterTable);
+        DOM.rowsPerPageSelect.addEventListener('change', (e) => { rowsPerPage = e.target.value === 'all' ? 'all' : parseInt(e.target.value); currentPage = 1; renderTable(); });
+
+        function getPaginationRange(current, last) {
+            const delta = 1; const left = current - delta; const right = current + delta + 1; const range = []; const rangeWithDots = []; let l;
+            for (let i = 1; i <= last; i++) { if (i === 1 || i === last || (i >= left && i < right)) range.push(i); }
+            for (let i of range) { if (l) { if (i - l === 2) rangeWithDots.push(l + 1); else if (i - l !== 1) rangeWithDots.push('...'); } rangeWithDots.push(i); l = i; }
+            return rangeWithDots;
+        }
+
+        window.changePage = (page) => { currentPage = page; renderTable(); document.querySelector('.custom-scrollbar').scrollTo({top:0, behavior:'smooth'}); };
+
+        function renderPagination(totalItems) {
+            DOM.paginationNav.innerHTML = '';
+            if (totalItems === 0 || rowsPerPage === 'all') {
+                DOM.pageInfoStart.textContent = totalItems > 0 ? 1 : 0; DOM.pageInfoEnd.textContent = totalItems; DOM.pageInfoTotal.textContent = totalItems; return;
+            }
+            const totalPages = Math.ceil(totalItems / rowsPerPage);
+            DOM.pageInfoStart.textContent = ((currentPage - 1) * rowsPerPage) + 1; DOM.pageInfoEnd.textContent = Math.min(currentPage * rowsPerPage, totalItems); DOM.pageInfoTotal.textContent = totalItems;
+            if(totalPages <= 1) return;
+
+            const btnClassBase = "relative inline-flex items-center justify-center w-9 h-9 text-sm font-bold rounded-xl transition-all duration-200 mx-1 focus:outline-none focus:ring-2 focus:ring-emerald-500 ";
+
+            const prevBtn = document.createElement('button');
+            prevBtn.className = btnClassBase + (currentPage === 1 ? 'text-gray-300 bg-gray-50 cursor-not-allowed' : 'text-gray-600 hover:bg-emerald-50 hover:text-emerald-600 shadow-sm border border-gray-100');
+            prevBtn.innerHTML = `<i class="fa-solid fa-chevron-right text-xs"></i>`; prevBtn.onclick = () => currentPage > 1 && changePage(currentPage - 1); DOM.paginationNav.appendChild(prevBtn);
+
+            const pages = getPaginationRange(currentPage, totalPages);
+            pages.forEach(p => {
+                if (p === '...') {
+                    const dots = document.createElement('span'); dots.className = "relative inline-flex items-center justify-center w-9 h-9 text-sm font-bold text-gray-400 mx-1 tracking-widest"; dots.innerHTML = "..."; DOM.paginationNav.appendChild(dots);
+                } else {
+                    const btn = document.createElement('button'); const isCurrent = p === currentPage;
+                    btn.className = isCurrent ? btnClassBase + "bg-emerald-600 text-white shadow-md shadow-emerald-500/30 transform scale-105" : btnClassBase + "text-gray-600 hover:bg-emerald-50 hover:text-emerald-600 bg-white border border-gray-100 shadow-sm";
+                    btn.innerText = p; if(isCurrent) btn.setAttribute('aria-current', 'page'); btn.onclick = () => changePage(p); DOM.paginationNav.appendChild(btn);
+                }
+            });
+
+            const nextBtn = document.createElement('button');
+            nextBtn.className = btnClassBase + (currentPage === totalPages ? 'text-gray-300 bg-gray-50 cursor-not-allowed' : 'text-gray-600 hover:bg-emerald-50 hover:text-emerald-600 shadow-sm border border-gray-100');
+            nextBtn.innerHTML = `<i class="fa-solid fa-chevron-left text-xs"></i>`; nextBtn.onclick = () => currentPage < totalPages && changePage(currentPage + 1); DOM.paginationNav.appendChild(nextBtn);
+        }
+
+        function renderTable() {
+            DOM.tbody.innerHTML = '';
+            const noData = document.getElementById('no-records-msg');
+            if(filteredRecords.length === 0) {
+                noData.classList.remove('hidden'); if(DOM.selectAll) DOM.selectAll.checked = false; toggleExportSelectedBtn(); renderPagination(0); return;
+            }
+            noData.classList.add('hidden'); const now = Date.now();
+            let recordsToDisplay = rowsPerPage !== 'all' ? filteredRecords.slice((currentPage - 1) * rowsPerPage, (currentPage - 1) * rowsPerPage + rowsPerPage) : filteredRecords;
+
+            recordsToDisplay.forEach((rec, index) => {
+                const isExpired = now > rec.expiresAt;
+                const statusBadge = isExpired ? `<span class="bg-red-50 text-red-600 border border-red-200 px-2 py-1 rounded-lg text-xs font-bold shadow-sm inline-block w-full text-center"><i class="fa-solid fa-clock"></i> منتهي</span>` : `<span class="bg-green-50 text-green-600 border border-green-200 px-2 py-1 rounded-lg text-xs font-bold shadow-sm inline-block w-full text-center"><i class="fa-solid fa-check"></i> نشط</span>`;
+                const dateObj = new Date(rec.createdAt); const fullDateTime = `${dateObj.toLocaleDateString('en-GB')} <span class="text-[10px] text-gray-400 ml-1">${dateObj.toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit', hour12: false })}</span>`;
+                const globalIndex = (rowsPerPage !== 'all') ? ((currentPage - 1) * rowsPerPage) + index + 1 : index + 1;
+                const tr = document.createElement('tr'); tr.className = "hover:bg-emerald-50/60 transition-colors group";
+                
+                tr.innerHTML = `
+                    <td class="px-3 py-4 text-center sticky right-0 bg-white group-hover:bg-emerald-50/60 z-10 border-b border-gray-100"><input type="checkbox" class="row-checkbox w-4 h-4 rounded border-gray-300 text-emerald-600 focus:ring-emerald-500 cursor-pointer" value="${rec.id}"></td>
+                    <td class="px-3 py-4 text-center font-bold text-gray-400 text-sm sticky right-12 bg-white group-hover:bg-emerald-50/60 z-10 border-l border-b border-gray-100">${globalIndex}</td>
+                    <td class="px-3 py-4 text-center border-b border-gray-100">${statusBadge}</td>
+                    <td class="px-3 py-4 text-center font-mono text-sm border-b border-gray-100" dir="ltr">${fullDateTime}</td>
+                    <td class="px-3 py-4 text-center font-bold text-gray-900 border-b border-gray-100 text-sm"><div class="break-words max-w-[180px] whitespace-normal leading-tight mx-auto">${rec.patientName}</div></td>
+                    <td class="px-3 py-4 text-center font-mono text-gray-500 text-sm border-b border-gray-100" dir="ltr">${rec.patientId}</td>
+                    <td class="px-3 py-4 text-center space-x-1 space-x-reverse sticky left-0 bg-white group-hover:bg-emerald-50/60 z-10 border-r border-b border-gray-100 whitespace-nowrap">
+                        <button onclick="window.editRecord('${rec.id}')" class="bg-white border border-yellow-200 text-yellow-600 shadow-sm w-8 h-8 rounded-lg hover:bg-yellow-50 transition-colors" title="تعديل"><i class="fa-solid fa-pen-to-square text-sm"></i></button>
+                        <button onclick="window.viewQR('${rec.id}')" class="bg-white border border-gray-200 text-gray-700 shadow-sm w-8 h-8 rounded-lg hover:bg-gray-50 hover:text-emerald-600 transition-colors" title="عرض الرمز"><i class="fa-solid fa-qrcode text-sm"></i></button>
+                        <button onclick="window.copyLink('${rec.id}')" class="bg-white border border-gray-200 text-gray-700 shadow-sm w-8 h-8 rounded-lg hover:bg-gray-50 hover:text-purple-600 transition-colors" title="نسخ الرابط"><i class="fa-solid fa-link text-sm"></i></button>
+                        <button onclick="window.requestDelete('${rec.id}')" class="bg-white border border-red-100 text-red-500 shadow-sm w-8 h-8 rounded-lg hover:bg-red-50 transition-colors" title="حذف"><i class="fa-solid fa-trash-can text-sm"></i></button>
+                    </td>
+                `;
+                DOM.tbody.appendChild(tr);
+            });
+            renderPagination(filteredRecords.length);
+        }
+
+        DOM.form.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const editId = DOM.editRecordId.value; const clinic = document.getElementById('input-clinic').value.trim();
+            const validityDays = parseInt(document.getElementById('input-validity').value); const globalGender = document.getElementById('input-global-gender').value;
+            const validityText = { "365": "سنة كاملة", "30": "30 يوماً", "7": "7 أيام" }[validityDays] || `${validityDays} يوم`;
+
+            const cards = document.querySelectorAll('.request-card'); if(cards.length === 0) return;
+
+            const oldBtnHTML = DOM.btnSubmit.innerHTML; DOM.btnSubmit.innerHTML = `<i class="fa-solid fa-spinner fa-spin"></i> جاري التنفيذ...`; DOM.btnSubmit.disabled = true;
+
+            let successCount = 0; let lastGeneratedId = null;
+
+            for (let i = 0; i < cards.length; i++) {
+                const card = cards[i]; const newPatientId = card.querySelector('.req-id').value.trim(); const patientName = card.querySelector('.req-name').value.trim(); const pdfInput = card.querySelector('.req-pdf');
+                
+                if (currentRecords.some(r => r.patientId === newPatientId && r.id !== editId)) { 
+                    showToast(`تخطي: الهوية (${newPatientId}) مسجلة مسبقاً!`, 'error'); 
+                    continue; 
+                }
+
+                const docId = editId || (crypto.randomUUID ? crypto.randomUUID() : 'id_' + Date.now() + i); 
+                const now = editId ? currentRecords.find(r => r.id === editId).createdAt : Date.now();
+
+                const payload = { id: docId, clinic: clinic, patientId: newPatientId, patientName: patientName, age: card.querySelector('.req-age').value.trim(), gender: globalGender, fileUrl: card.querySelector('.req-url').value.trim(), validityText: validityText, createdAt: now, expiresAt: now + (validityDays * 24 * 60 * 60 * 1000) };
+                const qrUrl = window.getRecordUrlFromPayload(payload);
+
+                if (pdfInput.files && pdfInput.files.length > 0) {
+                    showToast(`دمج وتنزيل ملف: ${patientName}...`, 'info');
+                    if (!await processPDF(pdfInput.files[0], qrUrl, payload.patientId)) showToast(`فشل الدمج: ${patientName}`, 'error');
+                    await new Promise(res => setTimeout(res, 850)); 
+                }
+
+                if (editId) { 
+                    const index = currentRecords.findIndex(r => r.id === editId); 
+                    if (index !== -1) currentRecords[index] = payload; 
+                } else { 
+                    currentRecords.unshift(payload); 
+                }
+                successCount++; lastGeneratedId = docId;
+            }
+
+            if (successCount > 0) { 
+                localStorage.setItem(STORAGE_KEY, JSON.stringify(currentRecords)); 
+                showToast(editId ? 'تم التعديل بنجاح' : `تم حفظ (${successCount}) سجلات`, 'success'); 
+            }
+            DOM.btnSubmit.innerHTML = oldBtnHTML; DOM.btnSubmit.disabled = false;
+            resetFormState(); filterTable(); updateStats(); checkDuplicates();
+            if (successCount === 1 && lastGeneratedId) { window.viewQR(lastGeneratedId); }
+        });
+
+        function resetFormState() {
+            DOM.editRecordId.value = ''; DOM.reqContainer.innerHTML = ''; requestCount = 0; addRequestBlock(); 
+            DOM.btnAddRequestContainer.classList.remove('hidden'); 
+            DOM.btnSubmit.innerHTML = `<i class="fa-solid fa-rocket"></i> تنفيذ العملية والحفظ`; DOM.formTitle.innerHTML = `<i class="fa-solid fa-bolt text-emerald-600"></i> الإضافة السريعة (Batch)`;
+            DOM.formIndicator.className = "absolute top-0 right-0 w-1.5 h-full bg-emerald-600"; DOM.btnCancelEdit.classList.add('hidden');
+        }
+
+        DOM.btnCancelEdit.addEventListener('click', () => { resetFormState(); });
+
+        window.editRecord = (id) => {
+            const record = currentRecords.find(r => r.id === id); if (!record) return;
+            DOM.editRecordId.value = record.id; document.getElementById('input-clinic').value = record.clinic || ''; document.getElementById('input-global-gender').value = record.gender || 'Male'; 
+            DOM.reqContainer.innerHTML = ''; requestCount = 0; addRequestBlock(record); 
+            DOM.btnAddRequestContainer.classList.add('hidden'); 
+            DOM.formTitle.innerHTML = `<i class="fa-solid fa-pen-to-square text-amber-600"></i> تعديل بيانات المريض`; DOM.btnSubmit.innerHTML = `<i class="fa-solid fa-floppy-disk"></i> حفظ التعديلات`; DOM.formIndicator.className = "absolute top-0 right-0 w-1.5 h-full bg-amber-500"; DOM.btnCancelEdit.classList.remove('hidden');
+            
+            showToast('تم تحميل السجل للتعديل. تنبيه: تعديل البيانات سيغير رابط ورمز الـ QR الخاص بالسجل!', 'info');
+        };
+
+        function updateStats() {
+            const now = Date.now(); let active = 0, expired = 0, expiringSoon = 0, thisMonth = 0; const curMonth = new Date().getMonth(); const curYear = new Date().getFullYear();
+            currentRecords.forEach(r => { now > r.expiresAt ? expired++ : active++; if (r.expiresAt > now && r.expiresAt - now <= 7 * 24 * 60 * 60 * 1000) expiringSoon++; const created = new Date(r.createdAt); if (created.getMonth() === curMonth && created.getFullYear() === curYear) thisMonth++; });
+            document.getElementById('stat-total').textContent = currentRecords.length; document.getElementById('stat-active').textContent = active; document.getElementById('stat-expired').textContent = expired; document.getElementById('stat-month').textContent = thisMonth; if(document.getElementById('stat-soon')) document.getElementById('stat-soon').textContent = expiringSoon;
+        }
+
+        function checkDuplicates() {
+            const ids = currentRecords.map(r => r.patientId).filter(id => id); const duplicates = [...new Set(ids.filter((item, i) => ids.indexOf(item) !== i))];
+            if(document.getElementById('stat-duplicates')) document.getElementById('stat-duplicates').textContent = duplicates.length;
+            if(document.getElementById('card-duplicates')) { if(duplicates.length > 0) { document.getElementById('card-duplicates').classList.add('bg-amber-50'); document.getElementById('card-duplicates').classList.replace('border-gray-100', 'border-amber-400'); } else { document.getElementById('card-duplicates').classList.remove('bg-amber-50'); document.getElementById('card-duplicates').classList.replace('border-amber-400', 'border-gray-100'); } }
+        }
+
+        window.viewQR = (id) => {
+            const qrUrl = window.getRecordUrl(id); const record = currentRecords.find(r => r.id === id);
+            DOM.modalQRContainer.innerHTML = ''; DOM.printQRContainer.innerHTML = '';
+            try { new QRCode(DOM.modalQRContainer, { text: qrUrl, colorDark: "#000000", colorLight: "#ffffff", correctLevel: QRCode.CorrectLevel.L, width: 180, height: 180 }); new QRCode(DOM.printQRContainer, { text: qrUrl, colorDark: "#000000", colorLight: "#ffffff", correctLevel: QRCode.CorrectLevel.L, width: 95, height: 95 }); } catch(e) { DOM.modalQRContainer.innerHTML = `<p class="text-red-500 text-xs font-bold text-center mt-2">محتوى الرابط كبير جداً.</p>`; }
+            document.getElementById('print-clinic-name').textContent = record ? record.clinic : 'Clinic Name'; document.getElementById('print-patient-name').textContent = record ? record.patientName : '-'; document.getElementById('print-patient-id').textContent = record ? record.patientId : id; document.getElementById('print-patient-age').textContent = record ? record.age : '-';
+            DOM.qrModal.classList.remove('hidden');
+        };
+
+        window.copyLink = async (id) => { 
+            const qrUrl = window.getRecordUrl(id); 
+            try {
+                if (navigator.clipboard && window.isSecureContext) {
+                    await navigator.clipboard.writeText(qrUrl);
+                } else {
+                    const temp = document.createElement('input'); temp.value = qrUrl; 
+                    document.body.appendChild(temp); temp.select(); document.execCommand('copy'); document.body.removeChild(temp); 
+                }
+                showToast('تم نسخ الرابط بنجاح', 'success');
+            } catch (err) {
+                console.error("Clipboard Error:", err);
+                showToast('فشل نسخ الرابط، الرجاء المحاولة يدوياً', 'error');
+            }
+        };
+
+        window.requestDelete = (id) => { recordToDelete = id; DOM.deleteModal.classList.remove('hidden'); };
+        document.getElementById('cancel-delete-btn').addEventListener('click', () => { recordToDelete = null; DOM.deleteModal.classList.add('hidden'); });
+        document.getElementById('confirm-delete-btn').addEventListener('click', () => { 
+            if(!recordToDelete) return; 
+            currentRecords = currentRecords.filter(r => r.id !== recordToDelete); 
+            localStorage.setItem(STORAGE_KEY, JSON.stringify(currentRecords)); 
+            DOM.deleteModal.classList.add('hidden'); 
+            recordToDelete = null; 
+            showToast('تم حذف السجل بنجاح'); 
+            currentPage = 1; filterTable(); updateStats(); checkDuplicates(); 
+        });
+        document.getElementById('close-modal-btn').addEventListener('click', () => DOM.qrModal.classList.add('hidden'));
+
+        function toggleExportSelectedBtn() {
+            const checkedBoxes = document.querySelectorAll('.row-checkbox:checked'); const checked = checkedBoxes.length;
+            if (checked > 0) { DOM.exportSelectedContainer.classList.remove('hidden'); DOM.exportSelectedContainer.classList.add('flex'); DOM.selectedCount.textContent = checked; } else { DOM.exportSelectedContainer.classList.add('hidden'); DOM.exportSelectedContainer.classList.remove('flex'); }
+        }
+        
+        DOM.selectAll?.addEventListener('change', (e) => { document.querySelectorAll('.row-checkbox').forEach(cb => cb.checked = e.target.checked); toggleExportSelectedBtn(); });
+        DOM.tbody?.addEventListener('change', (e) => { if (e.target.classList.contains('row-checkbox')) { toggleExportSelectedBtn(); const allCheckboxes = document.querySelectorAll('.row-checkbox'); if(DOM.selectAll) DOM.selectAll.checked = allCheckboxes.length > 0 && Array.from(allCheckboxes).every(cb => cb.checked); } });
+        
+        DOM.btnExportSelected?.addEventListener('click', () => {
+            const checkedBoxes = document.querySelectorAll('.row-checkbox:checked'); if (checkedBoxes.length === 0) return;
+            let text = "\uFEFFسجل الروابط المحددة (QR Links)\n====================\n\n";
+            checkedBoxes.forEach(cb => { const rec = currentRecords.find(r => r.id === cb.value); if (rec) text += `المريض: ${rec.patientName}\nالهوية: ${rec.patientId}\nرابط الـ QR: ${window.getRecordUrl(rec.id)}\n--------------------\n`; });
+            const blob = new Blob([text], { type: 'text/plain;charset=utf-8;' }); const link = document.createElement("a"); link.href = URL.createObjectURL(blob); link.download = `QR_Links_${new Date().getTime()}.txt`; document.body.appendChild(link); link.click(); document.body.removeChild(link); showToast('تم تحميل الروابط بنجاح', 'success');
+        });
+
+        DOM.btnPrintSelected?.addEventListener('click', () => {
+            const checkedBoxes = document.querySelectorAll('.row-checkbox:checked'); if (checkedBoxes.length === 0) return;
+            let printWindow = window.open('', '_blank');
+            let printContent = `
+                <html lang="ar" dir="ltr"><head><title>طباعة بطاقات المرضى المحددين</title><style>
+                        body { font-family: Arial, sans-serif; display: flex; flex-wrap: wrap; gap: 20px; padding: 20px; background: white; }
+                        .card { width: 8.5cm; height: 5.4cm; border: 2px solid #000; border-radius: 8px; padding: 10px; text-align: center; box-sizing: border-box; page-break-inside: avoid; }
+                        .card img { width: 85px; height: 85px; margin: 0 auto; display: block; }
+                        .card h3 { margin: 0 0 5px 0; font-size: 13px; } .card p { margin: 0 0 3px 0; font-size: 10px; color: #333; }
+                        @media print { body { margin: 0; padding: 0; display: block; } .card { margin: 0 auto 20px auto; page-break-after: always; } .card:last-child { page-break-after: auto; } }
+                    </style></head><body>
+            `;
+            checkedBoxes.forEach(cb => {
+                const rec = currentRecords.find(r => r.id === cb.value);
+                if (rec) { printContent += `<div class="card"><h3>${rec.clinic}</h3><p>Name: <b>${rec.patientName}</b></p><p>ID: <b>${rec.patientId}</b> | Age: <b>${rec.age}</b></p><img src="https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=${encodeURIComponent(window.getRecordUrl(rec.id))}" alt="QR Code"><p style="margin-top:5px; font-weight: bold; font-size: 8px;">Scan to Verify Report</p></div>`; }
+            });
+            printContent += `</body></html>`; printWindow.document.write(printContent); printWindow.document.close(); setTimeout(() => { printWindow.print(); }, 1000);
+        });
+
+        document.getElementById('card-duplicates')?.addEventListener('click', () => {
+             const ids = currentRecords.map(r => r.patientId); const duplicateIds = [...new Set(ids.filter((item, index) => ids.indexOf(item) !== index))];
+             if (duplicateIds.length === 0) return showToast('لا يوجد سجلات مكررة', 'info');
+             filteredRecords = currentRecords.filter(r => duplicateIds.includes(r.patientId)); currentPage = 1; renderTable(); DOM.search.value = ''; if(fpInstance) fpInstance.clear(); DOM.clearDateBtn.classList.add('hidden'); showToast('تم تصفية الجدول لعرض السجلات المكررة', 'info');
+        });
+
+        document.getElementById('refresh-db-btn')?.addEventListener('click', () => { DOM.search.value = ''; if(fpInstance) fpInstance.clear(); DOM.clearDateBtn.classList.add('hidden'); filterTable(); updateStats(); checkDuplicates(); showToast('تم تحديث الجدول', 'info'); });
+
+        function loadClientReport(encodedData) {
+            const data = decodeDataFromUrl(encodedData);
+            if (data) {
+                const expiry = data.e || data.expiresAt;
+                if (Date.now() > expiry) { 
+                    DOM.cError.classList.remove('hidden'); 
+                } else {
+                    DOM.cSuccess.classList.remove('hidden'); 
+                    document.getElementById('c-clinic').textContent = data.c || data.clinic || '-'; 
+                    document.getElementById('c-id').textContent = data.i || data.patientId || '-'; 
+                    document.getElementById('c-name').textContent = data.n || data.patientName || '-'; 
+                    document.getElementById('c-age').textContent = data.a || data.age || '-'; 
+                    document.getElementById('c-gender').textContent = data.g || data.gender || '-';
+                    document.getElementById('c-date').textContent = (data.t || data.createdAt) ? new Date(data.t || data.createdAt).toLocaleString('en-GB') : '-';
+                    
+                    const driveUrl = data.u || data.fileUrl; 
+                    const btn = document.getElementById('c-download-btn'); 
+                    const btnContainer = document.getElementById('c-download-container');
+                    if(driveUrl) { 
+                        btn.href = driveUrl; 
+                        btnContainer.classList.remove('hidden'); 
+                        btn.classList.remove('hidden'); 
+                    } else { 
+                        btnContainer.classList.add('hidden'); 
+                    }
+                }
+            } else { 
+                DOM.cError.classList.remove('hidden'); 
+            }
+        }
+
+        function runMatrixScramble() {
+            const el = document.getElementById('footer-signature'); if(!el) return;
+            const originalText = "Designed by Eng. Bahaa Al-Sheikh"; const chars = "!<>-_\\\\/[]{}—=+*^?#________"; let frameRequest; let frame = 0; const queue = [];
+            for (let i = 0; i < originalText.length; i++) { queue.push({ from: chars[Math.floor(Math.random() * chars.length)], to: originalText[i], start: Math.floor(Math.random() * 40), end: Math.floor(Math.random() * 40) + 40, char: '' }); }
+            const update = () => {
+                let output = ''; let complete = 0;
+                for (let i = 0; i < queue.length; i++) {
+                    let { from, to, start, end, char } = queue[i];
+                    if (frame >= end) { complete++; output += to; } else if (frame >= start) { if (!char || Math.random() < 0.28) { char = chars[Math.floor(Math.random() * chars.length)]; queue[i].char = char; } output += (to === ' ') ? ' ' : `<span class="text-emerald-500 font-mono">${char}</span>`; } else { output += `<span class="text-emerald-300 opacity-50 font-mono">${from}</span>`; }
+                }
+                el.innerHTML = output; if (complete === queue.length) { cancelAnimationFrame(frameRequest); el.innerHTML = originalText; } else { frameRequest = requestAnimationFrame(update); frame++; }
+            };
+            update();
+        }
+
+        function initApp() {
+            const urlParams = new URLSearchParams(window.location.search); const encodedData = urlParams.get('d');
+            DOM.loginSec.classList.add('hidden'); DOM.adminSec.classList.add('hidden'); DOM.clientSec.classList.add('hidden');
+            runMatrixScramble(); 
+            if (encodedData) { document.title = "Verified Medical Report"; loadClientReport(encodedData); DOM.clientSec.classList.remove('hidden'); } else {
+                const isLoggedIn = sessionStorage.getItem('admin_session_active');
+                if (isLoggedIn === 'true') { DOM.adminSec.classList.remove('hidden'); resetFormState(); initFlatpickr(); filterTable(); updateStats(); checkDuplicates(); } else { DOM.loginSec.classList.remove('hidden'); }
+            }
+        }
+        
+        window.addEventListener('DOMContentLoaded', initApp);
+
+        document.getElementById('login-form').addEventListener('submit', (e) => {
+            e.preventDefault(); const u = document.getElementById('login-username').value; const p = document.getElementById('login-password').value;
+            if(u === ADMIN_USER && p === ADMIN_PASS) { sessionStorage.setItem('admin_session_active', 'true'); DOM.loginSec.classList.add('hidden'); DOM.adminSec.classList.remove('hidden'); resetFormState(); initFlatpickr(); filterTable(); updateStats(); checkDuplicates(); showToast('مرحباً بك في لوحة الإدارة'); } else { showToast('بيانات الدخول غير صحيحة!', 'error'); }
+        });
+
+        document.getElementById('logout-btn').addEventListener('click', () => { sessionStorage.removeItem('admin_session_active'); DOM.adminSec.classList.add('hidden'); DOM.loginSec.classList.remove('hidden'); document.getElementById('login-password').value = ''; });
+
+        document.getElementById('export-backup-btn').addEventListener('click', () => {
+            if(currentRecords.length === 0) return showToast('لا توجد سجلات', 'error');
+            const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify({ version: "9.0", exportDate: new Date().toISOString(), records: currentRecords }, null, 2));
+            const link = document.createElement('a'); link.href = dataStr; link.download = `Medical_Backup_${new Date().toISOString().split('T')[0]}.json`; document.body.appendChild(link); link.click(); document.body.removeChild(link); showToast('تم تنزيل النسخة الاحتياطية', 'success');
+        });
+
+        document.getElementById('import-backup-file').addEventListener('change', (event) => {
+            const file = event.target.files[0]; if (!file) return; const reader = new FileReader();
+            reader.onload = function(e) {
+                try {
+                    const parsed = JSON.parse(e.target.result); let imported = Array.isArray(parsed) ? parsed : (parsed.records || []); const existingIds = new Set(currentRecords.map(r => r.id)); let added = 0;
+                    imported.forEach(rec => { if (rec.id && !existingIds.has(rec.id)) { currentRecords.push(rec); added++; } });
+                    localStorage.setItem(STORAGE_KEY, JSON.stringify(currentRecords)); filterTable(); updateStats(); showToast(`تم دمج واستعادة ${added} سجل بنجاح!`, 'success');
+                } catch(err) { showToast('ملف غير صالح', 'error'); } event.target.value = '';
+            }; reader.readAsText(file);
+        });
+
+        document.getElementById('export-csv-btn').addEventListener('click', () => {
+            if(currentRecords.length === 0) return showToast('لا توجد بيانات للتصدير', 'error');
+            let csv = '\uFEFFDateTime,Validity,ExpiryDate,Status,ID,Patient Name,Age,Gender,Clinic,Report URL\n'; const now = Date.now();
+            currentRecords.forEach(r => { const status = now > r.expiresAt ? 'Expired' : 'Active'; csv += `"${new Date(r.createdAt).toLocaleString('en-GB')}","${r.validityText || ''}","${new Date(r.expiresAt).toLocaleString('en-GB')}",${status},${r.patientId},"${(r.patientName||'').replace(/"/g, '""')}",${r.age},${r.gender},"${(r.clinic||'').replace(/"/g, '""')}","${window.getRecordUrl(r.id)}"\n`; });
+            const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' }); const link = document.createElement("a"); link.href = URL.createObjectURL(blob); link.download = `Medical_Records_${new Date().toISOString().split('T')[0]}.csv`; document.body.appendChild(link); link.click(); document.body.removeChild(link); showToast('تم تحميل الإكسيل بنجاح', 'success');
+        });
+
+        document.getElementById('clear-db-btn').addEventListener('click', () => { if (currentRecords.length === 0) return showToast('قاعدة البيانات فارغة!', 'info'); document.getElementById('clear-all-modal').classList.remove('hidden'); });
+        document.getElementById('cancel-clear-btn').addEventListener('click', () => document.getElementById('clear-all-modal').classList.add('hidden'));
+        document.getElementById('confirm-clear-btn').addEventListener('click', () => { currentRecords = []; localStorage.setItem(STORAGE_KEY, JSON.stringify(currentRecords)); document.getElementById('clear-all-modal').classList.add('hidden'); filterTable(); updateStats(); checkDuplicates(); showToast('تم مسح جميع السجلات بنجاح', 'success'); });
+
+    </script>
+</body>
+</html>
