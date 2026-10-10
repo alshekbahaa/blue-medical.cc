@@ -52,7 +52,7 @@
     <main class="w-full max-w-[1600px] mx-auto flex-1 flex flex-col relative">
         
         <!-- Login Section -->
-        <section id="login-section" class="hidden bg-white rounded-2xl shadow-xl border border-gray-100 p-8 max-w-md mx-auto mt-12 transform transition-all">
+        <section id="login-section" class="hidden bg-white rounded-2xl shadow-xl border border-gray-100 p-8 max-w-md mx-auto mt-12 transform transition-all w-full">
             <div class="text-center mb-8">
                 <img src="Blue.png" alt="Logo" class="h-16 object-contain mx-auto mb-4" onerror="this.onerror=null; this.src='https://placehold.co/120x40/ffffff/059669?text=Logo'">
                 <h2 class="text-2xl font-bold text-gray-800">بوابة الإدارة الطبية</h2>
@@ -365,6 +365,7 @@
         const ADMIN_USER = localStorage.getItem('custom_admin_user') || "admin";
         const ADMIN_PASS = localStorage.getItem('custom_admin_pass') || "admin123"; 
         const STORAGE_KEY = "medical_records_local_v8"; 
+        const OLD_STORAGE_KEYS = ["medical_records_local_v3", "medical_records_local_v5", "medical_records_local_v7"];
         
         const DOM = {
             toast: document.getElementById('toast-container'), loginSec: document.getElementById('login-section'), adminSec: document.getElementById('admin-section'),
@@ -380,24 +381,33 @@
             btnExportSelected: document.getElementById('export-selected-btn'), btnPrintSelected: document.getElementById('print-selected-btn'), selectedCount: document.getElementById('selected-count')
         };
 
-        // دمج تلقائي لأي سجلات قديمة محفوظة في المتصفح من الإصدارات السابقة لضمان عدم ضياع أي بيانات بعد التحديث
+        // دمج السجلات القديمة لمرة واحدة ثم تنظيف المفاتيح القديمة حتى لا تعود البيانات بعد التصفير أو الحذف
         function loadAndMigrateRecords() {
-            let records = JSON.parse(localStorage.getItem(STORAGE_KEY)) || [];
-            const oldKeys = ["medical_records_local_v3", "medical_records_local_v5", "medical_records_local_v7"];
+            let records = [];
+            try {
+                records = JSON.parse(localStorage.getItem(STORAGE_KEY)) || [];
+            } catch (e) {
+                records = [];
+            }
             const existingIds = new Set(records.map(r => r.id));
             let migrated = false;
 
-            oldKeys.forEach(key => {
+            OLD_STORAGE_KEYS.forEach(key => {
                 try {
-                    const oldData = JSON.parse(localStorage.getItem(key));
-                    if (Array.isArray(oldData)) {
-                        oldData.forEach(rec => {
-                            if (rec && rec.id && !existingIds.has(rec.id)) {
-                                records.push(rec);
-                                existingIds.add(rec.id);
-                                migrated = true;
-                            }
-                        });
+                    const raw = localStorage.getItem(key);
+                    if (raw) {
+                        const oldData = JSON.parse(raw);
+                        if (Array.isArray(oldData)) {
+                            oldData.forEach(rec => {
+                                if (rec && rec.id && !existingIds.has(rec.id)) {
+                                    records.push(rec);
+                                    existingIds.add(rec.id);
+                                    migrated = true;
+                                }
+                            });
+                        }
+                        // حذف المفتاح القديم بعد نقله لضمان عدم عودة البيانات عند التصفير وتحديث الصفحة
+                        localStorage.removeItem(key);
                     }
                 } catch (e) {}
             });
@@ -569,14 +579,16 @@
         }
 
         function initFlatpickr() {
-            fpInstance = flatpickr("#date-filter", {
-                mode: "range", dateFormat: "Y-m-d", disableMobile: "true", 
-                onChange: function(selectedDates) {
-                    DOM.clearDateBtn.classList.toggle('hidden', selectedDates.length === 0);
-                    filterTable();
-                }
-            });
-            DOM.clearDateBtn.addEventListener('click', () => { fpInstance.clear(); DOM.clearDateBtn.classList.add('hidden'); });
+            if (typeof flatpickr !== 'undefined') {
+                fpInstance = flatpickr("#date-filter", {
+                    mode: "range", dateFormat: "Y-m-d", disableMobile: "true", 
+                    onChange: function(selectedDates) {
+                        DOM.clearDateBtn.classList.toggle('hidden', selectedDates.length === 0);
+                        filterTable();
+                    }
+                });
+                DOM.clearDateBtn.addEventListener('click', () => { fpInstance.clear(); DOM.clearDateBtn.classList.add('hidden'); });
+            }
         }
 
         function filterTable() {
@@ -778,6 +790,7 @@
             if(!recordToDelete) return; 
             currentRecords = currentRecords.filter(r => r.id !== recordToDelete); 
             localStorage.setItem(STORAGE_KEY, JSON.stringify(currentRecords)); 
+            OLD_STORAGE_KEYS.forEach(k => localStorage.removeItem(k));
             DOM.deleteModal.classList.add('hidden'); 
             recordToDelete = null; 
             showToast('تم حذف السجل بنجاح'); 
@@ -786,7 +799,6 @@
         
         document.getElementById('close-modal-btn').addEventListener('click', () => DOM.qrModal.classList.add('hidden'));
         
-        // FIXED: Added missing print event listener for single QR card print button
         document.getElementById('print-qr-btn').addEventListener('click', () => {
             DOM.qrModal.classList.add('hidden');
             setTimeout(() => window.print(), 200);
@@ -947,7 +959,16 @@
 
         document.getElementById('clear-db-btn').addEventListener('click', () => { if (currentRecords.length === 0) return showToast('قاعدة البيانات فارغة!', 'info'); document.getElementById('clear-all-modal').classList.remove('hidden'); });
         document.getElementById('cancel-clear-btn').addEventListener('click', () => document.getElementById('clear-all-modal').classList.add('hidden'));
-        document.getElementById('confirm-clear-btn').addEventListener('click', () => { currentRecords = []; localStorage.setItem(STORAGE_KEY, JSON.stringify(currentRecords)); document.getElementById('clear-all-modal').classList.add('hidden'); filterTable(); updateStats(); checkDuplicates(); showToast('تم مسح جميع السجلات بنجاح', 'success'); });
+        document.getElementById('confirm-clear-btn').addEventListener('click', () => { 
+            currentRecords = []; 
+            localStorage.setItem(STORAGE_KEY, JSON.stringify(currentRecords)); 
+            OLD_STORAGE_KEYS.forEach(k => localStorage.removeItem(k));
+            document.getElementById('clear-all-modal').classList.add('hidden'); 
+            filterTable(); 
+            updateStats(); 
+            checkDuplicates(); 
+            showToast('تم مسح جميع السجلات بنجاح', 'success'); 
+        });
 
     </script>
 </body>
