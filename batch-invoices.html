@@ -417,10 +417,10 @@
         }
 
         const STORAGE_KEYS = {
-            PATIENTS: 'bm_invoices_patients_v7',
-            SEQ: 'invoice_sequence_number_v7',
-            AUTH: 'bm_invoices_auth_v7',
-            DRIVE: 'bm_global_drive_link_v7'
+            PATIENTS: 'bm_invoices_patients_v8',
+            SEQ: 'invoice_sequence_number_v8',
+            AUTH: 'bm_invoices_auth_v8',
+            DRIVE: 'bm_global_drive_link_v8'
         };
 
         let globalPatients = [];
@@ -438,22 +438,31 @@
                 appContent.classList.add('hidden');
                 verifyScreen.classList.remove('hidden');
 
-                document.getElementById('v-clinic').textContent = urlParams.get('clinic') || 'Blue Medical Field Complex';
-                document.getElementById('v-name').textContent = urlParams.get('name') || '-';
-                const idVal = urlParams.get('id') || '';
+                // Decode parameters safely to prevent %20 and URL encoding issues
+                const rawClinic = urlParams.get('clinic') || 'Blue Medical Field Complex';
+                const rawName = urlParams.get('name') || '-';
+                const rawId = urlParams.get('id') || '';
+                const rawQty = urlParams.get('qty') || '1';
+                const rawInv = urlParams.get('inv') || '-';
+                const rawDate = urlParams.get('dateText') || '-';
+                const rawTotal = urlParams.get('total') || '0.00';
+                const rawDrive = urlParams.get('drive') || 'https://drive.google.com/drive/my-drive';
+
+                document.getElementById('v-clinic').textContent = decodeURIComponent(rawClinic);
+                document.getElementById('v-name').textContent = decodeURIComponent(rawName);
+                
+                const idVal = decodeURIComponent(rawId);
                 if (!idVal) {
                     document.getElementById('v-id-row').classList.add('hidden');
                 } else {
                     document.getElementById('v-id-row').classList.remove('hidden');
                     document.getElementById('v-id').textContent = idVal;
                 }
-                document.getElementById('v-qty').textContent = urlParams.get('qty') || '1';
-                document.getElementById('v-inv').textContent = urlParams.get('inv') || '-';
-                document.getElementById('v-date').textContent = urlParams.get('dateText') || '-';
-                document.getElementById('v-total').textContent = (urlParams.get('total') || '0.00') + ' SAR';
-                
-                const driveLink = urlParams.get('drive') || 'https://drive.google.com/drive/my-drive';
-                document.getElementById('v-drive-btn').href = driveLink;
+                document.getElementById('v-qty').textContent = decodeURIComponent(rawQty);
+                document.getElementById('v-inv').textContent = decodeURIComponent(rawInv);
+                document.getElementById('v-date').textContent = decodeURIComponent(rawDate);
+                document.getElementById('v-total').textContent = decodeURIComponent(rawTotal) + ' SAR';
+                document.getElementById('v-drive-btn').href = decodeURIComponent(rawDrive);
                 return;
             }
 
@@ -851,7 +860,7 @@
                 p.exactTotal = +tot.toFixed(2);
                 p.exactSubtotal = +(tot / 1.15).toFixed(2);
             } else if (field === 'invNum') {
-                p.invoiceNumberStr = String(value).trim();
+                p.invoiceNumberStr = String(value).replace(/^2026-/, '').trim();
             } else {
                 p[field] = value;
             }
@@ -931,11 +940,11 @@
             if (rebuildTable) {
                 document.getElementById('patients-table-body').innerHTML = filtered.map((p, idx) => {
                     const c = calculateInvoiceLine(p, defaultBase);
-                    const invNumberRaw = p.invoiceNumberStr || String(101001 + idx);
+                    const cleanInvNum = (p.invoiceNumberStr || String(101001 + idx)).replace(/^2026-/, '');
                     
                     let qrPayloadTest = qrMode === 'zatca' 
                         ? generateZatcaBase64(brandEn, brandVat, p.date, c.totalAmount, c.taxAmount)
-                        : `${baseUrl}?verified=true&clinic=${encodeURIComponent(brandEn)}&name=${encodeURIComponent(p.name)}&id=${encodeURIComponent(p.id || '')}&qty=${c.qty}&inv=2026-${invNumberRaw}&dateText=${encodeURIComponent(p.date)}&total=${c.totalAmount.toFixed(2)}&drive=${encodeURIComponent(globalDriveLink)}`;
+                        : `${baseUrl}?verified=true&clinic=${encodeURIComponent(brandEn)}&name=${encodeURIComponent(p.name)}&id=${encodeURIComponent(p.id || '')}&qty=${c.qty}&inv=${encodeURIComponent('2026-' + cleanInvNum)}&dateText=${encodeURIComponent(p.date)}&total=${encodeURIComponent(c.totalAmount.toFixed(2))}&drive=${encodeURIComponent(globalDriveLink)}`;
 
                     return `
                     <tr class="hover:bg-blue-50/40 ${p.isBulk ? 'bg-violet-50/30' : ''}">
@@ -943,7 +952,7 @@
                         <td class="py-2 px-4">
                             <div class="flex items-center gap-1" dir="ltr">
                                 <span class="text-xs font-bold text-slate-400">2026-</span>
-                                <input type="text" value="${invNumberRaw}" oninput="updatePatientField(${p.uid}, 'invNum', this.value)" class="w-24 bg-white border border-blue-200 rounded px-1.5 py-1 font-black text-blue-600 text-sm text-center">
+                                <input type="text" value="${cleanInvNum}" oninput="updatePatientField(${p.uid}, 'invNum', this.value)" class="w-24 bg-white border border-blue-200 rounded px-1.5 py-1 font-black text-blue-600 text-sm text-center">
                             </div>
                         </td>
                         <td class="py-2 px-4"><input type="text" value="${p.name}" oninput="updatePatientField(${p.uid}, 'name', this.value)" class="w-full bg-transparent border-b outline-none font-bold"></td>
@@ -971,14 +980,14 @@
                 const isBulkRow = Boolean(p.isBulk || !p.id);
                 const headerExamTitle = isBulkRow ? p.name : customTitle;
                 const firstColHeader = isBulkRow ? t.colExamOnly : t.colName;
-                const invNumberRaw = p.invoiceNumberStr || '101001';
-                const invNo = `2026-${invNumberRaw}`;
+                const cleanInvNum = (p.invoiceNumberStr || '101001').replace(/^2026-/, '');
+                const invNo = `2026-${cleanInvNum}`;
                 const qrId = `qr-code-${p.uid}`;
                 const pageId = `inv-page-${p.uid}`;
 
                 let qrPayload = qrMode === 'zatca' 
                     ? generateZatcaBase64(brandEn, brandVat, p.date, c.totalAmount, c.taxAmount)
-                    : `${baseUrl}?verified=true&clinic=${encodeURIComponent(brandEn)}&name=${encodeURIComponent(p.name)}&id=${encodeURIComponent(p.id || '')}&qty=${c.qty}&inv=${invNo}&dateText=${encodeURIComponent(p.date)}&total=${c.totalAmount.toFixed(2)}&drive=${encodeURIComponent(globalDriveLink)}`;
+                    : `${baseUrl}?verified=true&clinic=${encodeURIComponent(brandEn)}&name=${encodeURIComponent(p.name)}&id=${encodeURIComponent(p.id || '')}&qty=${c.qty}&inv=${encodeURIComponent(invNo)}&dateText=${encodeURIComponent(p.date)}&total=${encodeURIComponent(c.totalAmount.toFixed(2))}&drive=${encodeURIComponent(globalDriveLink)}`;
 
                 qrTasks.push({ id: qrId, text: qrPayload });
 
