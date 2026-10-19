@@ -70,6 +70,13 @@
             display: flex;
             flex-direction: column;
         }
+        .invoice-footer img {
+            width: 100% !important;
+            height: auto !important;
+            max-height: none !important;
+            object-fit: cover !important;
+            display: block;
+        }
 
         .page-overlay-actions {
             position: absolute;
@@ -137,13 +144,16 @@
         </div>
     </div>
 
-    <div id="verify-screen" class="hidden fixed inset-0 bg-slate-900/95 flex items-center justify-center z-50 p-4">
-        <div class="bg-white p-8 rounded-3xl shadow-2xl w-full max-w-lg text-center border-t-8 border-emerald-500">
-            <div class="w-20 h-20 bg-emerald-100 text-emerald-600 rounded-full flex items-center justify-center mx-auto mb-4 shadow-inner">
-                <svg class="w-12 h-12" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"></path></svg>
+    <div id="verify-screen" class="hidden fixed inset-0 bg-slate-900/95 flex items-center justify-center z-50 p-4 overflow-y-auto">
+        <div class="bg-white p-8 rounded-3xl shadow-2xl w-full max-w-lg text-center border-t-8 border-emerald-500 my-auto">
+            <div class="mb-4 flex justify-center">
+                <img src="Blue.png" alt="Blue.png" class="h-16 object-contain" onerror="this.src='https://placehold.co/180x60/2563eb/ffffff?text=Blue+Medical'">
+            </div>
+            <div class="w-16 h-16 bg-emerald-100 text-emerald-600 rounded-full flex items-center justify-center mx-auto mb-3 shadow-inner">
+                <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"></path></svg>
             </div>
             <h2 class="text-2xl font-black text-slate-800 mb-1">فاتورة طبية موثقة وصحيحة</h2>
-            <p class="text-emerald-600 font-bold text-sm mb-6">Verified Medical Examination Invoice</p>
+            <p class="text-emerald-600 font-bold text-xs mb-5">Verified Medical Examination Invoice</p>
             
             <div class="bg-slate-50 rounded-2xl p-5 text-right space-y-3 border border-slate-200 text-sm mb-6">
                 <div class="flex justify-between border-b pb-2"><span class="text-slate-500">المركز الطبي:</span><span id="v-clinic" class="font-bold text-slate-800"></span></div>
@@ -154,9 +164,10 @@
                 <div class="flex justify-between border-b pb-2"><span class="text-slate-500">تاريخ الإصدار:</span><span id="v-date" class="font-bold text-slate-800" dir="ltr"></span></div>
                 <div class="flex justify-between"><span class="text-slate-500">الإجمالي شامل الضريبة:</span><span id="v-total" class="font-black text-emerald-700" dir="ltr"></span></div>
             </div>
-            <button onclick="window.location.href = window.location.pathname" class="w-full bg-slate-800 hover:bg-slate-900 text-white font-bold py-3 rounded-xl transition">
-                الانتقال لنظام إصدار الفواتير
-            </button>
+            <a id="v-drive-btn" href="#" target="_blank" class="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-black py-3.5 rounded-xl transition shadow-lg shadow-emerald-600/20 flex items-center justify-center gap-2 mb-3">
+                <span>📥 تحميل نسخة الفاتورة الرسمية (PDF)</span>
+            </a>
+            <p class="text-xs text-slate-400 font-bold">هذه الوثيقة رسمية ومصضدقة إلكترونياً من المركز الطبي</p>
         </div>
     </div>
 
@@ -236,6 +247,10 @@
                             <option value="url" selected>رابط تحقق إلكتروني مباشر (الأول)</option>
                             <option value="zatca">باركود الفاتورة الضريبية (ZATCA TLV)</option>
                         </select>
+                    </div>
+                    <div class="md:col-span-4">
+                        <label class="block text-xs font-bold text-slate-600 mb-1.5">🔗 رابط Google Drive الافتراضي لتحميل الفاتورة عند مسح الـ QR:</label>
+                        <input type="url" id="global-drive-link" value="https://drive.google.com/drive/my-drive" placeholder="أدخل رابط Google Drive هنا..." class="w-full px-3.5 py-2.5 border rounded-xl font-bold bg-white text-sm text-left" dir="ltr">
                     </div>
                 </div>
 
@@ -402,9 +417,10 @@
         }
 
         const STORAGE_KEYS = {
-            PATIENTS: 'bm_invoices_patients_v5',
-            SEQ: 'invoice_sequence_number_v5',
-            AUTH: 'bm_invoices_auth_v5'
+            PATIENTS: 'bm_invoices_patients_v6',
+            SEQ: 'invoice_sequence_number_v6',
+            AUTH: 'bm_invoices_auth_v6',
+            DRIVE: 'bm_global_drive_link_v6'
         };
 
         let globalPatients = [];
@@ -413,10 +429,37 @@
         document.addEventListener('DOMContentLoaded', () => {
             const loginScreen = document.getElementById('login-screen');
             const appContent = document.getElementById('app-content');
+            const verifyScreen = document.getElementById('verify-screen');
             const errorDiv = document.getElementById('login-error');
+
+            const urlParams = new URLSearchParams(window.location.search);
+            if (urlParams.get('verified') === 'true') {
+                loginScreen.classList.add('hidden');
+                appContent.classList.add('hidden');
+                verifyScreen.classList.remove('hidden');
+
+                document.getElementById('v-clinic').textContent = urlParams.get('clinic') || 'Blue Medical Field Complex';
+                document.getElementById('v-name').textContent = urlParams.get('name') || '-';
+                const idVal = urlParams.get('id') || '';
+                if (!idVal) {
+                    document.getElementById('v-id-row').classList.add('hidden');
+                } else {
+                    document.getElementById('v-id-row').classList.remove('hidden');
+                    document.getElementById('v-id').textContent = idVal;
+                }
+                document.getElementById('v-qty').textContent = urlParams.get('qty') || '1';
+                document.getElementById('v-inv').textContent = urlParams.get('inv') || '-';
+                document.getElementById('v-date').textContent = urlParams.get('dateText') || '-';
+                document.getElementById('v-total').textContent = (urlParams.get('total') || '0.00') + ' SAR';
+                
+                const driveLink = urlParams.get('drive') || 'https://drive.google.com/drive/my-drive';
+                document.getElementById('v-drive-btn').href = driveLink;
+                return;
+            }
 
             if (sessionStorage.getItem(STORAGE_KEYS.AUTH) === 'true') {
                 loginScreen.classList.add('hidden');
+                verifyScreen.classList.add('hidden');
                 appContent.classList.remove('hidden');
                 initializeApp();
             }
@@ -430,6 +473,7 @@
                     loginScreen.style.opacity = '0';
                     setTimeout(() => {
                         loginScreen.classList.add('hidden');
+                        verifyScreen.classList.add('hidden');
                         appContent.classList.remove('hidden');
                         initializeApp();
                     }, 400);
@@ -449,26 +493,15 @@
             document.getElementById('bulk-date').valueAsDate = new Date();
             recalcBulkFromUnitOrQty();
 
-            const urlParams = new URLSearchParams(window.location.search);
-            if (urlParams.get('verified') === 'true') {
-                document.getElementById('verify-screen').classList.remove('hidden');
-                document.getElementById('login-screen').classList.add('hidden');
-                document.getElementById('app-content').classList.add('hidden');
-                document.getElementById('v-clinic').textContent = urlParams.get('clinic') || 'Blue Medical Field Complex';
-                document.getElementById('v-name').textContent = urlParams.get('name') || '-';
-                const idVal = urlParams.get('id') || '';
-                if (!idVal) {
-                    document.getElementById('v-id-row').classList.add('hidden');
-                } else {
-                    document.getElementById('v-id-row').classList.remove('hidden');
-                    document.getElementById('v-id').textContent = idVal;
-                }
-                document.getElementById('v-qty').textContent = urlParams.get('qty') || '1';
-                document.getElementById('v-inv').textContent = urlParams.get('inv') || '-';
-                document.getElementById('v-date').textContent = urlParams.get('dateText') || '-';
-                document.getElementById('v-total').textContent = (urlParams.get('total') || '0.00') + ' SAR';
-                return;
+            const savedDrive = localStorage.getItem(STORAGE_KEYS.DRIVE);
+            if (savedDrive) {
+                document.getElementById('global-drive-link').value = savedDrive;
             }
+
+            document.getElementById('global-drive-link').addEventListener('input', (e) => {
+                localStorage.setItem(STORAGE_KEYS.DRIVE, e.target.value.trim());
+                renderAllInvoices();
+            });
 
             loadStateFromStorage();
             updateSeqDisplay();
@@ -832,6 +865,7 @@
             const container = document.getElementById('invoices-container');
             const actionBar = document.getElementById('action-bar');
             const defaultBase = parseFloat(document.getElementById('base-amount').value) || 78.26;
+            const globalDriveLink = document.getElementById('global-drive-link').value.trim() || 'https://drive.google.com/drive/my-drive';
 
             let sumSub = 0, sumTax = 0, sumTotal = 0;
             globalPatients.forEach(p => {
@@ -900,7 +934,7 @@
 
                 let qrPayload = qrMode === 'zatca' 
                     ? generateZatcaBase64(brandEn, brandVat, p.date, c.totalAmount, c.taxAmount)
-                    : `${baseUrl}?verified=true&clinic=${encodeURIComponent(brandEn)}&name=${encodeURIComponent(p.name)}&id=${encodeURIComponent(p.id || '')}&qty=${c.qty}&inv=${invNo}&dateText=${encodeURIComponent(p.date)}&total=${c.totalAmount.toFixed(2)}`;
+                    : `${baseUrl}?verified=true&clinic=${encodeURIComponent(brandEn)}&name=${encodeURIComponent(p.name)}&id=${encodeURIComponent(p.id || '')}&qty=${c.qty}&inv=${invNo}&dateText=${encodeURIComponent(p.date)}&total=${c.totalAmount.toFixed(2)}&drive=${encodeURIComponent(globalDriveLink)}`;
 
                 qrTasks.push({ id: qrId, text: qrPayload });
 
@@ -955,7 +989,7 @@
                             <div class="font-black text-slate-900 text-[18px] mt-14 mb-4 text-right">${t.finance}</div>
                         </div>
                         <div class="invoice-footer">
-                            <img src="صورة2.png" class="w-full object-contain max-h-28" alt="صورة2.png" onerror="this.style.display='none'">
+                            <img src="صورة2.png" class="w-full object-cover max-h-none" alt="صورة2.png" onerror="this.style.display='none'">
                         </div>
                     </div>`;
             });
