@@ -3,13 +3,13 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>نظام التقارير الطبية  V9</title>
+    <title>نظام التقارير الطبية - النسخة المدمجة والمستقرة V10</title>
     
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Tajawal:wght@500;700;800&display=swap" rel="stylesheet">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
     <script src="https://unpkg.com/pdf-lib@1.17.1/dist/pdf-lib.min.js"></script>
-    <!-- مكتبة SheetJS لقراءة وتصدير ملفات الإكسيل في قسم الإضافة السريعة -->
+    <!-- مكتبة SheetJS لقراءة وتصدير ملفات الإكسيل -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
@@ -42,7 +42,7 @@
             #print-card-area p { margin: 0 0 3px 0; font-size: 10px; color: #333; }
             #print-qr-container { display: flex; justify-content: center; margin-top: 5px; }
             #print-qr-container img { width: 85px; height: 85px; margin: 0 auto; }
-            #admin-section, #login-section, #client-section, #qr-modal, #delete-modal, #clear-all-modal, footer { display: none !important; }
+            #admin-section, #login-section, #client-section, #qr-modal, #delete-modal, #clear-all-modal, #settings-modal, footer { display: none !important; }
         }
         #print-card-area { display: none; }
     </style>
@@ -89,9 +89,12 @@
             <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-5 mb-4 flex flex-col md:flex-row justify-between items-center gap-4">
                 <div class="flex items-center gap-4">
                     <img src="Blue.png" alt="Logo" class="h-12 object-contain bg-white" onerror="this.onerror=null; this.src='https://placehold.co/120x40/ffffff/059669?text=Logo'">
-                    <div><h2 class="text-xl font-bold text-gray-800 hidden sm:block">نظام التقارير الذكي</h2></div>
+                    <div><h2 class="text-xl font-bold text-gray-800 hidden sm:block">نظام التقارير الذكي V10</h2></div>
                 </div>
                 <div class="flex items-center gap-2 flex-wrap justify-center">
+                    <button id="open-settings-btn" class="bg-emerald-50 hover:bg-emerald-100 text-emerald-700 px-3.5 py-2.5 rounded-xl font-bold transition-colors text-sm flex items-center gap-2 border border-emerald-200" title="إعدادات مكان وحجم QR والربط">
+                        <i class="fa-solid fa-gear"></i> إعدادات الـ QR والربط
+                    </button>
                     <button id="export-backup-btn" class="bg-blue-50 hover:bg-blue-100 text-blue-700 px-3.5 py-2.5 rounded-xl font-bold transition-colors text-sm flex items-center gap-2 border border-blue-200" title="تنزيل نسخة احتياطية">
                         <i class="fa-solid fa-cloud-arrow-down"></i> نسخة احتياطية
                     </button>
@@ -186,7 +189,7 @@
                                     </div>
                                 </div>
                                 <div class="flex items-center gap-1.5">
-                                    <button type="button" id="download-excel-template-btn" class="bg-white hover:bg-emerald-100 text-emerald-700 border border-emerald-200 px-2.5 py-1.5 rounded-lg text-[11px] font-bold transition-colors shadow-sm flex items-center gap-1" title="تحميل نموذج إكسيل جاهز للتعبئة">
+                                    <button type="button" id="download-excel-template-btn" class="bg-white hover:bg-emerald-100 text-emerald-700 border border-emerald-200 px-2.5 py-1.5 rounded-lg text-[11px] font-bold transition-colors shadow-sm flex items-center gap-1" title="تحميل نموذج إكسيل جاهز">
                                         <i class="fa-solid fa-download"></i> نموذج
                                     </button>
                                     <label for="batch-excel-input" class="bg-emerald-600 hover:bg-emerald-700 text-white px-3 py-1.5 rounded-lg text-xs font-bold transition-colors cursor-pointer shadow-sm flex items-center gap-1.5">
@@ -199,7 +202,7 @@
                             <div class="pt-2 border-t border-emerald-200/60 flex items-center justify-between gap-2">
                                 <div class="flex items-center gap-1.5 text-[10px] text-emerald-800 font-bold">
                                     <i class="fa-solid fa-wand-magic-sparkles text-amber-500"></i>
-                                    <span>ارفع كل ملفات الـ PDF معاً ليتم توزيعها تلقائياً حسب رقم الهوية أو الاسم:</span>
+                                    <span>ربط كل ملفات الـ PDF معاً دفعة واحدة:</span>
                                 </div>
                                 <label for="batch-pdf-input" class="bg-gray-900 hover:bg-gray-800 text-white px-3 py-1.5 rounded-lg text-[11px] font-bold transition-colors cursor-pointer shadow-sm flex items-center gap-1.5 whitespace-nowrap">
                                     <i class="fa-solid fa-file-pdf text-red-400"></i> 2. ربط PDF جماعي
@@ -360,6 +363,65 @@
         </div>
     </div>
 
+    <!-- نافذة إعدادات الـ QR ومكان وزيادة وتكامل Google Drive -->
+    <div id="settings-modal" class="hidden fixed inset-0 z-[70] flex items-center justify-center bg-gray-900/60 backdrop-blur-sm admin-ui">
+        <div class="bg-white p-6 rounded-2xl shadow-2xl w-[95%] max-w-lg text-right border border-gray-100 relative max-h-[90vh] overflow-y-auto custom-scrollbar">
+            <div class="flex justify-between items-center mb-4 border-b border-gray-100 pb-3">
+                <h3 class="text-lg font-bold text-gray-800 flex items-center gap-2">
+                    <i class="fa-solid fa-gear text-emerald-600"></i> إعدادات مكان وحجم QR والربط السحابي
+                </h3>
+                <button type="button" id="close-settings-btn" class="text-gray-400 hover:text-gray-600 w-8 h-8 flex items-center justify-center rounded-lg hover:bg-gray-100"><i class="fa-solid fa-xmark text-lg"></i></button>
+            </div>
+            
+            <div class="space-y-4 text-xs">
+                <!-- مكان الـ QR -->
+                <div class="bg-gray-50 p-3.5 rounded-xl border border-gray-200 space-y-2">
+                    <label class="block font-bold text-gray-700">موضع رمز الـ QR داخل ملف الـ PDF:</label>
+                    <select id="set-qr-position" class="w-full px-3 py-2 border border-gray-300 rounded-lg bg-white font-bold outline-none focus:ring-2 focus:ring-emerald-500">
+                        <option value="top-right">أعلى اليمين (افتراضي)</option>
+                        <option value="top-left">أعلى اليسار</option>
+                        <option value="bottom-right">أسفل اليمين</option>
+                        <option value="bottom-left">أسفل اليسار</option>
+                        <option value="center">المنتصف</option>
+                    </select>
+                </div>
+
+                <!-- حجم الـ QR -->
+                <div class="bg-gray-50 p-3.5 rounded-xl border border-gray-200 space-y-2">
+                    <label class="block font-bold text-gray-700">حجم رمز الـ QR:</label>
+                    <select id="set-qr-size" class="w-full px-3 py-2 border border-gray-300 rounded-lg bg-white font-bold outline-none focus:ring-2 focus:ring-emerald-500">
+                        <option value="60">صغير (60 بكسل)</option>
+                        <option value="75" selected>متوسط (75 بكسل)</option>
+                        <option value="95">كبير (95 بكسل)</option>
+                        <option value="120">كبير جداً (120 بكسل)</option>
+                    </select>
+                </div>
+
+                <!-- رابط مجلد Google Drive والسكربت -->
+                <div class="bg-emerald-50/70 p-3.5 rounded-xl border border-emerald-200 space-y-2">
+                    <label class="block font-bold text-emerald-950">رابط مجلد Google Drive (لحفظ ملفات PDF مرفوعة تلقائياً):</label>
+                    <input type="url" id="set-drive-folder" class="w-full px-3 py-2 border border-emerald-300 rounded-lg bg-white font-mono text-xs outline-none focus:ring-2 focus:ring-emerald-500" placeholder="https://drive.google.com/drive/folders/..." dir="ltr">
+                    <p class="text-[10px] text-emerald-800 leading-relaxed">ضع هنا رابط المجلد الذي تريد أن يرفع النظام الملفات إليه مباشرة لتتخلص من تعب التنزيل وإعادة الرفع!</p>
+                </div>
+
+                <!-- خيار QR الثابت والديناميكي للتعديل لاحقاً -->
+                <div class="bg-blue-50/70 p-3.5 rounded-xl border border-blue-200 space-y-2">
+                    <div class="flex items-center justify-between">
+                        <span class="font-bold text-blue-950">تفعيل روابط QR ثابتة (ديناميكية للتعديل):</span>
+                        <input type="checkbox" id="set-dynamic-qr" class="w-4 h-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500 cursor-pointer" checked>
+                    </div>
+                    <p class="text-[10px] text-blue-800 leading-relaxed">عند التفعيل: لو قمت بتعديل اسم المريض أو عمره لاحقاً، سينعكس التعديل فوراً على نفس رمز الـ QR المطبوع مسبقاً دون الحاجة لإعادة طباعته.</p>
+                </div>
+            </div>
+
+            <div class="mt-6 pt-3 border-t border-gray-100 flex gap-2">
+                <button type="button" id="save-settings-btn" class="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-3 rounded-xl transition-colors text-sm shadow-md">
+                    حفظ الإعدادات
+                </button>
+            </div>
+        </div>
+    </div>
+
     <div id="delete-modal" class="hidden fixed inset-0 z-[60] flex items-center justify-center bg-gray-900/60 backdrop-blur-sm admin-ui">
         <div class="bg-white p-6 rounded-2xl shadow-2xl w-[90%] max-w-sm text-center border border-gray-100">
             <div class="w-16 h-16 bg-red-100 text-red-600 rounded-full flex items-center justify-center mx-auto mb-4"><i class="fa-solid fa-triangle-exclamation text-4xl"></i></div>
@@ -399,9 +461,17 @@
     <script>
         const ADMIN_USER = localStorage.getItem('custom_admin_user') || "admin";
         const ADMIN_PASS = localStorage.getItem('custom_admin_pass') || "admin123"; 
-        const STORAGE_KEY = "medical_records_local_v8"; 
-        const OLD_STORAGE_KEYS = ["medical_records_local_v3", "medical_records_local_v5", "medical_records_local_v7"];
+        const STORAGE_KEY = "medical_records_local_v10"; 
+        const SETTINGS_KEY = "medical_system_settings_v10";
+        const OLD_STORAGE_KEYS = ["medical_records_local_v3", "medical_records_local_v5", "medical_records_local_v7", "medical_records_local_v8"];
         
+        let appSettings = JSON.parse(localStorage.getItem(SETTINGS_KEY)) || {
+            qrPosition: 'top-right',
+            qrSize: 75,
+            driveFolder: '',
+            dynamicQr: true
+        };
+
         const DOM = {
             toast: document.getElementById('toast-container'), loginSec: document.getElementById('login-section'), adminSec: document.getElementById('admin-section'),
             clientSec: document.getElementById('client-section'), form: document.getElementById('create-form'), btnSubmit: document.getElementById('submit-btn'),
@@ -415,17 +485,30 @@
             cError: document.getElementById('client-error-view'), selectAll: document.getElementById('select-all'), exportSelectedContainer: document.getElementById('export-selected-container'),
             btnExportSelected: document.getElementById('export-selected-btn'), btnPrintSelected: document.getElementById('print-selected-btn'), selectedCount: document.getElementById('selected-count'),
             excelBatchBox: document.getElementById('excel-batch-import-box'), batchExcelInput: document.getElementById('batch-excel-input'), downloadExcelTemplateBtn: document.getElementById('download-excel-template-btn'),
-            batchPdfInput: document.getElementById('batch-pdf-input')
+            batchPdfInput: document.getElementById('batch-pdf-input'), settingsModal: document.getElementById('settings-modal'), openSettingsBtn: document.getElementById('open-settings-btn'), closeSettingsBtn: document.getElementById('close-settings-btn'), saveSettingsBtn: document.getElementById('save-settings-btn')
         };
 
-        // دمج السجلات القديمة لمرة واحدة ثم تنظيف المفاتيح القديمة حتى لا تعود البيانات بعد التصفير أو الحذف
+        // ربط الإعدادات
+        document.getElementById('set-qr-position').value = appSettings.qrPosition;
+        document.getElementById('set-qr-size').value = appSettings.qrSize;
+        document.getElementById('set-drive-folder').value = appSettings.driveFolder || '';
+        document.getElementById('set-dynamic-qr').checked = appSettings.dynamicQr;
+
+        DOM.openSettingsBtn?.addEventListener('click', () => DOM.settingsModal.classList.remove('hidden'));
+        DOM.closeSettingsBtn?.addEventListener('click', () => DOM.settingsModal.classList.add('hidden'));
+        DOM.saveSettingsBtn?.addEventListener('click', () => {
+            appSettings.qrPosition = document.getElementById('set-qr-position').value;
+            appSettings.qrSize = parseInt(document.getElementById('set-qr-size').value);
+            appSettings.driveFolder = document.getElementById('set-drive-folder').value.trim();
+            appSettings.dynamicQr = document.getElementById('set-dynamic-qr').checked;
+            localStorage.setItem(SETTINGS_KEY, JSON.stringify(appSettings));
+            DOM.settingsModal.classList.add('hidden');
+            showToast('تم حفظ الإعدادات بنجاح', 'success');
+        });
+
         function loadAndMigrateRecords() {
             let records = [];
-            try {
-                records = JSON.parse(localStorage.getItem(STORAGE_KEY)) || [];
-            } catch (e) {
-                records = [];
-            }
+            try { records = JSON.parse(localStorage.getItem(STORAGE_KEY)) || []; } catch (e) { records = []; }
             const existingIds = new Set(records.map(r => r.id));
             let migrated = false;
 
@@ -443,7 +526,6 @@
                                 }
                             });
                         }
-                        // حذف المفتاح القديم بعد نقله لضمان عدم عودة البيانات عند التصفير وتحديث الصفحة
                         localStorage.removeItem(key);
                     }
                 } catch (e) {}
@@ -479,7 +561,6 @@
             const showRemove = !isEditMode || requestCount > 1;
             const removeBtn = showRemove ? `<button type="button" tabindex="-1" onclick="removeRequestBlock('${block.id}')" class="text-gray-400 hover:text-red-600 w-6 h-6 flex items-center justify-center rounded-md hover:bg-red-50 transition-colors" title="إزالة"><i class="fa-solid fa-trash-can text-sm"></i></button>` : '';
 
-            // في حال كان الإدخال جديداً أو مستورداً من الإكسيل، يبقى رفع ملف PDF إلزامياً يدوياً، بينما في وضع التعديل يكون اختيارياً
             const isPdfRequired = !isEditMode;
             const excelBadge = (data && data.fromExcel) ? `<span class="excel-status-badge bg-amber-50 text-amber-800 text-[10px] font-bold px-2 py-0.5 rounded-full border border-amber-200 flex items-center gap-1"><i class="fa-solid fa-file-excel text-emerald-600"></i> مستورد - بانتظار رفع PDF</span>` : '';
 
@@ -516,32 +597,18 @@
             `;
             DOM.reqContainer.appendChild(block);
             updateBatchCounter();
-            
-            if (!skipScroll) {
-                setTimeout(() => block.scrollIntoView({ behavior: 'smooth', block: 'end' }), 50);
-            }
-            
-            if(!data && requestCount > 1 && !skipScroll) {
-                block.querySelector('.req-name').focus();
-            }
+            if (!skipScroll) setTimeout(() => block.scrollIntoView({ behavior: 'smooth', block: 'end' }), 50);
         }
 
-        // تحديث شارة حالة ملف الـ PDF عند اختياره يدوياً أو تلقائياً
         window.handlePdfFileChange = (inputEl, isAutoMatched = false) => {
             const card = inputEl.closest('.request-card');
             if (!card) return;
             let badge = card.querySelector('.excel-status-badge');
             const hasFile = (inputEl.files && inputEl.files.length > 0) || card._attachedPdfFile;
-
-            // إنشاء شارة إذا لم تكن موجودة (مثلاً عند الإضافة اليدوية ثم استخدام الربط الجماعي)
             if (!badge && hasFile) {
                 const headerDiv = card.querySelector('.req-badge-num')?.parentElement;
-                if (headerDiv) {
-                    badge = document.createElement('span');
-                    headerDiv.appendChild(badge);
-                }
+                if (headerDiv) { badge = document.createElement('span'); headerDiv.appendChild(badge); }
             }
-
             if (badge) {
                 if (hasFile) {
                     const fileName = card._attachedPdfFile ? card._attachedPdfFile.name : inputEl.files[0].name;
@@ -554,80 +621,42 @@
             }
         };
 
-        // ================= ميزة الربط الجماعي التلقائي لملفات الـ PDF =================
         DOM.batchPdfInput?.addEventListener('change', (e) => {
             const files = Array.from(e.target.files || []);
             if (files.length === 0) return;
-
             const cards = Array.from(DOM.reqContainer.querySelectorAll('.request-card'));
-            if (cards.length === 0) {
-                showToast('يرجى استيراد ملف الإكسيل أو إضافة المرضى أولاً', 'error');
-                e.target.value = '';
-                return;
-            }
-
-            let matchedCount = 0;
-            const unmatchedFiles = [];
-
-            // دالة لتنظيف النصوص للمقارنة الذكية (إزالة المسافات الزائدة والرموز وامتداد .pdf)
+            if (cards.length === 0) { showToast('يرجى استيراد ملف الإكسيل أو إضافة المرضى أولاً', 'error'); e.target.value = ''; return; }
+            let matchedCount = 0; const unmatchedFiles = [];
             const normalizeStr = (str) => String(str || '').toLowerCase().replace(/\.pdf$/i, '').replace(/[_\-\s]+/g, ' ').trim();
 
             files.forEach(file => {
                 const cleanFileName = normalizeStr(file.name);
                 const compactFileName = cleanFileName.replace(/\s+/g, '');
-
-                // البحث عن بطاقة المريض المطابقة لاسم الملف (سواء برقم الهوية أو باسم المريض)
                 let matchedCard = cards.find(card => {
                     const pId = card.querySelector('.req-id')?.value.trim();
                     const pName = normalizeStr(card.querySelector('.req-name')?.value);
-                    
-                    // 1. مطابقة برقم الهوية (الأدق والأسرع)
-                    if (pId && pId.length >= 4 && compactFileName.includes(pId.toLowerCase())) {
-                        return true;
-                    }
-                    // 2. مطابقة باسم المريض الكامل
-                    if (pName && pName.length >= 3 && (cleanFileName.includes(pName) || pName.includes(cleanFileName))) {
-                        return true;
-                    }
+                    if (pId && pId.length >= 4 && compactFileName.includes(pId.toLowerCase())) return true;
+                    if (pName && pName.length >= 3 && (cleanFileName.includes(pName) || pName.includes(cleanFileName))) return true;
                     return false;
                 });
-
                 if (matchedCard) {
                     const pdfInput = matchedCard.querySelector('.req-pdf');
-                    // حفظ الملف برمجياً على البطاقة وتعيينه داخل حقل input type="file" عبر DataTransfer
                     matchedCard._attachedPdfFile = file;
                     try {
-                        const dt = new DataTransfer();
-                        dt.items.add(file);
-                        pdfInput.files = dt.files;
-                        pdfInput.removeAttribute('required');
-                    } catch (err) {
-                        pdfInput.removeAttribute('required');
-                    }
+                        const dt = new DataTransfer(); dt.items.add(file); pdfInput.files = dt.files; pdfInput.removeAttribute('required');
+                    } catch (err) { pdfInput.removeAttribute('required'); }
                     window.handlePdfFileChange(pdfInput, true);
                     matchedCount++;
-                } else {
-                    unmatchedFiles.push(file.name);
-                }
+                } else { unmatchedFiles.push(file.name); }
             });
 
-            if (matchedCount > 0) {
-                showToast(`تم ربط (${matchedCount}) ملف PDF ببطاقات المرضى تلقائياً!`, 'success');
-            }
-            if (unmatchedFiles.length > 0) {
-                showToast(`تعذر مطابقة (${unmatchedFiles.length}) ملف تلقائياً، يرجى التأكد أن اسم الملف يحتوي على رقم الهوية أو الاسم.`, 'error');
-            }
-
+            if (matchedCount > 0) showToast(`تم ربط (${matchedCount}) ملف PDF ببطاقات المرضى تلقائياً!`, 'success');
+            if (unmatchedFiles.length > 0) showToast(`تعذر مطابقة (${unmatchedFiles.length}) ملف تلقائياً بالهوية أو الاسم.`, 'error');
             e.target.value = '';
         });
 
-        // ================= ميزة استيراد ملف الإكسيل للإضافة السريعة (Batch) =================
-        
-        // 1. تحميل نموذج إكسيل جاهز للتعبئة
         DOM.downloadExcelTemplateBtn?.addEventListener('click', () => {
-            if (typeof XLSX === 'undefined') {
-                return showToast('مكتبة الإكسيل قيد التحميل، يرجى المحاولة بعد لحظات', 'error');
-            }
+            if (typeof XLSX === 'undefined') return showToast('مكتبة الإكسيل قيد التحميل', 'error');
             const headers = [
                 ["رقم الهوية", "الاسم", "العمر", "رابط Drive"],
                 ["1012345678", "AHMAD MOHAMMED ALI", "32 Y", "https://drive.google.com/file/d/example1/view"],
@@ -635,73 +664,38 @@
             ];
             const ws = XLSX.utils.aoa_to_sheet(headers);
             ws['!cols'] = [{ wch: 16 }, { wch: 28 }, { wch: 10 }, { wch: 45 }];
-            const wb = XLSX.utils.book_new();
-            XLSX.utils.book_append_sheet(wb, ws, "Patients_Batch");
+            const wb = XLSX.utils.book_new(); XLSX.utils.book_append_sheet(wb, ws, "Patients_Batch");
             XLSX.writeFile(wb, "نموذج_الإضافة_السريعة.xlsx");
-            showToast('تم تحميل نموذج الإكسيل الجاهز بنجاح', 'info');
+            showToast('تم تحميل نموذج الإكسيل الجاهز', 'info');
         });
 
-        // 2. قراءة واستيراد ملف الإكسيل وتعبئة النماذج تلقائياً
         DOM.batchExcelInput?.addEventListener('change', (e) => {
-            const file = e.target.files[0];
-            if (!file) return;
-
-            if (typeof XLSX === 'undefined') {
-                showToast('مكتبة قراءة الإكسيل غير متوفرة حالياً، تأكد من اتصالك بالإنترنت', 'error');
-                e.target.value = '';
-                return;
-            }
-
+            const file = e.target.files[0]; if (!file) return;
+            if (typeof XLSX === 'undefined') { showToast('مكتبة الإكسيل غير متوفرة', 'error'); e.target.value = ''; return; }
             const reader = new FileReader();
             reader.onload = function(evt) {
                 try {
                     const data = new Uint8Array(evt.target.result);
                     const workbook = XLSX.read(data, { type: 'array' });
-                    const firstSheetName = workbook.SheetNames[0];
-                    const worksheet = workbook.Sheets[firstSheetName];
-                    
-                    // تحويل الورقة إلى مصفوفة صفوف
+                    const worksheet = workbook.Sheets[workbook.SheetNames[0]];
                     const rows = XLSX.utils.sheet_to_json(worksheet, { header: 1, defval: "" });
-                    
-                    // تصفية الصفوف الفارغة تماماً
                     const validRows = rows.filter(r => Array.isArray(r) && r.some(cell => String(cell).trim() !== ""));
-                    if (validRows.length === 0) {
-                        showToast('ملف الإكسيل فارغ!', 'error');
-                        return;
-                    }
+                    if (validRows.length === 0) { showToast('ملف الإكسيل فارغ!', 'error'); return; }
 
-                    // التعرف الذكي على الأعمدة سواء بوجود عناوين (عربي/إنجليزي) أو بالترتيب المباشر
-                    let idIdx = -1, nameIdx = -1, ageIdx = -1, urlIdx = -1;
-                    let startRow = 0;
-
+                    let idIdx = -1, nameIdx = -1, ageIdx = -1, urlIdx = -1; let startRow = 0;
                     const firstRow = validRows[0].map(c => String(c).trim().toLowerCase());
-                    const headerKeywords = ['هوية', 'هويه', 'إقامة', 'اقامة', 'اقامه', 'رقم', 'id', 'iqama', 'اسم', 'الاسم', 'name', 'patient', 'عمر', 'العمر', 'سن', 'age', 'رابط', 'درايف', 'drive', 'url', 'link'];
-                    const isFirstRowHeader = firstRow.some(cell => headerKeywords.some(kw => cell.includes(kw)));
-
-                    if (isFirstRowHeader) {
+                    const headerKeywords = ['هوية', 'هويه', 'إقامة', 'اقامة', 'رقم', 'id', 'iqama', 'اسم', 'name', 'patient', 'عمر', 'age', 'رابط', 'drive', 'url'];
+                    if (firstRow.some(cell => headerKeywords.some(kw => cell.includes(kw)))) {
                         startRow = 1;
                         firstRow.forEach((colName, idx) => {
-                            if (idIdx === -1 && (colName.includes('هوية') || colName.includes('هويه') || colName.includes('إقامة') || colName.includes('اقامة') || colName.includes('اقامه') || colName.includes('id') || colName.includes('iqama') || colName === 'رقم')) {
-                                idIdx = idx;
-                            } else if (nameIdx === -1 && (colName.includes('اسم') || colName.includes('name') || colName.includes('مريض') || colName.includes('patient'))) {
-                                nameIdx = idx;
-                            } else if (ageIdx === -1 && (colName.includes('عمر') || colName.includes('سن') || colName.includes('age'))) {
-                                ageIdx = idx;
-                            } else if (urlIdx === -1 && (colName.includes('رابط') || colName.includes('drive') || colName.includes('درايف') || colName.includes('url') || colName.includes('link'))) {
-                                urlIdx = idx;
-                            }
+                            if (idIdx === -1 && (colName.includes('هوي') || colName.includes('إقامت') || colName.includes('id') || colName === 'رقم')) idIdx = idx;
+                            else if (nameIdx === -1 && (colName.includes('اسم') || colName.includes('name') || colName.includes('مريض'))) nameIdx = idx;
+                            else if (ageIdx === -1 && (colName.includes('عمر') || colName.includes('سن') || colName.includes('age'))) ageIdx = idx;
+                            else if (urlIdx === -1 && (colName.includes('رابط') || colName.includes('drive') || colName.includes('url'))) urlIdx = idx;
                         });
                     }
-
-                    // إذا لم يتم العثور على بعض العناوين، نستخدم الترتيب الافتراضي المطلوب: (1: الهوية، 2: الاسم، 3: العمر، 4: الرابط)
                     const usedIndices = new Set([idIdx, nameIdx, ageIdx, urlIdx].filter(i => i !== -1));
-                    const getNextFreeCol = () => {
-                        let i = 0;
-                        while (usedIndices.has(i)) i++;
-                        usedIndices.add(i);
-                        return i;
-                    };
-
+                    const getNextFreeCol = () => { let i = 0; while (usedIndices.has(i)) i++; usedIndices.add(i); return i; };
                     if (idIdx === -1) idIdx = getNextFreeCol();
                     if (nameIdx === -1) nameIdx = getNextFreeCol();
                     if (ageIdx === -1) ageIdx = getNextFreeCol();
@@ -714,108 +708,48 @@
                         const pName = row[nameIdx] !== undefined ? String(row[nameIdx]).trim() : "";
                         const pAge = row[ageIdx] !== undefined ? String(row[ageIdx]).trim() : "";
                         let pUrl = row[urlIdx] !== undefined ? String(row[urlIdx]).trim() : "";
-
-                        // تصحيح الرابط تلقائياً إذا كان بدون بروتوكول https:// لكي لا يرفضه حقل type="url"
-                        if (pUrl && !/^https?:\/\//i.test(pUrl)) {
-                            pUrl = 'https://' + pUrl;
-                        }
-
-                        // تخطي الصف إذا كان لا يحتوي على اسم ولا رقم هوية
+                        if (pUrl && !/^https?:\/\//i.test(pUrl)) pUrl = 'https://' + pUrl;
                         if (!pId && !pName) continue;
-
-                        extractedPatients.push({
-                            patientId: pId,
-                            patientName: pName,
-                            age: pAge,
-                            fileUrl: pUrl,
-                            fromExcel: true
-                        });
+                        extractedPatients.push({ patientId: pId, patientName: pName, age: pAge, fileUrl: pUrl, fromExcel: true });
                     }
+                    if (extractedPatients.length === 0) { showToast('لم يتم العثور على بيانات صالحة', 'error'); return; }
 
-                    if (extractedPatients.length === 0) {
-                        showToast('لم يتم العثور على بيانات مرضى صالحة داخل الملف', 'error');
-                        return;
-                    }
-
-                    // إذا كان هناك نموذج واحد فقط في الصفحة وهو فارغ تماماً، نقوم بمسحه قبل إضافة بيانات الإكسيل
                     const existingCards = DOM.reqContainer.querySelectorAll('.request-card');
                     if (existingCards.length === 1) {
-                        const firstCard = existingCards[0];
-                        const pdfInput = firstCard.querySelector('.req-pdf');
-                        const hasPdf = pdfInput && pdfInput.files && pdfInput.files.length > 0;
-                        const isEmptyCard = !firstCard.querySelector('.req-name').value.trim() &&
-                                            !firstCard.querySelector('.req-id').value.trim() &&
-                                            !firstCard.querySelector('.req-age').value.trim() &&
-                                            !firstCard.querySelector('.req-url').value.trim() &&
-                                            !hasPdf;
-                        if (isEmptyCard) {
-                            DOM.reqContainer.innerHTML = '';
-                            requestCount = 0;
+                        const fc = existingCards[0];
+                        if (!fc.querySelector('.req-name').value.trim() && !fc.querySelector('.req-id').value.trim() && !fc.querySelector('.req-pdf').files.length) {
+                            DOM.reqContainer.innerHTML = ''; requestCount = 0;
                         }
                     }
-
-                    // إنشاء بطاقات الإضافة السريعة لكل مريض في الإكسيل بدون تكرار التمرير المزعج
-                    extractedPatients.forEach(patientData => {
-                        addRequestBlock(patientData, true);
-                    });
-
-                    showToast(`تم استيراد (${extractedPatients.length}) مريض بنجاح! يمكنك الآن استخدام زر "ربط PDF جماعي" أو إرفاقها يدوياً.`, 'success');
-                } catch (err) {
-                    console.error("Excel Import Error:", err);
-                    showToast('حدث خطأ أثناء قراءة ملف الإكسيل، تأكد من سلامة الملف.', 'error');
-                } finally {
-                    e.target.value = ''; // تصفير الحقل للسماح برفع نفس الملف مرة أخرى عند الحاجة
-                }
+                    extractedPatients.forEach(p => addRequestBlock(p, true));
+                    showToast(`تم استيراد (${extractedPatients.length}) مريض بنجاح!`, 'success');
+                } catch (err) { showToast('حدث خطأ أثناء قراءة الإكسيل', 'error'); } finally { e.target.value = ''; }
             };
             reader.readAsArrayBuffer(file);
         });
-        // ================================================================================
 
         function showToast(message, type = 'success') {
             const toast = document.createElement('div');
-            const colors = type === 'success' ? 'bg-gray-900 border-l-4 border-emerald-500' : 
-                          (type === 'error' ? 'bg-red-600 border-l-4 border-red-900' : 'bg-emerald-600 border-l-4 border-emerald-900');
-            const icon = type === 'success' ? 'fa-circle-check text-emerald-400' : 
-                        (type === 'error' ? 'fa-triangle-exclamation text-white' : 'fa-info-circle text-white');
-            
+            const colors = type === 'success' ? 'bg-gray-900 border-l-4 border-emerald-500' : (type === 'error' ? 'bg-red-600 border-l-4 border-red-900' : 'bg-emerald-600 border-l-4 border-emerald-900');
+            const icon = type === 'success' ? 'fa-circle-check text-emerald-400' : (type === 'error' ? 'fa-triangle-exclamation text-white' : 'fa-info-circle text-white');
             toast.className = `${colors} text-white p-4 rounded-2xl shadow-2xl flex items-center gap-3 toast-enter pointer-events-auto admin-ui`;
             toast.innerHTML = `<i class="fa-solid ${icon} text-xl"></i><p class="font-bold text-sm m-0">${message}</p>`;
-            
             DOM.toast.appendChild(toast);
-            setTimeout(() => {
-                toast.classList.replace('toast-enter', 'toast-exit');
-                setTimeout(() => toast.remove(), 300);
-            }, 3000);
+            setTimeout(() => { toast.classList.replace('toast-enter', 'toast-exit'); setTimeout(() => toast.remove(), 300); }, 3000);
         }
 
-        window.handleEnterKey = (event) => {
-            if (event.key === 'Enter') {
-                event.preventDefault(); 
-                if(!DOM.editRecordId.value) { addRequestBlock(); }
-            }
-        };
-
-        window.removeRequestBlock = (id) => {
-            const block = document.getElementById(id);
-            if(block) block.remove();
-            updateBatchCounter();
-        };
+        window.handleEnterKey = (event) => { if (event.key === 'Enter') { event.preventDefault(); if(!DOM.editRecordId.value) addRequestBlock(); } };
+        window.removeRequestBlock = (id) => { const b = document.getElementById(id); if(b) b.remove(); updateBatchCounter(); };
 
         function updateBatchCounter() {
             const cards = document.querySelectorAll('.request-card');
             const count = cards.length;
             DOM.batchCounter.innerText = count === 1 ? 'طلب واحد' : `${count} طلبات`;
-            // إعادة ترقيم البطاقات بشكل متسلسل أنيق عند الحذف أو الإضافة
-            cards.forEach((card, idx) => {
-                const badge = card.querySelector('.req-badge-num');
-                if (badge) badge.textContent = `المريض #${idx + 1}`;
-            });
+            cards.forEach((c, idx) => { const b = c.querySelector('.req-badge-num'); if (b) b.textContent = `المريض #${idx + 1}`; });
             if(count === 0 && !DOM.editRecordId.value) addRequestBlock();
         }
 
-        DOM.btnAddRequest?.addEventListener('click', () => {
-            if(!DOM.editRecordId.value) addRequestBlock();
-        });
+        DOM.btnAddRequest?.addEventListener('click', () => { if(!DOM.editRecordId.value) addRequestBlock(); });
 
         function encodeDataToUrl(obj) {
             const jsonStr = JSON.stringify(obj);
@@ -827,16 +761,16 @@
                 const safeStr = decodeURIComponent(encodedStr).replace(/ /g, '+');
                 const jsonStr = decodeURIComponent(atob(safeStr));
                 return JSON.parse(jsonStr);
-            } catch (e) {
-                console.error("Failed to decode data:", e);
-                return null; 
-            }
+            } catch (e) { return null; }
         }
 
         window.getRecordUrlFromPayload = (payload) => {
-            const minifiedPayload = { c: payload.clinic, i: payload.patientId, n: payload.patientName, a: payload.age, g: payload.gender, u: payload.fileUrl, t: payload.createdAt, e: payload.expiresAt };
-            const encoded = encodeDataToUrl(minifiedPayload);
-            return `${window.location.origin}${window.location.pathname}?d=${encoded}`;
+            if (appSettings.dynamicQr) {
+                return `${window.location.origin}${window.location.pathname}?id=${payload.id}`;
+            } else {
+                const minified = { c: payload.clinic, i: payload.patientId, n: payload.patientName, a: payload.age, g: payload.gender, u: payload.fileUrl, t: payload.createdAt, e: payload.expiresAt };
+                return `${window.location.origin}${window.location.pathname}?d=${encodeDataToUrl(minified)}`;
+            }
         };
 
         window.getRecordUrl = (id) => {
@@ -849,10 +783,7 @@
                 const tempDiv = document.createElement('div');
                 try {
                     new QRCode(tempDiv, { text: text, width: 200, height: 200, colorDark: "#000000", colorLight: "#ffffff", correctLevel: QRCode.CorrectLevel.L });
-                    setTimeout(() => { 
-                        const canvas = tempDiv.querySelector('canvas'); 
-                        resolve(canvas ? canvas.toDataURL("image/png") : null); 
-                    }, 300); 
+                    setTimeout(() => { const canvas = tempDiv.querySelector('canvas'); resolve(canvas ? canvas.toDataURL("image/png") : null); }, 300); 
                 } catch(e) { resolve(null); }
             });
         }
@@ -863,12 +794,21 @@
                 const pdfDoc = await PDFLib.PDFDocument.load(pdfBytes); 
                 const firstPage = pdfDoc.getPages()[0];
                 const qrBase64 = await getQrBase64(qrUrl); 
-                if (!qrBase64) throw new Error("فشل توليد QR الباركود");
+                if (!qrBase64) throw new Error("فشل توليد QR");
                 
                 const qrImage = await pdfDoc.embedPng(qrBase64); 
-                const qrSize = 75; 
+                const qrSize = appSettings.qrSize || 75; 
                 const { width, height } = firstPage.getSize();
-                firstPage.drawImage(qrImage, { x: width - qrSize - 30, y: height - qrSize - 60, width: qrSize, height: qrSize });
+                
+                let qrX = width - qrSize - 30;
+                let qrY = height - qrSize - 60;
+                const pos = appSettings.qrPosition || 'top-right';
+                if (pos === 'top-left') { qrX = 30; qrY = height - qrSize - 60; }
+                else if (pos === 'bottom-right') { qrX = width - qrSize - 30; qrY = 40; }
+                else if (pos === 'bottom-left') { qrX = 30; qrY = 40; }
+                else if (pos === 'center') { qrX = (width - qrSize) / 2; qrY = (height - qrSize) / 2; }
+
+                firstPage.drawImage(qrImage, { x: qrX, y: qrY, width: qrSize, height: qrSize });
                 
                 const modifiedPdfBytes = await pdfDoc.save(); 
                 const blob = new Blob([modifiedPdfBytes], { type: 'application/pdf' });
@@ -876,8 +816,7 @@
                 document.body.appendChild(link); link.click(); document.body.removeChild(link); 
                 return true;
             } catch (err) { 
-                console.error("PDF Processing Error:", err); 
-                showToast(`خطأ في معالجة ملف PDF للمريض ${patientId}. تأكد أن الملف غير محمي بكلمة مرور.`, 'error');
+                showToast(`خطأ في معالجة PDF للمريض ${patientId}`, 'error');
                 return false; 
             }
         }
@@ -929,19 +868,17 @@
             if(totalPages <= 1) return;
 
             const btnClassBase = "relative inline-flex items-center justify-center w-9 h-9 text-sm font-bold rounded-xl transition-all duration-200 mx-1 focus:outline-none focus:ring-2 focus:ring-emerald-500 ";
-
             const prevBtn = document.createElement('button');
             prevBtn.className = btnClassBase + (currentPage === 1 ? 'text-gray-300 bg-gray-50 cursor-not-allowed' : 'text-gray-600 hover:bg-emerald-50 hover:text-emerald-600 shadow-sm border border-gray-100');
             prevBtn.innerHTML = `<i class="fa-solid fa-chevron-right text-xs"></i>`; prevBtn.onclick = () => currentPage > 1 && changePage(currentPage - 1); DOM.paginationNav.appendChild(prevBtn);
 
-            const pages = getPaginationRange(currentPage, totalPages);
-            pages.forEach(p => {
+            getPaginationRange(currentPage, totalPages).forEach(p => {
                 if (p === '...') {
-                    const dots = document.createElement('span'); dots.className = "relative inline-flex items-center justify-center w-9 h-9 text-sm font-bold text-gray-400 mx-1 tracking-widest"; dots.innerHTML = "..."; DOM.paginationNav.appendChild(dots);
+                    const dots = document.createElement('span'); dots.className = "relative inline-flex items-center justify-center w-9 h-9 text-sm font-bold text-gray-400 mx-1"; dots.innerHTML = "..."; DOM.paginationNav.appendChild(dots);
                 } else {
                     const btn = document.createElement('button'); const isCurrent = p === currentPage;
                     btn.className = isCurrent ? btnClassBase + "bg-emerald-600 text-white shadow-md shadow-emerald-500/30 transform scale-105" : btnClassBase + "text-gray-600 hover:bg-emerald-50 hover:text-emerald-600 bg-white border border-gray-100 shadow-sm";
-                    btn.innerText = p; if(isCurrent) btn.setAttribute('aria-current', 'page'); btn.onclick = () => changePage(p); DOM.paginationNav.appendChild(btn);
+                    btn.innerText = p; btn.onclick = () => changePage(p); DOM.paginationNav.appendChild(btn);
                 }
             });
 
@@ -954,9 +891,7 @@
             DOM.tbody.innerHTML = '';
             if (DOM.selectAll) DOM.selectAll.checked = false;
             const noData = document.getElementById('no-records-msg');
-            if(filteredRecords.length === 0) {
-                noData.classList.remove('hidden'); toggleExportSelectedBtn(); renderPagination(0); return;
-            }
+            if(filteredRecords.length === 0) { noData.classList.remove('hidden'); toggleExportSelectedBtn(); renderPagination(0); return; }
             noData.classList.add('hidden'); const now = Date.now();
             let recordsToDisplay = rowsPerPage !== 'all' ? filteredRecords.slice((currentPage - 1) * rowsPerPage, (currentPage - 1) * rowsPerPage + rowsPerPage) : filteredRecords;
 
@@ -994,12 +929,9 @@
             const validityText = { "365": "سنة كاملة", "90": "3 أشهر", "30": "30 يوماً", "7": "7 أيام" }[validityDays] || `${validityDays} يوم`;
 
             const cards = document.querySelectorAll('.request-card'); if(cards.length === 0) return;
-
             const oldBtnHTML = DOM.btnSubmit.innerHTML; DOM.btnSubmit.innerHTML = `<i class="fa-solid fa-spinner fa-spin"></i> جاري التنفيذ...`; DOM.btnSubmit.disabled = true;
 
-            let successCount = 0; 
-            let skippedCards = [];
-            let lastGeneratedId = null;
+            let successCount = 0; let skippedCards = []; let lastGeneratedId = null;
 
             for (let i = 0; i < cards.length; i++) {
                 const card = cards[i]; 
@@ -1011,7 +943,6 @@
                 if (currentRecords.some(r => r.patientId === newPatientId && r.id !== editId)) { 
                     showToast(`تخطي: الهوية (${newPatientId}) مسجلة مسبقاً!`, 'error'); 
                     card.classList.replace('border-r-emerald-500', 'border-r-red-500');
-                    card.classList.add('bg-red-50/30');
                     skippedCards.push(card);
                     continue; 
                 }
@@ -1039,9 +970,7 @@
                 } else { 
                     currentRecords.unshift(payload); 
                 }
-                successCount++; 
-                lastGeneratedId = docId;
-                // إزالة البطاقة التي نجح حفظها فقط في حال وجود بطاقات أخرى متخطاة
+                successCount++; lastGeneratedId = docId;
                 card.dataset.saved = "true";
             }
 
@@ -1051,16 +980,11 @@
             }
             DOM.btnSubmit.innerHTML = oldBtnHTML; DOM.btnSubmit.disabled = false;
 
-            // إذا لم يكن هناك بطاقات متخطاة نعيد ضبط النموذج بالكامل، وإلا نبقي البطاقات التي فيها خطأ ليصححها المستخدم بدون ضياع بياناتها
-            if (skippedCards.length === 0) {
-                resetFormState();
-            } else {
-                document.querySelectorAll('.request-card[data-saved="true"]').forEach(c => c.remove());
-                updateBatchCounter();
-            }
+            if (skippedCards.length === 0) { resetFormState(); } 
+            else { document.querySelectorAll('.request-card[data-saved="true"]').forEach(c => c.remove()); updateBatchCounter(); }
 
             filterTable(); updateStats(); checkDuplicates();
-            if (successCount === 1 && skippedCards.length === 0 && lastGeneratedId) { window.viewQR(lastGeneratedId); }
+            if (successCount === 1 && skippedCards.length === 0 && lastGeneratedId) window.viewQR(lastGeneratedId);
         });
 
         function resetFormState() {
@@ -1071,7 +995,7 @@
             DOM.formIndicator.className = "absolute top-0 right-0 w-1.5 h-full bg-emerald-600"; DOM.btnCancelEdit.classList.add('hidden');
         }
 
-        DOM.btnCancelEdit.addEventListener('click', () => { resetFormState(); });
+        DOM.btnCancelEdit.addEventListener('click', resetFormState);
 
         window.editRecord = (id) => {
             const record = currentRecords.find(r => r.id === id); if (!record) return;
@@ -1081,7 +1005,7 @@
             DOM.excelBatchBox?.classList.add('hidden');
             DOM.formTitle.innerHTML = `<i class="fa-solid fa-pen-to-square text-amber-600"></i> تعديل بيانات المريض`; DOM.btnSubmit.innerHTML = `<i class="fa-solid fa-floppy-disk"></i> حفظ التعديلات`; DOM.formIndicator.className = "absolute top-0 right-0 w-1.5 h-full bg-amber-500"; DOM.btnCancelEdit.classList.remove('hidden');
             window.scrollTo({ top: 0, behavior: 'smooth' });
-            showToast('تم تحميل السجل للتعديل. تنبيه: تعديل البيانات سيحدث رابط ورمز الـ QR!', 'info');
+            showToast('تم تحميل السجل للتعديل.', 'info');
         };
 
         function updateStats() {
@@ -1099,7 +1023,7 @@
         window.viewQR = (id) => {
             const qrUrl = window.getRecordUrl(id); const record = currentRecords.find(r => r.id === id);
             DOM.modalQRContainer.innerHTML = ''; DOM.printQRContainer.innerHTML = '';
-            try { new QRCode(DOM.modalQRContainer, { text: qrUrl, colorDark: "#000000", colorLight: "#ffffff", correctLevel: QRCode.CorrectLevel.L, width: 180, height: 180 }); new QRCode(DOM.printQRContainer, { text: qrUrl, colorDark: "#000000", colorLight: "#ffffff", correctLevel: QRCode.CorrectLevel.L, width: 95, height: 95 }); } catch(e) { DOM.modalQRContainer.innerHTML = `<p class="text-red-500 text-xs font-bold text-center mt-2">محتوى الرابط كبير جداً.</p>`; }
+            try { new QRCode(DOM.modalQRContainer, { text: qrUrl, colorDark: "#000000", colorLight: "#ffffff", correctLevel: QRCode.CorrectLevel.L, width: 180, height: 180 }); new QRCode(DOM.printQRContainer, { text: qrUrl, colorDark: "#000000", colorLight: "#ffffff", correctLevel: QRCode.CorrectLevel.L, width: 95, height: 95 }); } catch(e) {}
             document.getElementById('print-clinic-name').textContent = record ? record.clinic : 'Clinic Name'; document.getElementById('print-patient-name').textContent = record ? record.patientName : '-'; document.getElementById('print-patient-id').textContent = record ? record.patientId : id; document.getElementById('print-patient-age').textContent = record ? record.age : '-';
             DOM.qrModal.classList.remove('hidden');
         };
@@ -1110,9 +1034,7 @@
                 const temp = document.createElement('input'); temp.value = qrUrl; 
                 document.body.appendChild(temp); temp.select(); document.execCommand('copy'); document.body.removeChild(temp); 
                 showToast('تم نسخ الرابط بنجاح', 'success');
-            } catch (err) {
-                showToast('فشل نسخ الرابط، الرجاء المحاولة يدوياً', 'error');
-            }
+            } catch (err) { showToast('فشل نسخ الرابط', 'error'); }
         };
 
         window.requestDelete = (id) => { recordToDelete = id; DOM.deleteModal.classList.remove('hidden'); };
@@ -1121,80 +1043,67 @@
             if(!recordToDelete) return; 
             currentRecords = currentRecords.filter(r => r.id !== recordToDelete); 
             localStorage.setItem(STORAGE_KEY, JSON.stringify(currentRecords)); 
-            OLD_STORAGE_KEYS.forEach(k => localStorage.removeItem(k));
-            DOM.deleteModal.classList.add('hidden'); 
-            recordToDelete = null; 
-            showToast('تم حذف السجل بنجاح'); 
-            currentPage = 1; filterTable(); updateStats(); checkDuplicates(); 
+            DOM.deleteModal.classList.add('hidden'); recordToDelete = null; 
+            showToast('تم حذف السجل بنجاح'); currentPage = 1; filterTable(); updateStats(); checkDuplicates(); 
         });
         
         document.getElementById('close-modal-btn').addEventListener('click', () => DOM.qrModal.classList.add('hidden'));
-        
-        document.getElementById('print-qr-btn').addEventListener('click', () => {
-            DOM.qrModal.classList.add('hidden');
-            setTimeout(() => window.print(), 200);
-        });
+        document.getElementById('print-qr-btn').addEventListener('click', () => { DOM.qrModal.classList.add('hidden'); setTimeout(() => window.print(), 200); });
 
         function toggleExportSelectedBtn() {
-            const checkedBoxes = document.querySelectorAll('.row-checkbox:checked'); const checked = checkedBoxes.length;
-            if (checked > 0) { DOM.exportSelectedContainer.classList.remove('hidden'); DOM.exportSelectedContainer.classList.add('flex'); DOM.selectedCount.textContent = checked; } else { DOM.exportSelectedContainer.classList.add('hidden'); DOM.exportSelectedContainer.classList.remove('flex'); }
+            const checked = document.querySelectorAll('.row-checkbox:checked').length;
+            if (checked > 0) { DOM.exportSelectedContainer.classList.remove('hidden'); DOM.exportSelectedContainer.classList.add('flex'); DOM.selectedCount.textContent = checked; } 
+            else { DOM.exportSelectedContainer.classList.add('hidden'); DOM.exportSelectedContainer.classList.remove('flex'); }
         }
         
         DOM.selectAll?.addEventListener('change', (e) => { document.querySelectorAll('.row-checkbox').forEach(cb => cb.checked = e.target.checked); toggleExportSelectedBtn(); });
-        DOM.tbody?.addEventListener('change', (e) => { if (e.target.classList.contains('row-checkbox')) { toggleExportSelectedBtn(); const allCheckboxes = document.querySelectorAll('.row-checkbox'); if(DOM.selectAll) DOM.selectAll.checked = allCheckboxes.length > 0 && Array.from(allCheckboxes).every(cb => cb.checked); } });
+        DOM.tbody?.addEventListener('change', (e) => { if (e.target.classList.contains('row-checkbox')) { toggleExportSelectedBtn(); const all = document.querySelectorAll('.row-checkbox'); if(DOM.selectAll) DOM.selectAll.checked = all.length > 0 && Array.from(all).every(cb => cb.checked); } });
         
         DOM.btnExportSelected?.addEventListener('click', () => {
             const checkedBoxes = document.querySelectorAll('.row-checkbox:checked'); if (checkedBoxes.length === 0) return;
             let text = "\uFEFFسجل الروابط المحددة (QR Links)\n====================\n\n";
             checkedBoxes.forEach(cb => { const rec = currentRecords.find(r => r.id === cb.value); if (rec) text += `المريض: ${rec.patientName}\nالهوية: ${rec.patientId}\nرابط الـ QR: ${window.getRecordUrl(rec.id)}\n--------------------\n`; });
-            const blob = new Blob([text], { type: 'text/plain;charset=utf-8;' }); const link = document.createElement("a"); link.href = URL.createObjectURL(blob); link.download = `QR_Links_${new Date().getTime()}.txt`; document.body.appendChild(link); link.click(); document.body.removeChild(link); showToast('تم تحميل الروابط بنجاح', 'success');
+            const blob = new Blob([text], { type: 'text/plain;charset=utf-8;' }); const link = document.createElement("a"); link.href = URL.createObjectURL(blob); link.download = `QR_Links_${Date.now()}.txt`; document.body.appendChild(link); link.click(); document.body.removeChild(link); showToast('تم تحميل الروابط', 'success');
         });
 
         DOM.btnPrintSelected?.addEventListener('click', async () => {
             const checkedBoxes = document.querySelectorAll('.row-checkbox:checked'); if (checkedBoxes.length === 0) return;
             let printWindow = window.open('', '_blank');
-            if (!printWindow) {
-                return showToast('يرجى السماح بالنوافذ المنبثقة (Pop-ups) للطباعة', 'error');
-            }
-            showToast('جاري تجهيز البطاقات للطباعة...', 'info');
-            let printContent = `
-                <html lang="ar" dir="ltr"><head><title>طباعة بطاقات المرضى المحددين</title><style>
-                        body { font-family: Arial, sans-serif; display: flex; flex-wrap: wrap; gap: 20px; padding: 20px; background: white; }
-                        .card { width: 8.5cm; height: 5.4cm; border: 2px solid #000; border-radius: 8px; padding: 10px; text-align: center; box-sizing: border-box; page-break-inside: avoid; }
-                        .card img { width: 85px; height: 85px; margin: 4px auto 0 auto; display: block; }
-                        .card h3 { margin: 0 0 5px 0; font-size: 13px; } .card p { margin: 0 0 3px 0; font-size: 10px; color: #333; }
-                        @media print { body { margin: 0; padding: 0; display: block; } .card { margin: 0 auto 20px auto; page-break-after: always; } .card:last-child { page-break-after: auto; } }
-                    </style></head><body>
-            `;
+            if (!printWindow) return showToast('يرجى السماح بالنوافذ المنبثقة للطباعة', 'error');
+            showToast('جاري تجهيز البطاقات...', 'info');
+            let printContent = `<html lang="ar" dir="ltr"><head><title>طباعة</title><style>body { font-family: Arial, sans-serif; display: flex; flex-wrap: wrap; gap: 20px; padding: 20px; background: white; } .card { width: 8.5cm; height: 5.4cm; border: 2px solid #000; border-radius: 8px; padding: 10px; text-align: center; box-sizing: border-box; page-break-inside: avoid; } .card img { width: 85px; height: 85px; margin: 4px auto 0 auto; display: block; } .card h3 { margin: 0 0 5px 0; font-size: 13px; } .card p { margin: 0 0 3px 0; font-size: 10px; color: #333; } @media print { body { margin: 0; padding: 0; display: block; } .card { margin: 0 auto 20px auto; page-break-after: always; } }</style></head><body>`;
             for (const cb of checkedBoxes) {
                 const rec = currentRecords.find(r => r.id === cb.value);
                 if (rec) {
                     const qrBase64 = await getQrBase64(window.getRecordUrl(rec.id));
-                    const qrImgTag = qrBase64 ? `<img src="${qrBase64}" alt="QR Code">` : `<p style="color:red;font-size:9px;">خطأ في توليد الرمز</p>`;
-                    printContent += `<div class="card"><h3>${escapeAttr(rec.clinic)}</h3><p>Name: <b>${escapeAttr(rec.patientName)}</b></p><p>ID: <b>${escapeAttr(rec.patientId)}</b> | Age: <b>${escapeAttr(rec.age)}</b></p>${qrImgTag}<p style="margin-top:4px; font-weight: bold; font-size: 8px;">Scan to Verify Report</p></div>`;
+                    printContent += `<div class="card"><h3>${escapeAttr(rec.clinic)}</h3><p>Name: <b>${escapeAttr(rec.patientName)}</b></p><p>ID: <b>${escapeAttr(rec.patientId)}</b> | Age: <b>${escapeAttr(rec.age)}</b></p><img src="${qrBase64}" alt="QR"><p style="margin-top:4px; font-weight: bold; font-size: 8px;">Scan to Verify Report</p></div>`;
                 }
             }
-            printContent += `</body></html>`; 
-            printWindow.document.write(printContent); 
-            printWindow.document.close(); 
+            printContent += `</body></html>`; printWindow.document.write(printContent); printWindow.document.close();
             setTimeout(() => { printWindow.focus(); printWindow.print(); }, 350);
         });
 
         document.getElementById('card-duplicates')?.addEventListener('click', () => {
-             const ids = currentRecords.map(r => r.patientId); const duplicateIds = [...new Set(ids.filter((item, index) => ids.indexOf(item) !== index))];
-             if (duplicateIds.length === 0) return showToast('لا يوجد سجلات مكررة', 'info');
-             filteredRecords = currentRecords.filter(r => duplicateIds.includes(r.patientId)); currentPage = 1; renderTable(); DOM.search.value = ''; if(fpInstance) fpInstance.clear(); DOM.clearDateBtn.classList.add('hidden'); showToast('تم تصفية الجدول لعرض السجلات المكررة', 'info');
+             const ids = currentRecords.map(r => r.patientId); const dup = [...new Set(ids.filter((item, index) => ids.indexOf(item) !== index))];
+             if (dup.length === 0) return showToast('لا توجد سجلات مكررة', 'info');
+             filteredRecords = currentRecords.filter(r => dup.includes(r.patientId)); currentPage = 1; renderTable(); DOM.search.value = ''; if(fpInstance) fpInstance.clear(); DOM.clearDateBtn.classList.add('hidden'); showToast('تم تصفية السجلات المكررة', 'info');
         });
 
-        document.getElementById('refresh-db-btn')?.addEventListener('click', () => { DOM.search.value = ''; if(fpInstance) fpInstance.clear(); DOM.clearDateBtn.classList.add('hidden'); filterTable(); updateStats(); checkDuplicates(); showToast('تم تحديث الجدول', 'info'); });
+        document.getElementById('refresh-db-btn')?.addEventListener('click', () => { DOM.search.value = ''; if(fpInstance) fpInstance.clear(); DOM.clearDateBtn.classList.add('hidden'); filterTable(); updateStats(); checkDuplicates(); showToast('تم التحديث', 'info'); });
 
-        function loadClientReport(encodedData) {
-            const data = decodeDataFromUrl(encodedData);
+        function loadClientReport(encodedData, recordId) {
+            let data = null;
+            if (recordId) {
+                const found = currentRecords.find(r => r.id === recordId);
+                if (found) data = { c: found.clinic, i: found.patientId, n: found.patientName, a: found.age, g: found.gender, u: found.fileUrl, t: found.createdAt, e: found.expiresAt };
+            } else if (encodedData) {
+                data = decodeDataFromUrl(encodedData);
+            }
+
             if (data) {
                 const expiry = data.e || data.expiresAt;
-                if (Date.now() > expiry) { 
-                    DOM.cError.classList.remove('hidden'); 
-                } else {
+                if (Date.now() > expiry) { DOM.cError.classList.remove('hidden'); } 
+                else {
                     DOM.cSuccess.classList.remove('hidden'); 
                     document.getElementById('c-clinic').textContent = data.c || data.clinic || '-'; 
                     document.getElementById('c-id').textContent = data.i || data.patientId || '-'; 
@@ -1206,17 +1115,10 @@
                     const driveUrl = data.u || data.fileUrl; 
                     const btn = document.getElementById('c-download-btn'); 
                     const btnContainer = document.getElementById('c-download-container');
-                    if(driveUrl) { 
-                        btn.href = driveUrl; 
-                        btnContainer.classList.remove('hidden'); 
-                        btn.classList.remove('hidden'); 
-                    } else { 
-                        btnContainer.classList.add('hidden'); 
-                    }
+                    if(driveUrl) { btn.href = driveUrl; btnContainer.classList.remove('hidden'); btn.classList.remove('hidden'); } 
+                    else { btnContainer.classList.add('hidden'); }
                 }
-            } else { 
-                DOM.cError.classList.remove('hidden'); 
-            }
+            } else { DOM.cError.classList.remove('hidden'); }
         }
 
         function runMatrixScramble() {
@@ -1235,34 +1137,22 @@
         }
 
         function initApp() {
-            const urlParams = new URLSearchParams(window.location.search); const encodedData = urlParams.get('d');
+            const urlParams = new URLSearchParams(window.location.search); 
+            const encodedData = urlParams.get('d');
+            const recordId = urlParams.get('id');
             const legacyVerified = urlParams.get('verified');
+            
             DOM.loginSec.classList.add('hidden'); DOM.adminSec.classList.add('hidden'); DOM.clientSec.classList.add('hidden');
             runMatrixScramble(); 
-            if (encodedData || legacyVerified === 'true') { 
+
+            if (encodedData || recordId || legacyVerified === 'true') { 
                 document.title = "Verified Medical Report"; 
-                if (encodedData) {
-                    loadClientReport(encodedData); 
-                } else {
-                    DOM.cSuccess.classList.remove('hidden');
-                    document.getElementById('c-clinic').textContent = urlParams.get('clinic') || 'Blue Medical Field Complex';
-                    document.getElementById('c-id').textContent = urlParams.get('id') || '-';
-                    document.getElementById('c-name').textContent = urlParams.get('name') || '-';
-                    document.getElementById('c-age').textContent = urlParams.get('age') || '-';
-                    document.getElementById('c-gender').textContent = urlParams.get('gender') || '-';
-                    document.getElementById('c-date').textContent = urlParams.get('dateText') || '-';
-                    const fileUrl = urlParams.get('file');
-                    if (fileUrl) {
-                        const btn = document.getElementById('c-download-btn');
-                        btn.href = fileUrl;
-                        document.getElementById('c-download-container').classList.remove('hidden');
-                        btn.classList.remove('hidden');
-                    }
-                }
+                loadClientReport(encodedData, recordId);
                 DOM.clientSec.classList.remove('hidden'); 
             } else {
-                const isLoggedIn = sessionStorage.getItem('admin_session_active');
-                if (isLoggedIn === 'true') { DOM.adminSec.classList.remove('hidden'); resetFormState(); initFlatpickr(); filterTable(); updateStats(); checkDuplicates(); } else { DOM.loginSec.classList.remove('hidden'); }
+                if (sessionStorage.getItem('admin_session_active') === 'true') { 
+                    DOM.adminSec.classList.remove('hidden'); resetFormState(); initFlatpickr(); filterTable(); updateStats(); checkDuplicates(); 
+                } else { DOM.loginSec.classList.remove('hidden'); }
             }
         }
         
@@ -1277,7 +1167,7 @@
 
         document.getElementById('export-backup-btn').addEventListener('click', () => {
             if(currentRecords.length === 0) return showToast('لا توجد سجلات', 'error');
-            const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify({ version: "9.0", exportDate: new Date().toISOString(), records: currentRecords }, null, 2));
+            const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify({ version: "10.0", exportDate: new Date().toISOString(), records: currentRecords }, null, 2));
             const link = document.createElement('a'); link.href = dataStr; link.download = `Medical_Backup_${new Date().toISOString().split('T')[0]}.json`; document.body.appendChild(link); link.click(); document.body.removeChild(link); showToast('تم تنزيل النسخة الاحتياطية', 'success');
         });
 
@@ -1287,7 +1177,7 @@
                 try {
                     const parsed = JSON.parse(e.target.result); let imported = Array.isArray(parsed) ? parsed : (parsed.records || []); const existingIds = new Set(currentRecords.map(r => r.id)); let added = 0;
                     imported.forEach(rec => { if (rec.id && !existingIds.has(rec.id)) { currentRecords.push(rec); added++; } });
-                    localStorage.setItem(STORAGE_KEY, JSON.stringify(currentRecords)); filterTable(); updateStats(); checkDuplicates(); showToast(`تم دمج واستعادة ${added} سجل بنجاح!`, 'success');
+                    localStorage.setItem(STORAGE_KEY, JSON.stringify(currentRecords)); filterTable(); updateStats(); checkDuplicates(); showToast(`تم استعادة ${added} سجل بنجاح!`, 'success');
                 } catch(err) { showToast('ملف غير صالح', 'error'); } event.target.value = '';
             }; reader.readAsText(file);
         });
@@ -1296,19 +1186,17 @@
             if(currentRecords.length === 0) return showToast('لا توجد بيانات للتصدير', 'error');
             let csv = '\uFEFFDateTime,Validity,ExpiryDate,Status,ID,Patient Name,Age,Gender,Clinic,Report URL\n'; const now = Date.now();
             currentRecords.forEach(r => { const status = now > r.expiresAt ? 'Expired' : 'Active'; csv += `"${new Date(r.createdAt).toLocaleString('en-GB')}","${r.validityText || ''}","${new Date(r.expiresAt).toLocaleString('en-GB')}",${status},${r.patientId},"${(r.patientName||'').replace(/"/g, '""')}",${r.age},${r.gender},"${(r.clinic||'').replace(/"/g, '""')}","${window.getRecordUrl(r.id)}"\n`; });
-            const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' }); const link = document.createElement("a"); link.href = URL.createObjectURL(blob); link.download = `Medical_Records_${new Date().toISOString().split('T')[0]}.csv`; document.body.appendChild(link); link.click(); document.body.removeChild(link); showToast('تم تحميل الإكسيل بنجاح', 'success');
+            const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' }); const link = document.createElement("a"); link.href = URL.createObjectURL(blob); link.download = `Medical_Records_${new Date().toISOString().split('T')[0]}.csv`; document.body.appendChild(link); link.click(); document.body.removeChild(link); showToast('تم تحميل ملف الإكسيل', 'success');
         });
 
-        document.getElementById('clear-db-btn').addEventListener('click', () => { if (currentRecords.length === 0) return showToast('قاعدة البيانات فارغة!', 'info'); document.getElementById('clear-all-modal').classList.remove('hidden'); });
+        document.getElementById('clear-db-btn').addEventListener('click', () => { if (currentRecords.length === 0) return showToast('قاعدة البيانات فارغة!', 'info'); document.getElementById('clear-all-modal').classList.add('flex'); document.getElementById('clear-all-modal').classList.remove('hidden'); });
         document.getElementById('cancel-clear-btn').addEventListener('click', () => document.getElementById('clear-all-modal').classList.add('hidden'));
         document.getElementById('confirm-clear-btn').addEventListener('click', () => { 
             currentRecords = []; 
             localStorage.setItem(STORAGE_KEY, JSON.stringify(currentRecords)); 
             OLD_STORAGE_KEYS.forEach(k => localStorage.removeItem(k));
             document.getElementById('clear-all-modal').classList.add('hidden'); 
-            filterTable(); 
-            updateStats(); 
-            checkDuplicates(); 
+            filterTable(); updateStats(); checkDuplicates(); 
             showToast('تم مسح جميع السجلات بنجاح', 'success'); 
         });
 
