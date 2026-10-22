@@ -164,25 +164,14 @@
                                         <option value="30">30 يوماً</option>
                                         <option value="7">7 أيام</option>
                                     </select>
-                                </div>
-                                <div>
-                                    <label class="block text-[11px] font-bold text-gray-600 mb-1">الجنس (للجميع)</label>
-                                    <select id="input-global-gender" required class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 outline-none bg-white text-sm font-bold english-ui cursor-pointer" dir="ltr">
-                                        <option value="Male">Male</option>
-                                        <option value="Female">Female</option>
-                                    </select>
-                                </div>
-                            </div>
-                        </div>
-
-                        <!-- أداة استيراد بيانات المرضى من ملف Excel (الميزة الجديدة) -->
-                        <div id="excel-batch-import-box" class="bg-emerald-50/70 p-3 rounded-xl border border-emerald-200 flex flex-col gap-2 shadow-sm">
+                        <!-- أداة استيراد بيانات المرضى من ملف Excel + الربط التلقائي للـ PDF -->
+                        <div id="excel-batch-import-box" class="bg-emerald-50/70 p-3 rounded-xl border border-emerald-200 flex flex-col gap-2.5 shadow-sm">
                             <div class="flex items-center justify-between">
                                 <div class="flex items-center gap-2">
                                     <i class="fa-solid fa-file-excel text-emerald-600 text-base"></i>
                                     <div>
                                         <p class="text-xs font-bold text-emerald-950 leading-tight">تعبئة تلقائية من إكسيل</p>
-                                        <p class="text-[10px] text-emerald-700">الهوية، الاسم، العمر، رابط Drive (يبقى الـ PDF يدوياً)</p>
+                                        <p class="text-[10px] text-emerald-700">استيراد البيانات + ربط ملفات PDF دفعة واحدة</p>
                                     </div>
                                 </div>
                                 <div class="flex items-center gap-1.5">
@@ -190,10 +179,21 @@
                                         <i class="fa-solid fa-download"></i> نموذج
                                     </button>
                                     <label for="batch-excel-input" class="bg-emerald-600 hover:bg-emerald-700 text-white px-3 py-1.5 rounded-lg text-xs font-bold transition-colors cursor-pointer shadow-sm flex items-center gap-1.5">
-                                        <i class="fa-solid fa-file-import"></i> استيراد إكسيل
+                                        <i class="fa-solid fa-file-import"></i> 1. استيراد إكسيل
                                     </label>
                                     <input type="file" id="batch-excel-input" accept=".xlsx, .xls, .csv" class="hidden">
                                 </div>
+                            </div>
+                            <!-- زر الربط الجماعي الذكي لملفات الـ PDF -->
+                            <div class="pt-2 border-t border-emerald-200/60 flex items-center justify-between gap-2">
+                                <div class="flex items-center gap-1.5 text-[10px] text-emerald-800 font-bold">
+                                    <i class="fa-solid fa-wand-magic-sparkles text-amber-500"></i>
+                                    <span>ارفع كل ملفات الـ PDF معاً ليتم توزيعها تلقائياً حسب رقم الهوية أو الاسم:</span>
+                                </div>
+                                <label for="batch-pdf-input" class="bg-gray-900 hover:bg-gray-800 text-white px-3 py-1.5 rounded-lg text-[11px] font-bold transition-colors cursor-pointer shadow-sm flex items-center gap-1.5 whitespace-nowrap">
+                                    <i class="fa-solid fa-file-pdf text-red-400"></i> 2. ربط PDF جماعي
+                                </label>
+                                <input type="file" id="batch-pdf-input" accept=".pdf" multiple class="hidden">
                             </div>
                         </div>
 
@@ -403,7 +403,8 @@
             modalQRContainer: document.getElementById('modal-qrcode-container'), printQRContainer: document.getElementById('print-qr-container'), cSuccess: document.getElementById('client-success-view'),
             cError: document.getElementById('client-error-view'), selectAll: document.getElementById('select-all'), exportSelectedContainer: document.getElementById('export-selected-container'),
             btnExportSelected: document.getElementById('export-selected-btn'), btnPrintSelected: document.getElementById('print-selected-btn'), selectedCount: document.getElementById('selected-count'),
-            excelBatchBox: document.getElementById('excel-batch-import-box'), batchExcelInput: document.getElementById('batch-excel-input'), downloadExcelTemplateBtn: document.getElementById('download-excel-template-btn')
+            excelBatchBox: document.getElementById('excel-batch-import-box'), batchExcelInput: document.getElementById('batch-excel-input'), downloadExcelTemplateBtn: document.getElementById('download-excel-template-btn'),
+            batchPdfInput: document.getElementById('batch-pdf-input')
         };
 
         // دمج السجلات القديمة لمرة واحدة ثم تنظيف المفاتيح القديمة حتى لا تعود البيانات بعد التصفير أو الحذف
@@ -514,21 +515,100 @@
             }
         }
 
-        // تحديث شارة حالة ملف الـ PDF عند اختياره يدوياً
-        window.handlePdfFileChange = (inputEl) => {
+        // تحديث شارة حالة ملف الـ PDF عند اختياره يدوياً أو تلقائياً
+        window.handlePdfFileChange = (inputEl, isAutoMatched = false) => {
             const card = inputEl.closest('.request-card');
             if (!card) return;
-            const badge = card.querySelector('.excel-status-badge');
+            let badge = card.querySelector('.excel-status-badge');
+            const hasFile = (inputEl.files && inputEl.files.length > 0) || card._attachedPdfFile;
+
+            // إنشاء شارة إذا لم تكن موجودة (مثلاً عند الإضافة اليدوية ثم استخدام الربط الجماعي)
+            if (!badge && hasFile) {
+                const headerDiv = card.querySelector('.req-badge-num')?.parentElement;
+                if (headerDiv) {
+                    badge = document.createElement('span');
+                    headerDiv.appendChild(badge);
+                }
+            }
+
             if (badge) {
-                if (inputEl.files && inputEl.files.length > 0) {
+                if (hasFile) {
+                    const fileName = card._attachedPdfFile ? card._attachedPdfFile.name : inputEl.files[0].name;
                     badge.className = 'excel-status-badge bg-emerald-100 text-emerald-800 text-[10px] font-bold px-2 py-0.5 rounded-full border border-emerald-300 flex items-center gap-1';
-                    badge.innerHTML = '<i class="fa-solid fa-check-circle text-emerald-600"></i> تم إرفاق الـ PDF';
+                    badge.innerHTML = `<i class="fa-solid fa-check-circle text-emerald-600"></i> ${isAutoMatched ? 'تم الربط تلقائياً' : 'تم إرفاق الـ PDF'} (${escapeAttr(fileName)})`;
                 } else {
                     badge.className = 'excel-status-badge bg-amber-50 text-amber-800 text-[10px] font-bold px-2 py-0.5 rounded-full border border-amber-200 flex items-center gap-1';
                     badge.innerHTML = '<i class="fa-solid fa-file-excel text-emerald-600"></i> مستورد - بانتظار رفع PDF';
                 }
             }
         };
+
+        // ================= ميزة الربط الجماعي التلقائي لملفات الـ PDF =================
+        DOM.batchPdfInput?.addEventListener('change', (e) => {
+            const files = Array.from(e.target.files || []);
+            if (files.length === 0) return;
+
+            const cards = Array.from(DOM.reqContainer.querySelectorAll('.request-card'));
+            if (cards.length === 0) {
+                showToast('يرجى استيراد ملف الإكسيل أو إضافة المرضى أولاً', 'error');
+                e.target.value = '';
+                return;
+            }
+
+            let matchedCount = 0;
+            const unmatchedFiles = [];
+
+            // دالة لتنظيف النصوص للمقارنة الذكية (إزالة المسافات الزائدة والرموز وامتداد .pdf)
+            const normalizeStr = (str) => String(str || '').toLowerCase().replace(/\.pdf$/i, '').replace(/[_\-\s]+/g, ' ').trim();
+
+            files.forEach(file => {
+                const cleanFileName = normalizeStr(file.name);
+                const compactFileName = cleanFileName.replace(/\s+/g, '');
+
+                // البحث عن بطاقة المريض المطابقة لاسم الملف (سواء برقم الهوية أو باسم المريض)
+                let matchedCard = cards.find(card => {
+                    const pId = card.querySelector('.req-id')?.value.trim();
+                    const pName = normalizeStr(card.querySelector('.req-name')?.value);
+                    
+                    // 1. مطابقة برقم الهوية (الأدق والأسرع)
+                    if (pId && pId.length >= 4 && compactFileName.includes(pId.toLowerCase())) {
+                        return true;
+                    }
+                    // 2. مطابقة باسم المريض الكامل
+                    if (pName && pName.length >= 3 && (cleanFileName.includes(pName) || pName.includes(cleanFileName))) {
+                        return true;
+                    }
+                    return false;
+                });
+
+                if (matchedCard) {
+                    const pdfInput = matchedCard.querySelector('.req-pdf');
+                    // حفظ الملف برمجياً على البطاقة وتعيينه داخل حقل input type="file" عبر DataTransfer
+                    matchedCard._attachedPdfFile = file;
+                    try {
+                        const dt = new DataTransfer();
+                        dt.items.add(file);
+                        pdfInput.files = dt.files;
+                        pdfInput.removeAttribute('required');
+                    } catch (err) {
+                        pdfInput.removeAttribute('required');
+                    }
+                    window.handlePdfFileChange(pdfInput, true);
+                    matchedCount++;
+                } else {
+                    unmatchedFiles.push(file.name);
+                }
+            });
+
+            if (matchedCount > 0) {
+                showToast(`تم ربط (${matchedCount}) ملف PDF ببطاقات المرضى تلقائياً!`, 'success');
+            }
+            if (unmatchedFiles.length > 0) {
+                showToast(`تعذر مطابقة (${unmatchedFiles.length}) ملف تلقائياً، يرجى التأكد أن اسم الملف يحتوي على رقم الهوية أو الاسم.`, 'error');
+            }
+
+            e.target.value = '';
+        });
 
         // ================= ميزة استيراد ملف الإكسيل للإضافة السريعة (Batch) =================
         
@@ -668,7 +748,7 @@
                         addRequestBlock(patientData, true);
                     });
 
-                    showToast(`تم استيراد (${extractedPatients.length}) مريض بنجاح! يرجى إرفاق ملفات الـ PDF يدوياً.`, 'success');
+                    showToast(`تم استيراد (${extractedPatients.length}) مريض بنجاح! يمكنك الآن استخدام زر "ربط PDF جماعي" أو إرفاقها يدوياً.`, 'success');
                 } catch (err) {
                     console.error("Excel Import Error:", err);
                     showToast('حدث خطأ أثناء قراءة ملف الإكسيل، تأكد من سلامة الملف.', 'error');
@@ -915,6 +995,7 @@
                 const newPatientId = card.querySelector('.req-id').value.trim(); 
                 const patientName = card.querySelector('.req-name').value.trim(); 
                 const pdfInput = card.querySelector('.req-pdf');
+                const selectedPdfFile = (pdfInput.files && pdfInput.files.length > 0) ? pdfInput.files[0] : card._attachedPdfFile;
                 
                 if (currentRecords.some(r => r.patientId === newPatientId && r.id !== editId)) { 
                     showToast(`تخطي: الهوية (${newPatientId}) مسجلة مسبقاً!`, 'error'); 
@@ -930,9 +1011,9 @@
                 const payload = { id: docId, clinic: clinic, patientId: newPatientId, patientName: patientName, age: card.querySelector('.req-age').value.trim(), gender: globalGender, fileUrl: card.querySelector('.req-url').value.trim(), validityText: validityText, createdAt: now, expiresAt: now + (validityDays * 24 * 60 * 60 * 1000) };
                 const qrUrl = window.getRecordUrlFromPayload(payload);
 
-                if (pdfInput.files && pdfInput.files.length > 0) {
+                if (selectedPdfFile) {
                     showToast(`دمج وتنزيل ملف: ${patientName}...`, 'info');
-                    if (!await processPDF(pdfInput.files[0], qrUrl, payload.patientId)) {
+                    if (!await processPDF(selectedPdfFile, qrUrl, payload.patientId)) {
                         showToast(`فشل الدمج: ${patientName}`, 'error');
                         card.classList.replace('border-r-emerald-500', 'border-r-red-500');
                         skippedCards.push(card);
