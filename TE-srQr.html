@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>نظام التقارير الطبية - النسخة المدمجة والمستقرة V9</title>
+    <title>نظام التقارير الطبية  V9</title>
     
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Tajawal:wght@500;700;800&display=swap" rel="stylesheet">
@@ -376,7 +376,7 @@
     <!-- Hidden Print Area -->
     <div id="print-card-area">
         <div style="display: flex; align-items: center; justify-content: center; gap: 8px; margin-bottom: 5px;">
-            <img src="Blue.png" alt="Logo" style="height: 28px; object-fit: contain; filter: brightness(0) invert(1);" onerror="this.style.display='none'">
+            <img src="Blue.png" alt="Logo" style="height: 28px; object-fit: contain;" onerror="this.style.display='none'">
             <h3 id="print-clinic-name" style="margin: 0; font-size: 13px;">Clinic Name</h3>
         </div>
         <p style="font-size: 10px; margin: 0 0 2px 0;">Name: <span id="print-patient-name" style="font-weight: bold;"></span></p>
@@ -452,7 +452,12 @@
         let rowsPerPage = 20; 
         let fpInstance;
 
-        function addRequestBlock(data = null) {
+        function escapeAttr(str) {
+            if (!str) return '';
+            return String(str).replace(/&/g, '&amp;').replace(/"/g, '&quot;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+        }
+
+        function addRequestBlock(data = null, skipScroll = false) {
             requestCount++;
             const block = document.createElement('div');
             block.className = 'request-card bg-white border border-gray-200 rounded-xl p-4 relative shadow-sm border-r-4 border-r-emerald-500 transition-all';
@@ -464,11 +469,11 @@
 
             // في حال كان الإدخال جديداً أو مستورداً من الإكسيل، يبقى رفع ملف PDF إلزامياً يدوياً، بينما في وضع التعديل يكون اختيارياً
             const isPdfRequired = !isEditMode;
-            const excelBadge = (data && data.fromExcel) ? `<span class="bg-emerald-100 text-emerald-800 text-[10px] font-bold px-2 py-0.5 rounded-full border border-emerald-200 flex items-center gap-1"><i class="fa-solid fa-file-excel text-emerald-600"></i> مستورد - بانتظار رفع PDF</span>` : '';
+            const excelBadge = (data && data.fromExcel) ? `<span class="excel-status-badge bg-amber-50 text-amber-800 text-[10px] font-bold px-2 py-0.5 rounded-full border border-amber-200 flex items-center gap-1"><i class="fa-solid fa-file-excel text-emerald-600"></i> مستورد - بانتظار رفع PDF</span>` : '';
 
             block.innerHTML = `
                 <div class="flex justify-between items-center mb-3 border-b border-gray-100 pb-2">
-                    <div class="flex items-center gap-2">
+                    <div class="flex items-center gap-2 flex-wrap">
                         <span class="req-badge-num bg-gray-100 text-gray-700 text-[11px] font-bold px-2 py-1 rounded shadow-sm">المريض #${requestCount}</span>
                         ${excelBadge}
                     </div>
@@ -477,34 +482,53 @@
                 <div class="grid grid-cols-12 gap-3">
                     <div class="col-span-12 sm:col-span-7">
                         <label class="block text-[11px] font-bold text-gray-700 mb-1">اسم المريض الكامل <span class="text-red-500">*</span></label>
-                        <input type="text" class="req-name w-full px-3 py-2 border border-gray-200 rounded-lg outline-none bg-gray-50 text-sm focus:ring-2 focus:ring-emerald-500 uppercase transition-all" placeholder="e.g. AHMAD ALI" dir="ltr" required value="${data ? (data.patientName || '') : ''}">
+                        <input type="text" class="req-name w-full px-3 py-2 border border-gray-200 rounded-lg outline-none bg-gray-50 text-sm focus:ring-2 focus:ring-emerald-500 uppercase transition-all" placeholder="e.g. AHMAD ALI" dir="ltr" required value="${data ? escapeAttr(data.patientName) : ''}">
                     </div>
                     <div class="col-span-12 sm:col-span-5">
                         <label class="block text-[11px] font-bold text-gray-700 mb-1">رقم الإقامة / الهوية <span class="text-red-500">*</span></label>
-                        <input type="text" class="req-id w-full px-3 py-2 border border-gray-200 rounded-lg outline-none bg-gray-50 text-sm font-mono focus:ring-2 focus:ring-emerald-500 transition-all" placeholder="e.g. 10xxxxxxxx" dir="ltr" required value="${data ? (data.patientId || '') : ''}">
+                        <input type="text" class="req-id w-full px-3 py-2 border border-gray-200 rounded-lg outline-none bg-gray-50 text-sm font-mono focus:ring-2 focus:ring-emerald-500 transition-all" placeholder="e.g. 10xxxxxxxx" dir="ltr" required value="${data ? escapeAttr(data.patientId) : ''}">
                     </div>
                     <div class="col-span-4 sm:col-span-3">
                         <label class="block text-[11px] font-bold text-gray-700 mb-1">العمر <span class="text-red-500">*</span></label>
-                        <input type="text" class="req-age w-full px-3 py-2 border border-gray-200 rounded-lg outline-none text-sm focus:ring-2 focus:ring-emerald-500 transition-all" placeholder="30 Y" dir="ltr" required value="${data ? (data.age || '') : ''}">
+                        <input type="text" class="req-age w-full px-3 py-2 border border-gray-200 rounded-lg outline-none text-sm focus:ring-2 focus:ring-emerald-500 transition-all" placeholder="30 Y" dir="ltr" required value="${data ? escapeAttr(data.age) : ''}">
                     </div>
                     <div class="col-span-8 sm:col-span-9">
                         <label class="block text-[11px] font-bold text-gray-700 mb-1">رابط Google Drive <span class="text-red-500">*</span></label>
-                        <input type="url" class="req-url w-full px-3 py-2 border border-gray-200 rounded-lg outline-none text-xs focus:ring-2 focus:ring-emerald-500 transition-all" placeholder="https://drive.google.com/..." dir="ltr" required value="${data ? (data.fileUrl || '') : ''}">
+                        <input type="url" class="req-url w-full px-3 py-2 border border-gray-200 rounded-lg outline-none text-xs focus:ring-2 focus:ring-emerald-500 transition-all" placeholder="https://drive.google.com/..." dir="ltr" required value="${data ? escapeAttr(data.fileUrl) : ''}">
                     </div>
                     <div class="col-span-12 bg-emerald-50/50 border border-emerald-100 rounded-lg p-2 mt-1 relative group hover:bg-emerald-50 transition-colors flex flex-col sm:flex-row sm:items-center justify-between gap-2">
                         <label class="text-[11px] font-bold text-emerald-800 flex items-center gap-1.5 whitespace-nowrap"><i class="fa-solid fa-file-pdf text-red-500"></i> دمج الـ QR في PDF ${isPdfRequired ? '<span class="text-red-500">*</span>' : ''}</label>
-                        <input type="file" accept=".pdf" ${isPdfRequired ? 'required' : ''} class="req-pdf w-full sm:w-auto flex-1 text-[10px] text-gray-700 file:mr-2 file:py-1 file:px-3 file:rounded-md file:border-0 file:text-[10px] file:font-bold file:bg-emerald-600 file:text-white hover:file:bg-emerald-700 bg-white border border-emerald-200 rounded-md p-1 cursor-pointer transition-all" onkeydown="handleEnterKey(event)">
+                        <input type="file" accept=".pdf" ${isPdfRequired ? 'required' : ''} onchange="handlePdfFileChange(this)" class="req-pdf w-full sm:w-auto flex-1 text-[10px] text-gray-700 file:mr-2 file:py-1 file:px-3 file:rounded-md file:border-0 file:text-[10px] file:font-bold file:bg-emerald-600 file:text-white hover:file:bg-emerald-700 bg-white border border-emerald-200 rounded-md p-1 cursor-pointer transition-all" onkeydown="handleEnterKey(event)">
                     </div>
                 </div>
             `;
             DOM.reqContainer.appendChild(block);
             updateBatchCounter();
-            setTimeout(() => block.scrollIntoView({ behavior: 'smooth', block: 'end' }), 50);
             
-            if(!data && requestCount > 1) {
+            if (!skipScroll) {
+                setTimeout(() => block.scrollIntoView({ behavior: 'smooth', block: 'end' }), 50);
+            }
+            
+            if(!data && requestCount > 1 && !skipScroll) {
                 block.querySelector('.req-name').focus();
             }
         }
+
+        // تحديث شارة حالة ملف الـ PDF عند اختياره يدوياً
+        window.handlePdfFileChange = (inputEl) => {
+            const card = inputEl.closest('.request-card');
+            if (!card) return;
+            const badge = card.querySelector('.excel-status-badge');
+            if (badge) {
+                if (inputEl.files && inputEl.files.length > 0) {
+                    badge.className = 'excel-status-badge bg-emerald-100 text-emerald-800 text-[10px] font-bold px-2 py-0.5 rounded-full border border-emerald-300 flex items-center gap-1';
+                    badge.innerHTML = '<i class="fa-solid fa-check-circle text-emerald-600"></i> تم إرفاق الـ PDF';
+                } else {
+                    badge.className = 'excel-status-badge bg-amber-50 text-amber-800 text-[10px] font-bold px-2 py-0.5 rounded-full border border-amber-200 flex items-center gap-1';
+                    badge.innerHTML = '<i class="fa-solid fa-file-excel text-emerald-600"></i> مستورد - بانتظار رفع PDF';
+                }
+            }
+        };
 
         // ================= ميزة استيراد ملف الإكسيل للإضافة السريعة (Batch) =================
         
@@ -598,7 +622,12 @@
                         const pId = row[idIdx] !== undefined ? String(row[idIdx]).trim() : "";
                         const pName = row[nameIdx] !== undefined ? String(row[nameIdx]).trim() : "";
                         const pAge = row[ageIdx] !== undefined ? String(row[ageIdx]).trim() : "";
-                        const pUrl = row[urlIdx] !== undefined ? String(row[urlIdx]).trim() : "";
+                        let pUrl = row[urlIdx] !== undefined ? String(row[urlIdx]).trim() : "";
+
+                        // تصحيح الرابط تلقائياً إذا كان بدون بروتوكول https:// لكي لا يرفضه حقل type="url"
+                        if (pUrl && !/^https?:\/\//i.test(pUrl)) {
+                            pUrl = 'https://' + pUrl;
+                        }
 
                         // تخطي الصف إذا كان لا يحتوي على اسم ولا رقم هوية
                         if (!pId && !pName) continue;
@@ -621,19 +650,22 @@
                     const existingCards = DOM.reqContainer.querySelectorAll('.request-card');
                     if (existingCards.length === 1) {
                         const firstCard = existingCards[0];
+                        const pdfInput = firstCard.querySelector('.req-pdf');
+                        const hasPdf = pdfInput && pdfInput.files && pdfInput.files.length > 0;
                         const isEmptyCard = !firstCard.querySelector('.req-name').value.trim() &&
                                             !firstCard.querySelector('.req-id').value.trim() &&
                                             !firstCard.querySelector('.req-age').value.trim() &&
-                                            !firstCard.querySelector('.req-url').value.trim();
+                                            !firstCard.querySelector('.req-url').value.trim() &&
+                                            !hasPdf;
                         if (isEmptyCard) {
                             DOM.reqContainer.innerHTML = '';
                             requestCount = 0;
                         }
                     }
 
-                    // إنشاء بطاقات الإضافة السريعة لكل مريض في الإكسيل
+                    // إنشاء بطاقات الإضافة السريعة لكل مريض في الإكسيل بدون تكرار التمرير المزعج
                     extractedPatients.forEach(patientData => {
-                        addRequestBlock(patientData);
+                        addRequestBlock(patientData, true);
                     });
 
                     showToast(`تم استيراد (${extractedPatients.length}) مريض بنجاح! يرجى إرفاق ملفات الـ PDF يدوياً.`, 'success');
@@ -829,9 +861,10 @@
 
         function renderTable() {
             DOM.tbody.innerHTML = '';
+            if (DOM.selectAll) DOM.selectAll.checked = false;
             const noData = document.getElementById('no-records-msg');
             if(filteredRecords.length === 0) {
-                noData.classList.remove('hidden'); if(DOM.selectAll) DOM.selectAll.checked = false; toggleExportSelectedBtn(); renderPagination(0); return;
+                noData.classList.remove('hidden'); toggleExportSelectedBtn(); renderPagination(0); return;
             }
             noData.classList.add('hidden'); const now = Date.now();
             let recordsToDisplay = rowsPerPage !== 'all' ? filteredRecords.slice((currentPage - 1) * rowsPerPage, (currentPage - 1) * rowsPerPage + rowsPerPage) : filteredRecords;
@@ -859,6 +892,7 @@
                 `;
                 DOM.tbody.appendChild(tr);
             });
+            toggleExportSelectedBtn();
             renderPagination(filteredRecords.length);
         }
 
@@ -872,7 +906,9 @@
 
             const oldBtnHTML = DOM.btnSubmit.innerHTML; DOM.btnSubmit.innerHTML = `<i class="fa-solid fa-spinner fa-spin"></i> جاري التنفيذ...`; DOM.btnSubmit.disabled = true;
 
-            let successCount = 0; let lastGeneratedId = null;
+            let successCount = 0; 
+            let skippedCards = [];
+            let lastGeneratedId = null;
 
             for (let i = 0; i < cards.length; i++) {
                 const card = cards[i]; 
@@ -882,10 +918,13 @@
                 
                 if (currentRecords.some(r => r.patientId === newPatientId && r.id !== editId)) { 
                     showToast(`تخطي: الهوية (${newPatientId}) مسجلة مسبقاً!`, 'error'); 
+                    card.classList.replace('border-r-emerald-500', 'border-r-red-500');
+                    card.classList.add('bg-red-50/30');
+                    skippedCards.push(card);
                     continue; 
                 }
 
-                const docId = editId || (crypto.randomUUID ? crypto.randomUUID() : 'id_' + Date.now() + i); 
+                const docId = editId || (crypto.randomUUID ? crypto.randomUUID() : 'id_' + Date.now() + '_' + i); 
                 const now = editId ? currentRecords.find(r => r.id === editId).createdAt : Date.now();
 
                 const payload = { id: docId, clinic: clinic, patientId: newPatientId, patientName: patientName, age: card.querySelector('.req-age').value.trim(), gender: globalGender, fileUrl: card.querySelector('.req-url').value.trim(), validityText: validityText, createdAt: now, expiresAt: now + (validityDays * 24 * 60 * 60 * 1000) };
@@ -893,7 +932,12 @@
 
                 if (pdfInput.files && pdfInput.files.length > 0) {
                     showToast(`دمج وتنزيل ملف: ${patientName}...`, 'info');
-                    if (!await processPDF(pdfInput.files[0], qrUrl, payload.patientId)) showToast(`فشل الدمج: ${patientName}`, 'error');
+                    if (!await processPDF(pdfInput.files[0], qrUrl, payload.patientId)) {
+                        showToast(`فشل الدمج: ${patientName}`, 'error');
+                        card.classList.replace('border-r-emerald-500', 'border-r-red-500');
+                        skippedCards.push(card);
+                        continue;
+                    }
                     await new Promise(res => setTimeout(res, 850)); 
                 }
 
@@ -903,16 +947,28 @@
                 } else { 
                     currentRecords.unshift(payload); 
                 }
-                successCount++; lastGeneratedId = docId;
+                successCount++; 
+                lastGeneratedId = docId;
+                // إزالة البطاقة التي نجح حفظها فقط في حال وجود بطاقات أخرى متخطاة
+                card.dataset.saved = "true";
             }
 
             if (successCount > 0) { 
                 localStorage.setItem(STORAGE_KEY, JSON.stringify(currentRecords)); 
-                showToast(editId ? 'تم التعديل بنجاح' : `تم حفظ (${successCount}) سجلات`, 'success'); 
+                showToast(editId ? 'تم التعديل بنجاح' : `تم حفظ (${successCount}) سجلات بنجاح`, 'success'); 
             }
             DOM.btnSubmit.innerHTML = oldBtnHTML; DOM.btnSubmit.disabled = false;
-            resetFormState(); filterTable(); updateStats(); checkDuplicates();
-            if (successCount === 1 && lastGeneratedId) { window.viewQR(lastGeneratedId); }
+
+            // إذا لم يكن هناك بطاقات متخطاة نعيد ضبط النموذج بالكامل، وإلا نبقي البطاقات التي فيها خطأ ليصححها المستخدم بدون ضياع بياناتها
+            if (skippedCards.length === 0) {
+                resetFormState();
+            } else {
+                document.querySelectorAll('.request-card[data-saved="true"]').forEach(c => c.remove());
+                updateBatchCounter();
+            }
+
+            filterTable(); updateStats(); checkDuplicates();
+            if (successCount === 1 && skippedCards.length === 0 && lastGeneratedId) { window.viewQR(lastGeneratedId); }
         });
 
         function resetFormState() {
@@ -1002,23 +1058,34 @@
             const blob = new Blob([text], { type: 'text/plain;charset=utf-8;' }); const link = document.createElement("a"); link.href = URL.createObjectURL(blob); link.download = `QR_Links_${new Date().getTime()}.txt`; document.body.appendChild(link); link.click(); document.body.removeChild(link); showToast('تم تحميل الروابط بنجاح', 'success');
         });
 
-        DOM.btnPrintSelected?.addEventListener('click', () => {
+        DOM.btnPrintSelected?.addEventListener('click', async () => {
             const checkedBoxes = document.querySelectorAll('.row-checkbox:checked'); if (checkedBoxes.length === 0) return;
             let printWindow = window.open('', '_blank');
+            if (!printWindow) {
+                return showToast('يرجى السماح بالنوافذ المنبثقة (Pop-ups) للطباعة', 'error');
+            }
+            showToast('جاري تجهيز البطاقات للطباعة...', 'info');
             let printContent = `
                 <html lang="ar" dir="ltr"><head><title>طباعة بطاقات المرضى المحددين</title><style>
                         body { font-family: Arial, sans-serif; display: flex; flex-wrap: wrap; gap: 20px; padding: 20px; background: white; }
                         .card { width: 8.5cm; height: 5.4cm; border: 2px solid #000; border-radius: 8px; padding: 10px; text-align: center; box-sizing: border-box; page-break-inside: avoid; }
-                        .card img { width: 85px; height: 85px; margin: 0 auto; display: block; }
+                        .card img { width: 85px; height: 85px; margin: 4px auto 0 auto; display: block; }
                         .card h3 { margin: 0 0 5px 0; font-size: 13px; } .card p { margin: 0 0 3px 0; font-size: 10px; color: #333; }
                         @media print { body { margin: 0; padding: 0; display: block; } .card { margin: 0 auto 20px auto; page-break-after: always; } .card:last-child { page-break-after: auto; } }
                     </style></head><body>
             `;
-            checkedBoxes.forEach(cb => {
+            for (const cb of checkedBoxes) {
                 const rec = currentRecords.find(r => r.id === cb.value);
-                if (rec) { printContent += `<div class="card"><h3>${rec.clinic}</h3><p>Name: <b>${rec.patientName}</b></p><p>ID: <b>${rec.patientId}</b> | Age: <b>${rec.age}</b></p><img src="https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=${encodeURIComponent(window.getRecordUrl(rec.id))}" alt="QR Code"><p style="margin-top:5px; font-weight: bold; font-size: 8px;">Scan to Verify Report</p></div>`; }
-            });
-            printContent += `</body></html>`; printWindow.document.write(printContent); printWindow.document.close(); setTimeout(() => { printWindow.print(); }, 1000);
+                if (rec) {
+                    const qrBase64 = await getQrBase64(window.getRecordUrl(rec.id));
+                    const qrImgTag = qrBase64 ? `<img src="${qrBase64}" alt="QR Code">` : `<p style="color:red;font-size:9px;">خطأ في توليد الرمز</p>`;
+                    printContent += `<div class="card"><h3>${escapeAttr(rec.clinic)}</h3><p>Name: <b>${escapeAttr(rec.patientName)}</b></p><p>ID: <b>${escapeAttr(rec.patientId)}</b> | Age: <b>${escapeAttr(rec.age)}</b></p>${qrImgTag}<p style="margin-top:4px; font-weight: bold; font-size: 8px;">Scan to Verify Report</p></div>`;
+                }
+            }
+            printContent += `</body></html>`; 
+            printWindow.document.write(printContent); 
+            printWindow.document.close(); 
+            setTimeout(() => { printWindow.focus(); printWindow.print(); }, 350);
         });
 
         document.getElementById('card-duplicates')?.addEventListener('click', () => {
