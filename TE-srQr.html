@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>نظام التقارير الطبية -  V10</title>
+    <title>نظام التقارير الطبية -   V10</title>
     
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Tajawal:wght@500;700;800&display=swap" rel="stylesheet">
@@ -92,7 +92,7 @@
                     <div><h2 class="text-xl font-bold text-gray-800 hidden sm:block">نظام التقارير الذكي V10</h2></div>
                 </div>
                 <div class="flex items-center gap-2 flex-wrap justify-center">
-                    <button id="open-settings-btn" class="bg-emerald-50 hover:bg-emerald-100 text-emerald-700 px-3.5 py-2.5 rounded-xl font-bold transition-colors text-sm flex items-center gap-2 border border-emerald-200" title="إعدادات مكان وحجم QR والربط">
+                    <button id="open-settings-btn" class="bg-emerald-50 hover:bg-emerald-100 text-emerald-700 px-3.5 py-2.5 rounded-xl font-bold transition-colors text-sm flex items-center gap-2 border border-emerald-200" title="إعدادات مكان وحجم QR">
                         <i class="fa-solid fa-gear"></i> إعدادات الـ QR والربط
                     </button>
                     <button id="export-backup-btn" class="bg-blue-50 hover:bg-blue-100 text-blue-700 px-3.5 py-2.5 rounded-xl font-bold transition-colors text-sm flex items-center gap-2 border border-blue-200" title="تنزيل نسخة احتياطية">
@@ -363,12 +363,12 @@
         </div>
     </div>
 
-    <!-- نافذة إعدادات الـ QR ومكان وحجم QR والربط السحابي -->
+    <!-- نافذة إعدادات الـ QR ومكان وحجم الـ QR -->
     <div id="settings-modal" class="hidden fixed inset-0 z-[70] flex items-center justify-center bg-gray-900/60 backdrop-blur-sm admin-ui">
         <div class="bg-white p-6 rounded-2xl shadow-2xl w-[95%] max-w-lg text-right border border-gray-100 relative max-h-[90vh] overflow-y-auto custom-scrollbar">
             <div class="flex justify-between items-center mb-4 border-b border-gray-100 pb-3">
                 <h3 class="text-lg font-bold text-gray-800 flex items-center gap-2">
-                    <i class="fa-solid fa-gear text-emerald-600"></i> إعدادات مكان وحجم QR والربط السحابي
+                    <i class="fa-solid fa-gear text-emerald-600"></i> إعدادات مكان وحجم رمز الـ QR
                 </h3>
                 <button type="button" id="close-settings-btn" class="text-gray-400 hover:text-gray-600 w-8 h-8 flex items-center justify-center rounded-lg hover:bg-gray-100"><i class="fa-solid fa-xmark text-lg"></i></button>
             </div>
@@ -397,20 +397,13 @@
                     </select>
                 </div>
 
-                <!-- رابط مجلد Google Drive -->
-                <div class="bg-emerald-50/70 p-3.5 rounded-xl border border-emerald-200 space-y-2">
-                    <label class="block font-bold text-emerald-950">رابط مجلد Google Drive (لحفظ ملفات PDF المرفوعة):</label>
-                    <input type="url" id="set-drive-folder" class="w-full px-3 py-2 border border-emerald-300 rounded-lg bg-white font-mono text-xs outline-none focus:ring-2 focus:ring-emerald-500" placeholder="https://drive.google.com/drive/folders/..." dir="ltr">
-                    <p class="text-[10px] text-emerald-800 leading-relaxed">عند إرفاق ملف PDF للدمج، سيتم حفظه واستخدام رابطه مباشرة دون الحاجة لإدخال رابط يدوياً.</p>
-                </div>
-
-                <!-- خيار QR الثابت والديناميكي للتعديل لاحقاً -->
+                <!-- خيار QR الديناميكي للتعديل لاحقاً -->
                 <div class="bg-blue-50/70 p-3.5 rounded-xl border border-blue-200 space-y-2">
                     <div class="flex items-center justify-between">
                         <span class="font-bold text-blue-950">تفعيل روابط QR ثابتة (ديناميكية للتعديل):</span>
                         <input type="checkbox" id="set-dynamic-qr" class="w-4 h-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500 cursor-pointer" checked>
                     </div>
-                    <p class="text-[10px] text-blue-800 leading-relaxed">عند التفعيل: أي تعديل على الاسم أو العمر لاحقاً سينعكس فوراً على نفس رمز الـ QR المطبوع مسبقاً دون إعادة طباعة.</p>
+                    <p class="text-[10px] text-blue-800 leading-relaxed">عند التفعيل: لو قمت بتعديل اسم المريض أو عمره لاحقاً، سينعكس التعديل فوراً على نفس رمز الـ QR المطبوع مسبقاً دون الحاجة لإعادة طباعته.</p>
                 </div>
             </div>
 
@@ -468,7 +461,6 @@
         let appSettings = JSON.parse(localStorage.getItem(SETTINGS_KEY)) || {
             qrPosition: 'top-right',
             qrSize: 75,
-            driveFolder: '',
             dynamicQr: true
         };
 
@@ -491,7 +483,6 @@
         // ربط الإعدادات
         document.getElementById('set-qr-position').value = appSettings.qrPosition;
         document.getElementById('set-qr-size').value = appSettings.qrSize;
-        document.getElementById('set-drive-folder').value = appSettings.driveFolder || '';
         document.getElementById('set-dynamic-qr').checked = appSettings.dynamicQr;
 
         DOM.openSettingsBtn?.addEventListener('click', () => DOM.settingsModal.classList.remove('hidden'));
@@ -499,7 +490,6 @@
         DOM.saveSettingsBtn?.addEventListener('click', () => {
             appSettings.qrPosition = document.getElementById('set-qr-position').value;
             appSettings.qrSize = parseInt(document.getElementById('set-qr-size').value);
-            appSettings.driveFolder = document.getElementById('set-drive-folder').value.trim();
             appSettings.dynamicQr = document.getElementById('set-dynamic-qr').checked;
             localStorage.setItem(SETTINGS_KEY, JSON.stringify(appSettings));
             DOM.settingsModal.classList.add('hidden');
@@ -585,8 +575,8 @@
                         <input type="text" class="req-age w-full px-3 py-2 border border-gray-200 rounded-lg outline-none text-sm focus:ring-2 focus:ring-emerald-500 transition-all" placeholder="30 Y" dir="ltr" required value="${data ? escapeAttr(data.age) : ''}">
                     </div>
                     <div class="col-span-8 sm:col-span-9">
-                        <label class="block text-[11px] font-bold text-gray-700 mb-1">رابط Google Drive <span class="req-url-star ${data && data.fileUrl ? '' : 'text-red-500'}">*</span></label>
-                        <input type="url" class="req-url w-full px-3 py-2 border border-gray-200 rounded-lg outline-none text-xs focus:ring-2 focus:ring-emerald-500 transition-all" placeholder="https://drive.google.com/..." dir="ltr" ${data && data.fileUrl ? '' : 'required'} value="${data ? escapeAttr(data.fileUrl) : ''}">
+                        <label class="block text-[11px] font-bold text-gray-700 mb-1">رابط Google Drive (اختياري)</label>
+                        <input type="url" class="req-url w-full px-3 py-2 border border-gray-200 rounded-lg outline-none text-xs focus:ring-2 focus:ring-emerald-500 transition-all" placeholder="https://drive.google.com/..." dir="ltr" value="${data ? escapeAttr(data.fileUrl || 'https://drive.google.com') : 'https://drive.google.com'}">
                     </div>
                     <div class="col-span-12 bg-emerald-50/50 border border-emerald-100 rounded-lg p-2 mt-1 relative group hover:bg-emerald-50 transition-colors flex flex-col sm:flex-row sm:items-center justify-between gap-2">
                         <label class="text-[11px] font-bold text-emerald-800 flex items-center gap-1.5 whitespace-nowrap"><i class="fa-solid fa-file-pdf text-red-500"></i> دمج الـ QR في PDF</label>
@@ -599,32 +589,23 @@
             if (!skipScroll) setTimeout(() => block.scrollIntoView({ behavior: 'smooth', block: 'end' }), 50);
         }
 
-        window.handlePdfFileChange = (inputEl) => {
+        window.handlePdfFileChange = (inputEl, isAutoMatched = false) => {
             const card = inputEl.closest('.request-card');
             if (!card) return;
-            const urlInput = card.querySelector('.req-url');
-            const urlStar = card.querySelector('.req-url-star');
             let badge = card.querySelector('.excel-status-badge');
             const hasFile = (inputEl.files && inputEl.files.length > 0) || card._attachedPdfFile;
-            
-            if (hasFile) {
-                // إذا تم اختيار ملف PDF، يصبح رابط الدرايف اختيارياً ولا يلزم المستخدم بإدخاله يدوياً
-                if (urlInput) urlInput.removeAttribute('required');
-                if (urlStar) urlStar.classList.add('hidden');
-
-                const fileName = card._attachedPdfFile ? card._attachedPdfFile.name : inputEl.files[0].name;
-                if (!badge) {
-                    const headerDiv = card.querySelector('.req-badge-num')?.parentElement;
-                    if (headerDiv) { badge = document.createElement('span'); headerDiv.appendChild(badge); }
-                }
-                if (badge) {
+            if (!badge && hasFile) {
+                const headerDiv = card.querySelector('.req-badge-num')?.parentElement;
+                if (headerDiv) { badge = document.createElement('span'); headerDiv.appendChild(badge); }
+            }
+            if (badge) {
+                if (hasFile) {
+                    const fileName = card._attachedPdfFile ? card._attachedPdfFile.name : inputEl.files[0].name;
                     badge.className = 'excel-status-badge bg-emerald-100 text-emerald-800 text-[10px] font-bold px-2 py-0.5 rounded-full border border-emerald-300 flex items-center gap-1';
-                    badge.innerHTML = `<i class="fa-solid fa-check-circle text-emerald-600"></i> تم إرفاق PDF (${escapeAttr(fileName)})`;
-                }
-            } else {
-                if (urlInput && !urlInput.value.trim()) {
-                    urlInput.setAttribute('required', 'true');
-                    if (urlStar) urlStar.classList.remove('hidden');
+                    badge.innerHTML = `<i class="fa-solid fa-check-circle text-emerald-600"></i> ${isAutoMatched ? 'تم الربط تلقائياً' : 'تم إرفاق الـ PDF'} (${escapeAttr(fileName)})`;
+                } else {
+                    badge.className = 'excel-status-badge bg-amber-50 text-amber-800 text-[10px] font-bold px-2 py-0.5 rounded-full border border-amber-200 flex items-center gap-1';
+                    badge.innerHTML = '<i class="fa-solid fa-file-excel text-emerald-600"></i> مستورد - بانتظار رفع PDF';
                 }
             }
         };
@@ -653,25 +634,25 @@
                     try {
                         const dt = new DataTransfer(); dt.items.add(file); pdfInput.files = dt.files;
                     } catch (err) {}
-                    window.handlePdfFileChange(pdfInput);
+                    window.handlePdfFileChange(pdfInput, true);
                     matchedCount++;
                 } else { unmatchedFiles.push(file.name); }
             });
 
             if (matchedCount > 0) showToast(`تم ربط (${matchedCount}) ملف PDF ببطاقات المرضى تلقائياً!`, 'success');
-            if (unmatchedFiles.length > 0) showToast(`تعذر مطابقة (${unmatchedFiles.length}) ملف تلقائياً.`, 'error');
+            if (unmatchedFiles.length > 0) showToast(`تعذر مطابقة (${unmatchedFiles.length}) ملف تلقائياً بالهوية أو الاسم.`, 'error');
             e.target.value = '';
         });
 
         DOM.downloadExcelTemplateBtn?.addEventListener('click', () => {
             if (typeof XLSX === 'undefined') return showToast('مكتبة الإكسيل قيد التحميل', 'error');
             const headers = [
-                ["رقم الهوية", "الاسم", "العمر", "رابط Drive (اختياري عند رفع PDF)"],
-                ["1012345678", "AHMAD MOHAMMED ALI", "32 Y", "https://drive.google.com/file/d/example1/view"],
-                ["2098765432", "KHALID SALEM OMAR", "45 Y", "https://drive.google.com/file/d/example2/view"]
+                ["رقم الهوية", "الاسم", "العمر", "رابط Drive (اختياري)"],
+                ["1012345678", "AHMAD MOHAMMED ALI", "32 Y", "https://drive.google.com/"],
+                ["2098765432", "KHALID SALEM OMAR", "45 Y", "https://drive.google.com/"]
             ];
             const ws = XLSX.utils.aoa_to_sheet(headers);
-            ws['!cols'] = [{ wch: 16 }, { wch: 28 }, { wch: 10 }, { wch: 45 }];
+            ws['!cols'] = [{ wch: 16 }, { wch: 28 }, { wch: 10 }, { wch: 30 }];
             const wb = XLSX.utils.book_new(); XLSX.utils.book_append_sheet(wb, ws, "Patients_Batch");
             XLSX.writeFile(wb, "نموذج_الإضافة_السريعة.xlsx");
             showToast('تم تحميل نموذج الإكسيل الجاهز', 'info');
@@ -715,7 +696,8 @@
                         const pId = row[idIdx] !== undefined ? String(row[idIdx]).trim() : "";
                         const pName = row[nameIdx] !== undefined ? String(row[nameIdx]).trim() : "";
                         const pAge = row[ageIdx] !== undefined ? String(row[ageIdx]).trim() : "";
-                        let pUrl = row[urlIdx] !== undefined ? String(row[urlIdx]).trim() : "";
+                        let pUrl = row[urlIdx] !== undefined ? String(row[urlIdx]).trim() : "https://drive.google.com";
+                        if (!pUrl) pUrl = "https://drive.google.com";
                         if (pUrl && !/^https?:\/\//i.test(pUrl)) pUrl = 'https://' + pUrl;
                         if (!pId && !pName) continue;
                         extractedPatients.push({ patientId: pId, patientName: pName, age: pAge, fileUrl: pUrl, fromExcel: true });
@@ -725,7 +707,7 @@
                     const existingCards = DOM.reqContainer.querySelectorAll('.request-card');
                     if (existingCards.length === 1) {
                         const fc = existingCards[0];
-                        if (!fc.querySelector('.req-name').value.trim() && !fc.querySelector('.req-id').value.trim() && !fc.querySelector('.req-pdf').files.length) {
+                        if (!fc.querySelector('.req-name').value.trim() && !fc.querySelector('.req-id').value.trim() && !fc.querySelector('.req-pdf').files.length && !fc._attachedPdfFile) {
                             DOM.reqContainer.innerHTML = ''; requestCount = 0;
                         }
                     }
@@ -772,12 +754,15 @@
             } catch (e) { return null; }
         }
 
+        // [إصلاح منطقي 1]: بنية الروابط الهجينة (Hybrid QR URL)
+        // تضمين المعرف (id) للتحديث الفوري من localStorage، مع تضمين البيانات المشفرة (d) كـ Fallback لضمان عمل الـ QR عند مسحه من جوال المريض الخارجي
         window.getRecordUrlFromPayload = (payload) => {
+            const minified = { c: payload.clinic, i: payload.patientId, n: payload.patientName, a: payload.age, g: payload.gender, u: payload.fileUrl, t: payload.createdAt, e: payload.expiresAt };
+            const encoded = encodeDataToUrl(minified);
             if (appSettings.dynamicQr) {
-                return `${window.location.origin}${window.location.pathname}?id=${payload.id}`;
+                return `${window.location.origin}${window.location.pathname}?id=${encodeURIComponent(payload.id)}&d=${encoded}`;
             } else {
-                const minified = { c: payload.clinic, i: payload.patientId, n: payload.patientName, a: payload.age, g: payload.gender, u: payload.fileUrl, t: payload.createdAt, e: payload.expiresAt };
-                return `${window.location.origin}${window.location.pathname}?d=${encodeDataToUrl(minified)}`;
+                return `${window.location.origin}${window.location.pathname}?d=${encoded}`;
             }
         };
 
@@ -864,7 +849,13 @@
             return rangeWithDots;
         }
 
-        window.changePage = (page) => { currentPage = page; renderTable(); document.querySelector('.custom-scrollbar').scrollTo({top:0, behavior:'smooth'}); };
+        // [إصلاح منطقي 4]: استهداف حاوية الجدول بدقة بدلاً من أول عنصر .custom-scrollbar في الصفحة
+        window.changePage = (page) => { 
+            currentPage = page; 
+            renderTable(); 
+            const tableContainer = DOM.tbody.closest('.custom-scrollbar');
+            if (tableContainer) tableContainer.scrollTo({ top: 0, behavior: 'smooth' }); 
+        };
 
         function renderPagination(totalItems) {
             DOM.paginationNav.innerHTML = '';
@@ -910,18 +901,23 @@
                 const globalIndex = (rowsPerPage !== 'all') ? ((currentPage - 1) * rowsPerPage) + index + 1 : index + 1;
                 const tr = document.createElement('tr'); tr.className = "hover:bg-emerald-50/60 transition-colors group";
                 
+                // [إصلاح هيكلي وأمني 2]: تعقيم المخرجات النصية (escapeAttr) لمنع كسر الجدول أو ثغرات XSS
+                const safeId = escapeAttr(rec.id);
+                const safeName = escapeAttr(rec.patientName);
+                const safePatientId = escapeAttr(rec.patientId);
+
                 tr.innerHTML = `
-                    <td class="px-3 py-4 text-center sticky right-0 bg-white group-hover:bg-emerald-50/60 z-10 border-b border-gray-100"><input type="checkbox" class="row-checkbox w-4 h-4 rounded border-gray-300 text-emerald-600 focus:ring-emerald-500 cursor-pointer" value="${rec.id}"></td>
+                    <td class="px-3 py-4 text-center sticky right-0 bg-white group-hover:bg-emerald-50/60 z-10 border-b border-gray-100"><input type="checkbox" class="row-checkbox w-4 h-4 rounded border-gray-300 text-emerald-600 focus:ring-emerald-500 cursor-pointer" value="${safeId}"></td>
                     <td class="px-3 py-4 text-center font-bold text-gray-400 text-sm sticky right-12 bg-white group-hover:bg-emerald-50/60 z-10 border-l border-b border-gray-100">${globalIndex}</td>
                     <td class="px-3 py-4 text-center border-b border-gray-100">${statusBadge}</td>
                     <td class="px-3 py-4 text-center font-mono text-sm border-b border-gray-100" dir="ltr">${fullDateTime}</td>
-                    <td class="px-3 py-4 text-center font-bold text-gray-900 border-b border-gray-100 text-sm"><div class="break-words max-w-[180px] whitespace-normal leading-tight mx-auto">${rec.patientName}</div></td>
-                    <td class="px-3 py-4 text-center font-mono text-gray-500 text-sm border-b border-gray-100" dir="ltr">${rec.patientId}</td>
+                    <td class="px-3 py-4 text-center font-bold text-gray-900 border-b border-gray-100 text-sm"><div class="break-words max-w-[180px] whitespace-normal leading-tight mx-auto">${safeName}</div></td>
+                    <td class="px-3 py-4 text-center font-mono text-gray-500 text-sm border-b border-gray-100" dir="ltr">${safePatientId}</td>
                     <td class="px-3 py-4 text-center space-x-1 space-x-reverse sticky left-0 bg-white group-hover:bg-emerald-50/60 z-10 border-r border-b border-gray-100 whitespace-nowrap">
-                        <button onclick="window.editRecord('${rec.id}')" class="bg-white border border-yellow-200 text-yellow-600 shadow-sm w-8 h-8 rounded-lg hover:bg-yellow-50 transition-colors" title="تعديل"><i class="fa-solid fa-pen-to-square text-sm"></i></button>
-                        <button onclick="window.viewQR('${rec.id}')" class="bg-white border border-gray-200 text-gray-700 shadow-sm w-8 h-8 rounded-lg hover:bg-gray-50 hover:text-emerald-600 transition-colors" title="عرض الرمز"><i class="fa-solid fa-qrcode text-sm"></i></button>
-                        <button onclick="window.copyLink('${rec.id}')" class="bg-white border border-gray-200 text-gray-700 shadow-sm w-8 h-8 rounded-lg hover:bg-gray-50 hover:text-purple-600 transition-colors" title="نسخ الرابط"><i class="fa-solid fa-link text-sm"></i></button>
-                        <button onclick="window.requestDelete('${rec.id}')" class="bg-white border border-red-100 text-red-500 shadow-sm w-8 h-8 rounded-lg hover:bg-red-50 transition-colors" title="حذف"><i class="fa-solid fa-trash-can text-sm"></i></button>
+                        <button onclick="window.editRecord('${safeId}')" class="bg-white border border-yellow-200 text-yellow-600 shadow-sm w-8 h-8 rounded-lg hover:bg-yellow-50 transition-colors" title="تعديل"><i class="fa-solid fa-pen-to-square text-sm"></i></button>
+                        <button onclick="window.viewQR('${safeId}')" class="bg-white border border-gray-200 text-gray-700 shadow-sm w-8 h-8 rounded-lg hover:bg-gray-50 hover:text-emerald-600 transition-colors" title="عرض الرمز"><i class="fa-solid fa-qrcode text-sm"></i></button>
+                        <button onclick="window.copyLink('${safeId}')" class="bg-white border border-gray-200 text-gray-700 shadow-sm w-8 h-8 rounded-lg hover:bg-gray-50 hover:text-purple-600 transition-colors" title="نسخ الرابط"><i class="fa-solid fa-link text-sm"></i></button>
+                        <button onclick="window.requestDelete('${safeId}')" class="bg-white border border-red-100 text-red-500 shadow-sm w-8 h-8 rounded-lg hover:bg-red-50 transition-colors" title="حذف"><i class="fa-solid fa-trash-can text-sm"></i></button>
                     </td>
                 `;
                 DOM.tbody.appendChild(tr);
@@ -943,11 +939,16 @@
 
             for (let i = 0; i < cards.length; i++) {
                 const card = cards[i]; 
+                // [إصلاح منطقي 2]: إعادة ضبط لون إطار البطاقة قبل الفحص في حال قام المستخدم بتصحيح خطأ سابق
+                card.classList.remove('border-r-red-500');
+                card.classList.add('border-r-emerald-500');
+
                 const newPatientId = card.querySelector('.req-id').value.trim(); 
                 const patientName = card.querySelector('.req-name').value.trim(); 
                 const pdfInput = card.querySelector('.req-pdf');
                 const selectedPdfFile = (pdfInput.files && pdfInput.files.length > 0) ? pdfInput.files[0] : card._attachedPdfFile;
-                const fileUrl = card.querySelector('.req-url').value.trim() || (selectedPdfFile ? "#pdf_generated" : "");
+                let fileUrlInput = card.querySelector('.req-url').value.trim();
+                if(!fileUrlInput) fileUrlInput = "https://drive.google.com";
                 
                 if (currentRecords.some(r => r.patientId === newPatientId && r.id !== editId)) { 
                     showToast(`تخطي: الهوية (${newPatientId}) مسجلة مسبقاً!`, 'error'); 
@@ -957,9 +958,10 @@
                 }
 
                 const docId = editId || (crypto.randomUUID ? crypto.randomUUID() : 'id_' + Date.now() + '_' + i); 
-                const now = editId ? currentRecords.find(r => r.id === editId).createdAt : Date.now();
+                const existingRec = editId ? currentRecords.find(r => r.id === editId) : null;
+                const now = existingRec ? existingRec.createdAt : Date.now();
 
-                const payload = { id: docId, clinic: clinic, patientId: newPatientId, patientName: patientName, age: card.querySelector('.req-age').value.trim(), gender: globalGender, fileUrl: fileUrl, validityText: validityText, createdAt: now, expiresAt: now + (validityDays * 24 * 60 * 60 * 1000) };
+                const payload = { id: docId, clinic: clinic, patientId: newPatientId, patientName: patientName, age: card.querySelector('.req-age').value.trim(), gender: globalGender, fileUrl: fileUrlInput, validityText: validityText, createdAt: now, expiresAt: now + (validityDays * 24 * 60 * 60 * 1000) };
                 const qrUrl = window.getRecordUrlFromPayload(payload);
 
                 if (selectedPdfFile) {
@@ -1006,9 +1008,17 @@
 
         DOM.btnCancelEdit.addEventListener('click', resetFormState);
 
+        // [إصلاح منطقي 3]: استرجاع مدة الصلاحية الأصلية للسجل عند فتحه للتعديل
         window.editRecord = (id) => {
             const record = currentRecords.find(r => r.id === id); if (!record) return;
-            DOM.editRecordId.value = record.id; document.getElementById('input-clinic').value = record.clinic || ''; document.getElementById('input-global-gender').value = record.gender || 'Male'; 
+            DOM.editRecordId.value = record.id; 
+            document.getElementById('input-clinic').value = record.clinic || ''; 
+            document.getElementById('input-global-gender').value = record.gender || 'Male'; 
+            if (record.expiresAt && record.createdAt) {
+                const diffDays = Math.round((record.expiresAt - record.createdAt) / (24 * 60 * 60 * 1000));
+                const validitySelect = document.getElementById('input-validity');
+                if ([365, 90, 30, 7].includes(diffDays)) validitySelect.value = String(diffDays);
+            }
             DOM.reqContainer.innerHTML = ''; requestCount = 0; addRequestBlock(record); 
             DOM.btnAddRequestContainer.classList.add('hidden'); 
             DOM.excelBatchBox?.classList.add('hidden');
@@ -1100,18 +1110,33 @@
 
         document.getElementById('refresh-db-btn')?.addEventListener('click', () => { DOM.search.value = ''; if(fpInstance) fpInstance.clear(); DOM.clearDateBtn.classList.add('hidden'); filterTable(); updateStats(); checkDuplicates(); showToast('تم التحديث', 'info'); });
 
-        function loadClientReport(encodedData, recordId) {
+        // [إصلاح منطقي 1 و 5]: قراءة ذكية لتقرير المريض تعطي الأولوية للـ ID المحدث في localStorage، وتلجأ للبيانات المشفرة (d) عند المسح من جهاز خارجي، مع دعم الروابط القديمة (legacyVerified)
+        function loadClientReport(encodedData, recordId, urlParams) {
             let data = null;
             if (recordId) {
                 const found = currentRecords.find(r => r.id === recordId);
                 if (found) data = { c: found.clinic, i: found.patientId, n: found.patientName, a: found.age, g: found.gender, u: found.fileUrl, t: found.createdAt, e: found.expiresAt };
-            } else if (encodedData) {
+            }
+            if (!data && encodedData) {
                 data = decodeDataFromUrl(encodedData);
+            }
+            if (!data && urlParams && urlParams.get('verified') === 'true') {
+                data = {
+                    c: urlParams.get('clinic') || 'Blue Medical Field Complex',
+                    i: urlParams.get('id') || '-',
+                    n: urlParams.get('name') || '-',
+                    a: urlParams.get('age') || '-',
+                    g: urlParams.get('gender') || '-',
+                    u: urlParams.get('file') || '',
+                    t: null,
+                    dateText: urlParams.get('dateText') || '-',
+                    e: Date.now() + 86400000
+                };
             }
 
             if (data) {
                 const expiry = data.e || data.expiresAt;
-                if (Date.now() > expiry) { DOM.cError.classList.remove('hidden'); } 
+                if (expiry && Date.now() > expiry) { DOM.cError.classList.remove('hidden'); } 
                 else {
                     DOM.cSuccess.classList.remove('hidden'); 
                     document.getElementById('c-clinic').textContent = data.c || data.clinic || '-'; 
@@ -1119,13 +1144,16 @@
                     document.getElementById('c-name').textContent = data.n || data.patientName || '-'; 
                     document.getElementById('c-age').textContent = data.a || data.age || '-'; 
                     document.getElementById('c-gender').textContent = data.g || data.gender || '-';
-                    document.getElementById('c-date').textContent = (data.t || data.createdAt) ? new Date(data.t || data.createdAt).toLocaleString('en-GB') : '-';
+                    document.getElementById('c-date').textContent = data.dateText || ((data.t || data.createdAt) ? new Date(data.t || data.createdAt).toLocaleString('en-GB') : '-');
                     
                     const driveUrl = data.u || data.fileUrl; 
                     const btn = document.getElementById('c-download-btn'); 
                     const btnContainer = document.getElementById('c-download-container');
-                    if(driveUrl && driveUrl !== '#pdf_generated') { btn.href = driveUrl; btnContainer.classList.remove('hidden'); btn.classList.remove('hidden'); } 
-                    else { btnContainer.classList.add('hidden'); }
+                    if(driveUrl && driveUrl !== "https://drive.google.com" && driveUrl !== "https://drive.google.com/") { 
+                        btn.href = driveUrl; btnContainer.classList.remove('hidden'); btn.classList.remove('hidden'); 
+                    } else { 
+                        btnContainer.classList.add('hidden'); 
+                    }
                 }
             } else { DOM.cError.classList.remove('hidden'); }
         }
@@ -1156,7 +1184,7 @@
 
             if (encodedData || recordId || legacyVerified === 'true') { 
                 document.title = "Verified Medical Report"; 
-                loadClientReport(encodedData, recordId);
+                loadClientReport(encodedData, recordId, urlParams);
                 DOM.clientSec.classList.remove('hidden'); 
             } else {
                 if (sessionStorage.getItem('admin_session_active') === 'true') { 
@@ -1195,10 +1223,12 @@
             if(currentRecords.length === 0) return showToast('لا توجد بيانات للتصدير', 'error');
             let csv = '\uFEFFDateTime,Validity,ExpiryDate,Status,ID,Patient Name,Age,Gender,Clinic,Report URL\n'; const now = Date.now();
             currentRecords.forEach(r => { const status = now > r.expiresAt ? 'Expired' : 'Active'; csv += `"${new Date(r.createdAt).toLocaleString('en-GB')}","${r.validityText || ''}","${new Date(r.expiresAt).toLocaleString('en-GB')}",${status},${r.patientId},"${(r.patientName||'').replace(/"/g, '""')}",${r.age},${r.gender},"${(r.clinic||'').replace(/"/g, '""')}","${window.getRecordUrl(r.id)}"\n`; });
+            // [إصلاح كودي 1]: تصحيح امتداد ملف الإكسيل المصدر من .json إلى .csv ليتوافق مع برنامج Microsoft Excel
             const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' }); const link = document.createElement("a"); link.href = URL.createObjectURL(blob); link.download = `Medical_Records_${new Date().toISOString().split('T')[0]}.csv`; document.body.appendChild(link); link.click(); document.body.removeChild(link); showToast('تم تحميل ملف الإكسيل', 'success');
         });
 
-        document.getElementById('clear-db-btn').addEventListener('click', () => { if (currentRecords.length === 0) return showToast('قاعدة البيانات فارغة!', 'info'); document.getElementById('clear-all-modal').classList.add('flex'); document.getElementById('clear-all-modal').classList.remove('hidden'); });
+        // [إصلاح هيكلي 3]: توحيد التحكم في ظهور وإخفاء نافذة التصفير
+        document.getElementById('clear-db-btn').addEventListener('click', () => { if (currentRecords.length === 0) return showToast('قاعدة البيانات فارغة!', 'info'); document.getElementById('clear-all-modal').classList.remove('hidden'); });
         document.getElementById('cancel-clear-btn').addEventListener('click', () => document.getElementById('clear-all-modal').classList.add('hidden'));
         document.getElementById('confirm-clear-btn').addEventListener('click', () => { 
             currentRecords = []; 
