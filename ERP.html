@@ -8,17 +8,17 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <style>
-        /* === التصميم العام والمتغيرات الفاخرة (Luxury Medical UI) === */
+        /* === التصميم العام والمتغيرات الفاخرة سريعة الأداء (High-Performance Luxury UI) === */
         :root {
             --primary: #0284c7; 
             --primary-dark: #0369a1;
             --primary-light: #e0f2fe;
-            --primary-glow: rgba(2, 132, 199, 0.22);
+            --primary-glow: rgba(2, 132, 199, 0.2);
             --secondary: #0d9488;
             --bg-main: #f1f5f9;
             --surface: #ffffff;
             --surface-alt: #f8fafc;
-            --surface-glass: rgba(255, 255, 255, 0.88);
+            --surface-glass: #ffffff;
             --text-main: #0f172a;
             --text-muted: #64748b;
             --border: #e2e8f0;
@@ -26,44 +26,40 @@
             --warning: #f59e0b;
             --success: #10b981;
             --purple: #8b5cf6;
-            --scrim: rgba(15, 23, 42, 0.6);
+            --scrim: rgba(15, 23, 42, 0.55);
             
             --radius: 16px;
             --radius-sm: 10px;
-            --shadow-sm: 0 2px 8px -2px rgba(15, 23, 42, 0.06);
-            --shadow-md: 0 10px 25px -5px rgba(15, 23, 42, 0.08), 0 4px 10px -4px rgba(15, 23, 42, 0.04);
-            --shadow-lg: 0 20px 40px -10px rgba(15, 23, 42, 0.14);
-            --transition: 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+            --shadow-sm: 0 2px 6px rgba(15, 23, 42, 0.05);
+            --shadow-md: 0 6px 16px -3px rgba(15, 23, 42, 0.07);
+            --shadow-lg: 0 14px 28px -6px rgba(15, 23, 42, 0.12);
+            --transition: 0.12s ease-out;
         }
 
         body.dark-mode {
             --primary: #38bdf8;
             --primary-dark: #0284c7;
             --primary-light: rgba(56, 189, 248, 0.14);
-            --primary-glow: rgba(56, 189, 248, 0.25);
+            --primary-glow: rgba(56, 189, 248, 0.22);
             --secondary: #14b8a6;
             --bg-main: #0b1120;
             --surface: #1e293b;
             --surface-alt: #0f172a;
-            --surface-glass: rgba(30, 41, 59, 0.88);
+            --surface-glass: #1e293b;
             --text-main: #f8fafc;
             --text-muted: #94a3b8;
             --border: #334155;
-            --scrim: rgba(0, 0, 0, 0.78);
+            --scrim: rgba(0, 0, 0, 0.75);
         }
 
         * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Cairo', 'Segoe UI', Tahoma, sans-serif; }
         body {
             background-color: var(--bg-main);
-            background-image: 
-                radial-gradient(at 0% 0%, rgba(2, 132, 199, 0.07) 0px, transparent 50%),
-                radial-gradient(at 100% 100%, rgba(13, 148, 136, 0.07) 0px, transparent 50%);
             color: var(--text-main);
             height: 100vh;
             display: flex;
             flex-direction: column;
             overflow: hidden;
-            transition: background-color 0.3s, color 0.3s;
         }
         button { cursor: pointer; border: none; background: transparent; font-family: inherit; font-size: 0.92rem; color: inherit; }
         input, select, textarea { font-family: inherit; color: var(--text-main); }
@@ -74,10 +70,8 @@
             display: flex;
             justify-content: space-between;
             align-items: center;
-            background: var(--surface-glass);
-            backdrop-filter: blur(14px);
-            -webkit-backdrop-filter: blur(14px);
-            height: 70px;
+            background: var(--surface);
+            height: 82px;
             padding: 0 26px;
             box-shadow: var(--shadow-sm);
             z-index: 40;
@@ -85,17 +79,31 @@
             border-bottom: 1px solid var(--border);
             flex-shrink: 0;
         }
-        .header-section { display: flex; align-items: center; gap: 10px; position: relative; direction: ltr; }
-        .header-section > * { direction: rtl; }
+        /* الجهة اليمنى: القائمة + الشعار الكبير + اسم العيادة */
+        .header-right-brand {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+        }
+        /* الجهة اليسرى: أدوات التحكم السريعة */
+        .header-left-tools {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            position: relative;
+            direction: ltr;
+        }
+        .header-left-tools > * { direction: rtl; }
+
         .clinic-title {
-            font-size: 1.25rem;
+            font-size: 1.35rem;
             font-weight: 800;
             background: linear-gradient(135deg, var(--primary-dark), var(--secondary));
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
             display: flex;
             align-items: center;
-            gap: 10px;
+            gap: 14px;
         }
         body.dark-mode .clinic-title {
             background: linear-gradient(135deg, #38bdf8, #2dd4bf);
@@ -103,25 +111,50 @@
             -webkit-text-fill-color: transparent;
         }
         .clinic-logo {
-            width: 42px;
-            height: 42px;
+            width: 58px;
+            height: 58px;
             object-fit: contain;
-            border-radius: 10px;
+            border-radius: 14px;
             background: var(--surface);
-            padding: 3px;
-            border: 1px solid var(--border);
+            padding: 4px;
+            border: 2px solid var(--primary-light);
             box-shadow: var(--shadow-sm);
             flex-shrink: 0;
         }
-        .auth-logo {
-            width: 64px;
-            height: 64px;
+        .dashboard-hero-banner {
+            background: linear-gradient(135deg, var(--surface) 0%, var(--primary-light) 100%);
+            border: 1px solid var(--border);
+            border-right: 6px solid var(--primary);
+            border-radius: var(--radius);
+            padding: 18px 24px;
+            margin-bottom: 22px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 16px;
+            box-shadow: var(--shadow-sm);
+        }
+        .dashboard-hero-logo {
+            width: 74px;
+            height: 74px;
             object-fit: contain;
             border-radius: 16px;
-            background: rgba(255, 255, 255, 0.95);
+            background: #ffffff;
             padding: 6px;
-            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
-            margin-bottom: 14px;
+            border: 2px solid var(--primary);
+            box-shadow: var(--shadow-md);
+            flex-shrink: 0;
+        }
+        .auth-logo {
+            width: 88px;
+            height: 88px;
+            object-fit: contain;
+            border-radius: 20px;
+            background: #ffffff;
+            padding: 8px;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.22);
+            border: 2px solid rgba(255, 255, 255, 0.8);
         }
         
         .icon-btn {
@@ -140,8 +173,6 @@
             background: var(--primary-light);
             color: var(--primary);
             border-color: var(--primary);
-            transform: translateY(-2px);
-            box-shadow: var(--shadow-sm);
         }
 
         .waffle-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 3px; width: 18px; height: 18px; }
@@ -149,10 +180,9 @@
         
         .waffle-panel {
             position: absolute;
-            top: 56px;
+            top: 54px;
             left: 0;
-            background: var(--surface-glass);
-            backdrop-filter: blur(18px);
+            background: var(--surface);
             border-radius: var(--radius);
             box-shadow: var(--shadow-lg);
             border: 1px solid var(--border);
@@ -164,94 +194,90 @@
             z-index: 50;
             opacity: 0;
             pointer-events: none;
-            transform: translateY(-10px) scale(0.97);
+            transform: translateY(-6px);
             transition: var(--transition);
             direction: rtl;
         }
-        .waffle-panel.open { opacity: 1; pointer-events: auto; transform: translateY(0) scale(1); }
+        .waffle-panel.open { opacity: 1; pointer-events: auto; transform: translateY(0); }
         .app-tile { display: flex; flex-direction: column; align-items: center; gap: 6px; font-size: 0.78rem; font-weight: 700; color: var(--text-main); transition: var(--transition); padding: 12px 6px; border-radius: 12px; text-align: center; border: 1px solid transparent; }
-        .app-tile:hover { background: var(--primary-light); color: var(--primary); border-color: var(--primary-glow); transform: translateY(-3px); }
-        .app-icon { width: 46px; height: 46px; border-radius: 14px; display: flex; justify-content: center; align-items: center; color: white; font-size: 1.35rem; box-shadow: 0 6px 14px -3px rgba(0,0,0,0.18); }
+        .app-tile:hover { background: var(--primary-light); color: var(--primary); border-color: var(--primary-glow); }
+        .app-icon { width: 46px; height: 46px; border-radius: 14px; display: flex; justify-content: center; align-items: center; color: white; font-size: 1.35rem; }
 
         .hamburger-lines { display: flex; flex-direction: column; gap: 4px; width: 20px; }
-        .hamburger-lines span { display: block; height: 2.2px; width: 100%; background: currentColor; border-radius: 2px; transition: var(--transition); }
+        .hamburger-lines span { display: block; height: 2.2px; width: 100%; background: currentColor; border-radius: 2px; }
 
         /* === Navigation Drawer === */
-        .scrim { position: fixed; inset: 0; background: var(--scrim); backdrop-filter: blur(3px); z-index: 90; opacity: 0; pointer-events: none; transition: var(--transition); }
+        .scrim { position: fixed; inset: 0; background: var(--scrim); z-index: 90; opacity: 0; pointer-events: none; transition: opacity 0.15s ease; }
         .scrim.open { opacity: 1; pointer-events: auto; }
         
-        .drawer { position: fixed; top: 0; right: 0; bottom: 0; width: 295px; background: var(--surface); box-shadow: -10px 0 35px rgba(0,0,0,0.2); z-index: 100; transform: translateX(100%); transition: transform var(--transition); display: flex; flex-direction: column; border-left: 1px solid var(--border); }
+        .drawer { position: fixed; top: 0; right: 0; bottom: 0; width: 295px; background: var(--surface); box-shadow: -8px 0 25px rgba(0,0,0,0.15); z-index: 100; transform: translateX(100%); transition: transform 0.18s ease-out; display: flex; flex-direction: column; border-left: 1px solid var(--border); will-change: transform; }
         .drawer.open { transform: translateX(0); }
-        .drawer-header { padding: 28px 22px; background: linear-gradient(135deg, #0f172a 0%, #0369a1 60%, #0d9488 100%); color: white; display: flex; align-items: center; gap: 14px; position: relative; overflow: hidden; }
-        .drawer-avatar { width: 54px; height: 54px; background: rgba(255,255,255,0.18); backdrop-filter: blur(6px); border-radius: 16px; display: flex; justify-content: center; align-items: center; font-size: 1.5rem; font-weight: 800; border: 2px solid rgba(255,255,255,0.45); flex-shrink: 0; }
+        .drawer-header { padding: 24px 20px; background: linear-gradient(135deg, #0f172a 0%, #0369a1 60%, #0d9488 100%); color: white; display: flex; align-items: center; gap: 14px; }
+        .drawer-avatar { width: 58px; height: 58px; background: rgba(255,255,255,0.2); border-radius: 16px; display: flex; justify-content: center; align-items: center; font-size: 1.5rem; font-weight: 800; border: 2px solid rgba(255,255,255,0.45); flex-shrink: 0; }
         .drawer-nav { flex: 1; padding: 14px 10px; overflow-y: auto; display: flex; flex-direction: column; gap: 4px; }
         .nav-item { display: flex; align-items: center; gap: 12px; padding: 12px 16px; width: 100%; font-size: 0.92rem; font-weight: 600; color: var(--text-main); transition: var(--transition); border-radius: 12px; text-align: right; }
-        .nav-item:hover { background: var(--surface-alt); transform: translateX(-3px); }
-        .nav-item.active { background: linear-gradient(90deg, var(--primary-light), transparent); color: var(--primary); font-weight: 800; box-shadow: inset -4px 0 0 var(--primary); }
+        .nav-item:hover { background: var(--surface-alt); }
+        .nav-item.active { background: var(--primary-light); color: var(--primary); font-weight: 800; box-shadow: inset -4px 0 0 var(--primary); }
 
         /* === Main Area & Breadcrumbs === */
         main { flex: 1; overflow-y: auto; padding: 0 26px 40px 26px; position: relative; }
-        .breadcrumbs { display: flex; gap: 8px; align-items: center; list-style: none; padding: 16px 0; font-size: 0.88rem; color: var(--text-muted); font-weight: 600; max-width: 1300px; margin: 0 auto; }
+        .breadcrumbs { display: flex; gap: 8px; align-items: center; list-style: none; padding: 14px 0; font-size: 0.88rem; color: var(--text-muted); font-weight: 600; max-width: 1300px; margin: 0 auto; }
         .breadcrumbs li { display: flex; align-items: center; gap: 8px; }
         .breadcrumbs li:not(:last-child)::after { content: '›'; color: var(--text-muted); font-size: 1.1rem; }
         .breadcrumbs a { color: var(--primary); text-decoration: none; cursor: pointer; padding: 2px 8px; border-radius: 6px; background: var(--primary-light); font-weight: 700; }
-        .breadcrumbs a:hover { filter: brightness(0.95); }
         
-        .section { display: none; animation: slideIn 0.28s cubic-bezier(0.16, 1, 0.3, 1); max-width: 1300px; margin: 0 auto; }
-        .section.active { display: block; }
-        @keyframes slideIn { from { opacity: 0; transform: translateY(12px); } to { opacity: 1; transform: translateY(0); } }
+        .section { display: none; max-width: 1300px; margin: 0 auto; }
+        .section.active { display: block; animation: fadeInFast 0.12s ease-out; }
+        @keyframes fadeInFast { from { opacity: 0.4; transform: translateY(4px); } to { opacity: 1; transform: translateY(0); } }
 
-        .card { background: var(--surface); border-radius: var(--radius); padding: 24px; margin-bottom: 24px; box-shadow: var(--shadow-md); border: 1px solid var(--border); transition: var(--transition); }
+        .card { background: var(--surface); border-radius: var(--radius); padding: 24px; margin-bottom: 24px; box-shadow: var(--shadow-md); border: 1px solid var(--border); }
         .card-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; padding-bottom: 14px; border-bottom: 1px solid var(--border); flex-wrap: wrap; gap: 12px; }
         .card-title { font-size: 1.18rem; font-weight: 800; color: var(--text-main); display: flex; align-items: center; gap: 10px; }
         .card-title::before { content: ''; width: 5px; height: 22px; border-radius: 4px; background: linear-gradient(180deg, var(--primary), var(--secondary)); display: inline-block; }
         
         .btn { padding: 9px 18px; border-radius: 11px; font-weight: 700; font-size: 0.88rem; transition: var(--transition); display: inline-flex; align-items: center; gap: 7px; justify-content: center; border: 1px solid transparent; }
-        .btn:active { transform: scale(0.97); }
+        .btn:active { transform: scale(0.98); }
         .btn-sm { padding: 6px 12px; font-size: 0.78rem; border-radius: 8px; }
-        .btn-primary { background: linear-gradient(135deg, var(--primary), var(--primary-dark)); color: white; box-shadow: 0 4px 12px var(--primary-glow); }
-        .btn-primary:hover { transform: translateY(-1px); box-shadow: 0 6px 18px var(--primary-glow); filter: brightness(1.05); }
-        .btn-success { background: linear-gradient(135deg, #10b981, #059669); color: white; box-shadow: 0 4px 12px rgba(16, 185, 129, 0.25); }
-        .btn-success:hover { transform: translateY(-1px); filter: brightness(1.05); }
+        .btn-primary { background: linear-gradient(135deg, var(--primary), var(--primary-dark)); color: white; }
+        .btn-primary:hover { filter: brightness(1.06); }
+        .btn-success { background: linear-gradient(135deg, #10b981, #059669); color: white; }
         .btn-warning { background: linear-gradient(135deg, #f59e0b, #d97706); color: white; }
-        .btn-danger { background: linear-gradient(135deg, #ef4444, #dc2626); color: white; box-shadow: 0 4px 12px rgba(239, 68, 68, 0.25); }
+        .btn-danger { background: linear-gradient(135deg, #ef4444, #dc2626); color: white; }
         .btn-purple { background: linear-gradient(135deg, #8b5cf6, #6d28d9); color: white; }
         .btn-outline { border-color: var(--border); color: var(--text-main); background: var(--surface); }
-        .btn-outline:hover { background: var(--primary-light); border-color: var(--primary); color: var(--primary); transform: translateY(-1px); }
+        .btn-outline:hover { background: var(--primary-light); border-color: var(--primary); color: var(--primary); }
 
         /* Medical Critical Alert Banner */
-        .medical-alert-banner { background: linear-gradient(90deg, rgba(239, 68, 68, 0.12), rgba(239, 68, 68, 0.04)); border: 1px solid rgba(239, 68, 68, 0.45); border-right: 5px solid var(--danger); color: #991b1b; padding: 14px 20px; border-radius: 14px; margin-bottom: 20px; display: none; align-items: center; justify-content: space-between; gap: 12px; animation: pulseAlert 2s infinite; }
+        .medical-alert-banner { background: rgba(239, 68, 68, 0.1); border: 1px solid rgba(239, 68, 68, 0.45); border-right: 5px solid var(--danger); color: #991b1b; padding: 14px 20px; border-radius: 14px; margin-bottom: 20px; display: none; align-items: center; justify-content: space-between; gap: 12px; }
         body.dark-mode .medical-alert-banner { color: #fca5a5; }
-        @keyframes pulseAlert { 0%, 100% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.25); } 50% { box-shadow: 0 0 0 6px rgba(239, 68, 68, 0); } }
 
         /* Sub-tabs Navigation */
         .sub-tabs { display: flex; gap: 8px; background: var(--surface-alt); padding: 6px; border-radius: 14px; border: 1px solid var(--border); margin-bottom: 22px; overflow-x: auto; }
-        .sub-tab-btn { padding: 9px 18px; border-radius: 10px; font-weight: 700; font-size: 0.86rem; color: var(--text-muted); background: transparent; transition: 0.2s; white-space: nowrap; flex: 1; text-align: center; }
+        .sub-tab-btn { padding: 9px 18px; border-radius: 10px; font-weight: 700; font-size: 0.86rem; color: var(--text-muted); background: transparent; transition: 0.12s; white-space: nowrap; flex: 1; text-align: center; }
         .sub-tab-btn.active { background: var(--surface); color: var(--primary); box-shadow: var(--shadow-sm); }
-        .sub-tab-btn:hover:not(.active) { color: var(--text-main); }
         .sub-tab-pane { display: none; }
-        .sub-tab-pane.active { display: block; animation: slideIn 0.22s ease; }
+        .sub-tab-pane.active { display: block; }
 
         /* === Forms & Combobox === */
         .input-group { display: flex; flex-direction: column; gap: 6px; margin-bottom: 14px; }
         .input-group label { font-size: 0.83rem; font-weight: 700; color: var(--text-muted); }
-        .form-control { padding: 10px 14px; border: 1.5px solid var(--border); border-radius: 11px; font-size: 0.92rem; outline: none; transition: var(--transition); width: 100%; background: var(--surface-alt); color: var(--text-main); }
-        .form-control:focus { border-color: var(--primary); background: var(--surface); box-shadow: 0 0 0 4px var(--primary-light); }
+        .form-control { padding: 10px 14px; border: 1.5px solid var(--border); border-radius: 11px; font-size: 0.92rem; outline: none; transition: border-color 0.15s; width: 100%; background: var(--surface-alt); color: var(--text-main); }
+        .form-control:focus { border-color: var(--primary); background: var(--surface); }
         
         .combobox-container { position: relative; flex: 1; min-width: 240px; }
         .combobox-input-wrapper { position: relative; }
         .combobox-input-wrapper input { padding-right: 40px; border-radius: 12px; }
         .search-icon { position: absolute; right: 13px; top: 50%; transform: translateY(-50%); color: var(--text-muted); width: 18px; pointer-events: none; }
-        .combobox-list { position: absolute; top: calc(100% + 6px); left: 0; right: 0; background: var(--surface); border: 1px solid var(--border); border-radius: 12px; box-shadow: var(--shadow-lg); z-index: 1000; max-height: 240px; overflow-y: auto; display: none; list-style: none; overflow: hidden; }
+        .combobox-list { position: absolute; top: calc(100% + 6px); left: 0; right: 0; background: var(--surface); border: 1px solid var(--border); border-radius: 12px; box-shadow: var(--shadow-lg); z-index: 1000; max-height: 240px; overflow-y: auto; display: none; list-style: none; }
         .combobox-list.show { display: block; }
-        .combobox-item { padding: 11px 16px; cursor: pointer; border-bottom: 1px solid var(--border); transition: 0.15s; display: flex; justify-content: space-between; align-items: center; font-size: 0.9rem; font-weight: 600; }
+        .combobox-item { padding: 11px 16px; cursor: pointer; border-bottom: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center; font-size: 0.9rem; font-weight: 600; }
         .combobox-item:hover, .combobox-item.active { background: var(--primary-light); color: var(--primary); }
         .combobox-item-id { font-family: monospace; font-size: 0.78rem; background: var(--surface-alt); padding: 2px 8px; border-radius: 6px; color: var(--text-muted); }
 
         .switch { position: relative; display: inline-block; width: 46px; height: 25px; flex-shrink: 0; }
         .switch input { opacity: 0; width: 0; height: 0; }
-        .slider { position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background-color: var(--border); transition: .3s; border-radius: 25px; }
-        .slider:before { position: absolute; content: ""; height: 19px; width: 19px; left: 3px; bottom: 3px; background-color: white; transition: .3s; border-radius: 50%; }
+        .slider { position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background-color: var(--border); transition: .2s; border-radius: 25px; }
+        .slider:before { position: absolute; content: ""; height: 19px; width: 19px; left: 3px; bottom: 3px; background-color: white; transition: .2s; border-radius: 50%; }
         .switch input:checked + .slider { background-color: var(--success); }
         .switch input:checked + .slider:before { transform: translateX(21px); }
 
@@ -259,25 +285,24 @@
         .table-responsive { overflow-x: auto; border-radius: 14px; border: 1px solid var(--border); background: var(--surface); }
         table { width: 100%; border-collapse: collapse; text-align: right; min-width: 720px; }
         th, td { padding: 14px 16px; border-bottom: 1px solid var(--border); vertical-align: middle; font-size: 0.89rem; }
-        th { background: var(--surface-alt); color: var(--text-muted); font-weight: 700; font-size: 0.82rem; letter-spacing: 0.2px; }
-        tbody tr { transition: background-color 0.15s; }
+        th { background: var(--surface-alt); color: var(--text-muted); font-weight: 700; font-size: 0.82rem; }
         tbody tr:hover td { background: var(--primary-light); }
         tbody tr:last-child td { border-bottom: none; }
         
         .empty-state { text-align: center; padding: 44px 20px; color: var(--text-muted); display: flex; flex-direction: column; align-items: center; gap: 10px; background: var(--surface-alt); border-radius: 12px; }
         .pagination-container { display: flex; justify-content: space-between; align-items: center; margin-top: 18px; flex-wrap: wrap; gap: 12px; }
         .pagination { display: flex; gap: 6px; list-style: none; }
-        .page-btn { min-width: 35px; height: 35px; display: flex; justify-content: center; align-items: center; border-radius: 9px; font-size: 0.85rem; font-weight: 700; color: var(--text-main); background: var(--surface); border: 1px solid var(--border); transition: 0.2s; }
+        .page-btn { min-width: 35px; height: 35px; display: flex; justify-content: center; align-items: center; border-radius: 9px; font-size: 0.85rem; font-weight: 700; color: var(--text-main); background: var(--surface); border: 1px solid var(--border); }
         .page-btn:hover { border-color: var(--primary); color: var(--primary); }
-        .page-btn[aria-current="page"] { background: linear-gradient(135deg, var(--primary), var(--primary-dark)); color: white; border-color: transparent; box-shadow: 0 4px 10px var(--primary-glow); }
+        .page-btn[aria-current="page"] { background: var(--primary); color: white; border-color: transparent; }
 
         .badge { position: absolute; top: -5px; right: -5px; background: var(--danger); color: white; border-radius: 50%; min-width: 20px; height: 20px; padding: 0 5px; font-size: 0.72rem; display: flex; justify-content: center; align-items: center; font-weight: 800; border: 2px solid var(--surface); }
         .nav-badge { background: var(--danger); color: white; border-radius: 20px; padding: 2px 9px; font-size: 0.72rem; font-weight: 800; margin-right: auto; }
         
         .chip-container { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 18px; }
-        .chip { display: inline-flex; align-items: center; gap: 6px; padding: 7px 16px; border-radius: 30px; background: var(--surface-alt); border: 1px solid var(--border); font-size: 0.83rem; font-weight: 700; cursor: pointer; transition: 0.2s; }
+        .chip { display: inline-flex; align-items: center; gap: 6px; padding: 7px 16px; border-radius: 30px; background: var(--surface-alt); border: 1px solid var(--border); font-size: 0.83rem; font-weight: 700; cursor: pointer; }
         .chip:hover { border-color: var(--primary); color: var(--primary); }
-        .chip.active { background: linear-gradient(135deg, var(--primary), var(--primary-dark)); border-color: transparent; color: white; box-shadow: 0 4px 12px var(--primary-glow); }
+        .chip.active { background: var(--primary); border-color: transparent; color: white; }
 
         .tag-group { display: flex; gap: 6px; flex-wrap: wrap; margin-top: 6px; }
         .tag { display: inline-flex; align-items: center; padding: 3px 10px; border-radius: 8px; font-size: 0.75rem; font-weight: 700; background: var(--surface-alt); color: var(--text-muted); border: 1px solid var(--border); }
@@ -290,16 +315,15 @@
         /* === Profile & Finance Cards === */
         .profile-header { display: flex; justify-content: space-between; align-items: flex-start; padding-bottom: 20px; border-bottom: 1px solid var(--border); margin-bottom: 20px; flex-wrap: wrap; gap: 16px; }
         .profile-info { display: flex; gap: 18px; align-items: center; }
-        .profile-avatar { width: 76px; height: 76px; border-radius: 22px; background: linear-gradient(135deg, var(--primary), var(--secondary)); color: white; display: flex; justify-content: center; align-items: center; font-size: 2.1rem; font-weight: 800; flex-shrink: 0; box-shadow: 0 8px 20px var(--primary-glow); }
+        .profile-avatar { width: 76px; height: 76px; border-radius: 22px; background: linear-gradient(135deg, var(--primary), var(--secondary)); color: white; display: flex; justify-content: center; align-items: center; font-size: 2.1rem; font-weight: 800; flex-shrink: 0; }
         
         .finance-summary { display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 14px; margin-bottom: 22px; }
-        .finance-card { padding: 16px; border-radius: 14px; border: 1px solid var(--border); text-align: center; background: var(--surface-alt); position: relative; overflow: hidden; transition: 0.2s; }
-        .finance-card:hover { transform: translateY(-2px); box-shadow: var(--shadow-sm); }
+        .finance-card { padding: 16px; border-radius: 14px; border: 1px solid var(--border); text-align: center; background: var(--surface-alt); }
         .finance-card h4 { font-size: 0.78rem; font-weight: 700; color: var(--text-muted); margin-bottom: 6px; }
         .finance-card .amount { font-size: 1.3rem; font-weight: 800; color: var(--text-main); }
-        .finance-card.balance { border-color: rgba(239, 68, 68, 0.45); background: linear-gradient(180deg, rgba(239, 68, 68, 0.06), transparent); }
+        .finance-card.balance { border-color: rgba(239, 68, 68, 0.45); background: rgba(239, 68, 68, 0.05); }
         .finance-card.balance .amount { color: var(--danger); }
-        .finance-card.paid { border-color: rgba(16, 185, 129, 0.45); background: linear-gradient(180deg, rgba(16, 185, 129, 0.06), transparent); }
+        .finance-card.paid { border-color: rgba(16, 185, 129, 0.45); background: rgba(16, 185, 129, 0.05); }
         .finance-card.paid .amount { color: var(--success); }
 
         /* === Dashboard & Appointments === */
@@ -312,56 +336,52 @@
             display: flex;
             align-items: center;
             gap: 16px;
-            box-shadow: var(--shadow-md);
+            box-shadow: var(--shadow-sm);
             position: relative;
             overflow: hidden;
-            transition: var(--transition);
         }
-        .stat-card:hover { transform: translateY(-4px); box-shadow: var(--shadow-lg); border-color: var(--primary); }
-        .stat-card::after { content: ''; position: absolute; left: -20px; bottom: -20px; width: 90px; height: 90px; border-radius: 50%; background: var(--primary-light); opacity: 0.45; pointer-events: none; }
-        .stat-icon { width: 54px; height: 54px; border-radius: 16px; display: flex; justify-content: center; align-items: center; font-size: 1.55rem; color: white; flex-shrink: 0; box-shadow: 0 8px 16px -4px rgba(0,0,0,0.2); }
+        .stat-icon { width: 54px; height: 54px; border-radius: 16px; display: flex; justify-content: center; align-items: center; font-size: 1.55rem; color: white; flex-shrink: 0; }
         
         .sched-layout { display: grid; grid-template-columns: 330px 1fr; gap: 22px; align-items: start; }
         @media(max-width: 900px) { .sched-layout { grid-template-columns: 1fr; } }
 
-        .mini-cal { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 20px; box-shadow: var(--shadow-md); }
+        .mini-cal { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 20px; box-shadow: var(--shadow-sm); }
         .cal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 14px; font-weight: 800; }
         .cal-nav-btn { padding: 5px 12px; border-radius: 8px; background: var(--surface-alt); border: 1px solid var(--border); font-weight: bold; }
-        .cal-nav-btn:hover { background: var(--primary-light); color: var(--primary); }
         .cal-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 5px; text-align: center; }
         .cal-day-name { font-size: 0.74rem; color: var(--text-muted); font-weight: 700; padding-bottom: 6px; }
-        .cal-day { aspect-ratio: 1; display: flex; justify-content: center; align-items: center; border-radius: 10px; font-size: 0.86rem; font-weight: 600; cursor: pointer; position: relative; transition: 0.15s; }
+        .cal-day { aspect-ratio: 1; display: flex; justify-content: center; align-items: center; border-radius: 10px; font-size: 0.86rem; font-weight: 600; cursor: pointer; position: relative; }
         .cal-day:hover { background: var(--primary-light); color: var(--primary); }
-        .cal-day.active { background: linear-gradient(135deg, var(--primary), var(--primary-dark)); color: white; font-weight: 800; box-shadow: 0 4px 10px var(--primary-glow); }
+        .cal-day.active { background: var(--primary); color: white; font-weight: 800; }
         .cal-day.has-appt::after { content: ''; width: 5px; height: 5px; background: var(--secondary); border-radius: 50%; position: absolute; bottom: 3px; }
         .cal-day.empty { visibility: hidden; }
 
-        .timeline-container { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); height: 610px; overflow-y: auto; box-shadow: var(--shadow-md); }
-        .timeline-header { padding: 16px 20px; border-bottom: 1px solid var(--border); background: var(--surface-glass); backdrop-filter: blur(10px); position: sticky; top: 0; z-index: 10; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px; }
+        .timeline-container { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); height: 610px; overflow-y: auto; box-shadow: var(--shadow-sm); }
+        .timeline-header { padding: 16px 20px; border-bottom: 1px solid var(--border); background: var(--surface); position: sticky; top: 0; z-index: 10; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px; }
         .time-slot { display: flex; border-bottom: 1px dashed var(--border); min-height: 76px; }
         .time-label { width: 95px; padding: 12px; font-size: 0.82rem; color: var(--text-muted); font-weight: 700; border-left: 1px solid var(--border); text-align: center; background: var(--surface-alt); flex-shrink: 0; }
-        .slot-content { flex: 1; padding: 7px; cursor: pointer; display: flex; flex-direction: column; gap: 6px; transition: 0.15s; }
+        .slot-content { flex: 1; padding: 7px; cursor: pointer; display: flex; flex-direction: column; gap: 6px; }
         .slot-content:hover { background: var(--primary-light); }
         
-        .appt-card { border-radius: 10px; padding: 9px 14px; font-size: 0.85rem; border-right: 4px solid var(--primary); background: var(--primary-light); color: var(--text-main); display: flex; justify-content: space-between; align-items: center; direction: rtl; box-shadow: var(--shadow-sm); }
+        .appt-card { border-radius: 10px; padding: 9px 14px; font-size: 0.85rem; border-right: 4px solid var(--primary); background: var(--primary-light); color: var(--text-main); display: flex; justify-content: space-between; align-items: center; direction: rtl; }
         .appt-card.completed { background: rgba(16, 185, 129, 0.15); border-right-color: var(--success); }
         .appt-card.waiting { background: rgba(245, 158, 11, 0.18); border-right-color: var(--warning); }
 
         /* === 5-Surface SVG Odontogram & Perio Chart === */
-        .chart-container { display: flex; flex-direction: column; align-items: center; padding: 24px 14px; background: linear-gradient(180deg, var(--surface-alt), var(--surface)); border-radius: 16px; border: 1px solid var(--border); overflow-x: auto; margin-bottom: 24px; position: relative; box-shadow: inset 0 2px 10px rgba(0,0,0,0.03); }
-        .chart-overlay { position: absolute; inset: 0; background: var(--scrim); z-index: 10; display: flex; justify-content: center; align-items: center; flex-direction: column; gap: 12px; border-radius: 16px; backdrop-filter: blur(5px); color: white; text-align: center; padding: 20px; }
+        .chart-container { display: flex; flex-direction: column; align-items: center; padding: 24px 14px; background: var(--surface-alt); border-radius: 16px; border: 1px solid var(--border); overflow-x: auto; margin-bottom: 24px; position: relative; }
+        .chart-overlay { position: absolute; inset: 0; background: rgba(15, 23, 42, 0.72); z-index: 10; display: flex; justify-content: center; align-items: center; flex-direction: column; gap: 12px; border-radius: 16px; color: white; text-align: center; padding: 20px; }
         .jaw-label { font-weight: 800; color: var(--primary); margin: 10px 0 8px; width: 100%; text-align: center; border-bottom: 1px dashed var(--border); padding-bottom: 6px; font-size: 0.92rem; }
         .tooth-row { display: flex; gap: 7px; padding: 8px; align-items: center; }
         .tooth-group { display: flex; gap: 7px; }
         .tooth-divider { width: 2px; background: var(--primary); margin: 0 10px; align-self: stretch; opacity: 0.35; }
         
-        .tooth-wrapper { display: flex; flex-direction: column; align-items: center; gap: 4px; cursor: pointer; transition: var(--transition); position: relative; padding: 5px; border-radius: 10px; border: 1px solid transparent; }
-        .tooth-wrapper:hover { transform: translateY(-3px) scale(1.06); background: var(--primary-light); border-color: var(--primary-glow); box-shadow: var(--shadow-sm); }
+        .tooth-wrapper { display: flex; flex-direction: column; align-items: center; gap: 4px; cursor: pointer; position: relative; padding: 5px; border-radius: 10px; border: 1px solid transparent; }
+        .tooth-wrapper:hover { background: var(--primary-light); border-color: var(--primary-glow); }
         .tooth-num { font-size: 0.76rem; color: var(--text-main); font-weight: 800; }
         .tooth-badge-icon { font-size: 0.75rem; height: 16px; line-height: 16px; font-weight: bold; }
 
-        .tooth-svg { width: 42px; height: 42px; overflow: visible; filter: drop-shadow(0 2px 3px rgba(0,0,0,0.06)); }
-        .surf-poly { fill: #ffffff; stroke: #64748b; stroke-width: 1.5; transition: 0.15s; cursor: pointer; }
+        .tooth-svg { width: 42px; height: 42px; overflow: visible; }
+        .surf-poly { fill: #ffffff; stroke: #64748b; stroke-width: 1.5; cursor: pointer; }
         body.dark-mode .surf-poly { fill: #1e293b; stroke: #94a3b8; }
         .surf-poly:hover { stroke: var(--primary); stroke-width: 2.5; }
         .surf-poly.state-decay { fill: #ef4444 !important; }
@@ -370,28 +390,24 @@
         .surf-poly.state-crown { fill: #f59e0b !important; }
         .surf-poly.state-implant { fill: #64748b !important; }
 
-        /* Perio indicators */
         .perio-pill { font-size: 0.68rem; padding: 1px 6px; border-radius: 6px; background: var(--surface); border: 1px solid var(--border); font-family: monospace; font-weight: bold; }
         .perio-pill.deep { background: #fee2e2; color: #991b1b; border-color: #ef4444; }
         .bop-dot { width: 7px; height: 7px; border-radius: 50%; background: var(--danger); display: inline-block; }
 
-        /* Interactive 5-Surface Modal Selector */
         .interactive-tooth-box { display: flex; flex-direction: column; align-items: center; gap: 10px; margin: 12px 0; padding: 16px; background: var(--surface-alt); border-radius: 14px; border: 1px solid var(--border); }
         .modal-tooth-svg { width: 135px; height: 135px; }
         .modal-tooth-svg .surf-poly.selected-surf { stroke: #0284c7; stroke-width: 3.5; fill: #bae6fd; }
 
         /* === X-Ray Gallery & Lightbox === */
         .gallery-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); gap: 16px; margin-top: 14px; }
-        .gallery-card { border: 1px solid var(--border); border-radius: 12px; overflow: hidden; background: var(--surface-alt); position: relative; transition: 0.2s; }
-        .gallery-card:hover { transform: translateY(-3px); box-shadow: var(--shadow-md); }
+        .gallery-card { border: 1px solid var(--border); border-radius: 12px; overflow: hidden; background: var(--surface-alt); position: relative; }
         .gallery-card img { width: 100%; height: 130px; object-fit: cover; cursor: zoom-in; display: block; background: #000; }
         .gallery-meta { padding: 10px 12px; font-size: 0.78rem; display: flex; justify-content: space-between; align-items: center; }
 
         /* === Modals & Scroll Wheel === */
-        .modal-overlay { position: fixed; inset: 0; background: var(--scrim); backdrop-filter: blur(4px); z-index: 1000; display: flex; justify-content: center; align-items: center; opacity: 0; pointer-events: none; transition: var(--transition); padding: 15px; }
+        .modal-overlay { position: fixed; inset: 0; background: var(--scrim); z-index: 1000; display: flex; justify-content: center; align-items: center; opacity: 0; pointer-events: none; transition: opacity 0.12s ease; padding: 15px; }
         .modal-overlay.open { opacity: 1; pointer-events: auto; }
-        .modal-content { background: var(--surface); border-radius: 20px; width: 100%; max-width: 530px; padding: 26px; transform: scale(0.94) translateY(10px); transition: var(--transition); box-shadow: var(--shadow-lg); max-height: 92vh; overflow-y: auto; border: 1px solid var(--border); }
-        .modal-overlay.open .modal-content { transform: scale(1) translateY(0); }
+        .modal-content { background: var(--surface); border-radius: 20px; width: 100%; max-width: 530px; padding: 26px; box-shadow: var(--shadow-lg); max-height: 92vh; overflow-y: auto; border: 1px solid var(--border); }
         
         .wheel-picker-box { display: flex; justify-content: center; align-items: center; gap: 10px; background: var(--surface-alt); border: 1px solid var(--border); border-radius: 14px; height: 140px; position: relative; overflow: hidden; margin: 12px 0; direction: ltr; }
         .wheel-highlight { position: absolute; top: 50%; transform: translateY(-50%); width: 100%; height: 40px; background: var(--primary-light); border-top: 1px solid var(--primary); border-bottom: 1px solid var(--primary); pointer-events: none; }
@@ -401,34 +417,33 @@
         .wheel-item.active { font-size: 1.35rem; font-weight: 800; color: var(--primary); }
 
         .action-sheet { display: grid; grid-template-columns: repeat(2, 1fr); gap: 8px; margin-top: 12px; }
-        .action-btn { padding: 10px 12px; border-radius: 10px; border: 1px solid var(--border); background: var(--surface); display: flex; align-items: center; gap: 8px; font-size: 0.84rem; font-weight: 700; transition: 0.2s; }
-        .action-btn:hover { background: var(--primary-light); border-color: var(--primary); color: var(--primary); transform: translateY(-1px); }
+        .action-btn { padding: 10px 12px; border-radius: 10px; border: 1px solid var(--border); background: var(--surface); display: flex; align-items: center; gap: 8px; font-size: 0.84rem; font-weight: 700; }
+        .action-btn:hover { background: var(--primary-light); border-color: var(--primary); color: var(--primary); }
         .color-dot { width: 14px; height: 14px; border-radius: 50%; flex-shrink: 0; }
 
-        .treatment-plan { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); overflow: hidden; box-shadow: var(--shadow-sm); }
-        .tp-header { background: linear-gradient(90deg, var(--primary-light), transparent); padding: 16px 20px; font-weight: 800; color: var(--primary); display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px; border-bottom: 1px solid var(--border); }
+        .treatment-plan { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); overflow: hidden; }
+        .tp-header { background: var(--primary-light); padding: 16px 20px; font-weight: 800; color: var(--primary); display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px; border-bottom: 1px solid var(--border); }
         .tp-list { list-style: none; }
         .tp-item { display: flex; justify-content: space-between; align-items: center; padding: 14px 20px; border-bottom: 1px solid var(--border); flex-wrap: wrap; gap: 10px; }
-        .tp-tooth { background: linear-gradient(135deg, var(--primary), var(--primary-dark)); color: white; width: 34px; height: 34px; display: flex; justify-content: center; align-items: center; border-radius: 10px; font-size: 0.84rem; font-weight: 800; flex-shrink: 0; }
+        .tp-tooth { background: var(--primary); color: white; width: 34px; height: 34px; display: flex; justify-content: center; align-items: center; border-radius: 10px; font-size: 0.84rem; font-weight: 800; flex-shrink: 0; }
 
         .signature-pad { border: 2px dashed var(--border); border-radius: 12px; background: #fff; cursor: crosshair; touch-action: none; width: 100%; height: 150px; }
 
-        .toast { position: fixed; bottom: 26px; left: 50%; transform: translateX(-50%) translateY(50px); background: #0f172a; color: white; padding: 12px 26px; border-radius: 30px; font-weight: 700; font-size: 0.88rem; box-shadow: var(--shadow-lg); z-index: 2500; opacity: 0; pointer-events: none; transition: 0.3s cubic-bezier(0.4, 0, 0.2, 1); border: 1px solid #334155; }
+        .toast { position: fixed; bottom: 26px; left: 50%; transform: translateX(-50%) translateY(50px); background: #0f172a; color: white; padding: 12px 26px; border-radius: 30px; font-weight: 700; font-size: 0.88rem; box-shadow: var(--shadow-lg); z-index: 2500; opacity: 0; pointer-events: none; transition: 0.2s ease; border: 1px solid #334155; }
         .toast.show { transform: translateX(-50%) translateY(0); opacity: 1; }
 
-        /* === Luxury Split-Screen Login & Lock Screen Overlay === */
+        /* === Fast Split-Screen Login Overlay === */
         .auth-screen {
             position: fixed;
             inset: 0;
-            background: radial-gradient(circle at 15% 20%, #0369a1 0%, #0f172a 55%, #020617 100%);
+            background: linear-gradient(135deg, #0369a1 0%, #0f172a 65%, #020617 100%);
             z-index: 2000;
             display: flex;
             justify-content: center;
             align-items: center;
             padding: 20px;
-            transition: opacity 0.4s ease, visibility 0.4s ease;
         }
-        .auth-screen.hidden { opacity: 0; visibility: hidden; pointer-events: none; }
+        .auth-screen.hidden { display: none !important; }
         .auth-split-wrapper {
             background: var(--surface);
             color: var(--text-main);
@@ -436,11 +451,10 @@
             max-width: 880px;
             border-radius: 26px;
             overflow: hidden;
-            box-shadow: 0 30px 60px -15px rgba(0,0,0,0.6);
+            box-shadow: 0 25px 50px -12px rgba(0,0,0,0.5);
             border: 1px solid rgba(255,255,255,0.12);
             display: grid;
             grid-template-columns: 1.05fr 1.25fr;
-            animation: slideIn 0.4s ease;
         }
         @media(max-width: 780px) {
             .auth-split-wrapper { grid-template-columns: 1fr; max-width: 440px; }
@@ -456,16 +470,6 @@
             position: relative;
             overflow: hidden;
         }
-        .auth-brand-side::before {
-            content: '';
-            position: absolute;
-            width: 260px;
-            height: 260px;
-            border-radius: 50%;
-            background: rgba(255,255,255,0.08);
-            top: -80px;
-            left: -80px;
-        }
         .auth-form-side { padding: 32px 30px; text-align: center; display: flex; flex-direction: column; justify-content: center; }
         .role-selector { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin: 14px 0; }
         .role-card {
@@ -474,7 +478,6 @@
             border: 2px solid var(--border);
             background: var(--surface-alt);
             cursor: pointer;
-            transition: var(--transition);
             display: flex;
             flex-direction: column;
             align-items: center;
@@ -482,11 +485,11 @@
             font-size: 0.78rem;
             font-weight: 700;
         }
-        .role-card:hover { border-color: var(--primary); transform: translateY(-2px); }
-        .role-card.active { border-color: var(--primary); background: var(--primary-light); color: var(--primary); box-shadow: 0 6px 15px var(--primary-glow); }
+        .role-card:hover { border-color: var(--primary); }
+        .role-card.active { border-color: var(--primary); background: var(--primary-light); color: var(--primary); }
         .pin-input { text-align: center; font-size: 1.55rem; letter-spacing: 12px; font-weight: 800; font-family: monospace; padding: 8px; background: var(--surface-alt); }
         .pin-keypad { display: grid; grid-template-columns: repeat(4, 1fr); gap: 6px; margin-top: 8px; direction: ltr; }
-        .pin-key { padding: 8px 0; border-radius: 9px; background: var(--surface-alt); border: 1px solid var(--border); font-weight: 800; font-size: 0.92rem; transition: 0.15s; }
+        .pin-key { padding: 8px 0; border-radius: 9px; background: var(--surface-alt); border: 1px solid var(--border); font-weight: 800; font-size: 0.92rem; }
         .pin-key:hover { background: var(--primary-light); color: var(--primary); border-color: var(--primary); }
         .role-badge-header { font-size: 0.76rem; padding: 5px 12px; border-radius: 20px; background: var(--primary-light); color: var(--primary); font-weight: 800; border: 1px solid var(--primary-glow); white-space: nowrap; }
 
@@ -509,33 +512,35 @@
             <!-- Right Side: Medical Branding & Live Features -->
             <div class="auth-brand-side">
                 <div>
-                    <div style="display:flex; align-items:center; justify-content:space-between; gap:10px; margin-bottom:14px;">
-                        <img src="LOGO.PNG" alt="شعار العيادة" class="auth-logo" onerror="this.onerror=null; this.src='data:image/svg+xml;utf8,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 64 64%22><rect width=%2264%22 height=%2264%22 rx=%2214%22 fill=%22%230284c7%22/><text x=%2250%25%22 y=%2256%25%22 font-size=%2234%22 text-anchor=%22middle%22 dominant-baseline=%22middle%22>🦷</text></svg>';">
-                        <div style="display:inline-flex; align-items:center; gap:8px; background:rgba(255,255,255,0.16); padding:7px 14px; border-radius:30px; backdrop-filter:blur(6px); font-size:0.78rem; font-weight:700;">
-                            <span>✨ الإصدار المؤسسي الفاخر V4.2</span>
+                    <div style="display:flex; align-items:center; gap:14px; margin-bottom:16px;">
+                        <img src="logo3.png" alt="شعار العيادة" class="auth-logo" onerror="this.onerror=null; this.src='data:image/svg+xml;utf8,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 64 64%22><rect width=%2264%22 height=%2264%22 rx=%2214%22 fill=%22%230284c7%22/><text x=%2250%25%22 y=%2256%25%22 font-size=%2234%22 text-anchor=%22middle%22 dominant-baseline=%22middle%22>🦷</text></svg>';">
+                        <div>
+                            <div style="display:inline-flex; align-items:center; gap:6px; background:rgba(255,255,255,0.18); padding:5px 12px; border-radius:30px; font-size:0.75rem; font-weight:700; margin-bottom:6px;">
+                                <span>✨ الإصدار المؤسسي الفاخر V4.5</span>
+                            </div>
+                            <h1 style="font-size:1.55rem; font-weight:800; line-height:1.3;" id="auth-clinic-title">عيادة ابتسامة الذكية ERP</h1>
                         </div>
                     </div>
-                    <h1 style="font-size:1.75rem; font-weight:800; line-height:1.35; margin-bottom:10px;" id="auth-clinic-title">عيادة ابتسامة الذكية ERP</h1>
-                    <p style="font-size:0.88rem; opacity:0.9; line-height:1.6;">منظومة سحابية متكاملة لإدارة عيادات ومراكز طب وجراحة الأسنان، تخطيط الأسطح الخمسة، الأشعة، والفوترة الضريبية.</p>
+                    <p style="font-size:0.88rem; opacity:0.92; line-height:1.6;">منظومة سحابية فائقة السرعة لإدارة عيادات ومراكز طب وجراحة الأسنان، تخطيط الأسطح الخمسة، الأشعة، والفوترة الضريبية.</p>
                 </div>
 
                 <div style="display:flex; flex-direction:column; gap:10px; margin:20px 0;">
-                    <div style="display:flex; align-items:center; gap:10px; background:rgba(255,255,255,0.1); padding:10px 14px; border-radius:12px; font-size:0.82rem;">
+                    <div style="display:flex; align-items:center; gap:10px; background:rgba(255,255,255,0.12); padding:10px 14px; border-radius:12px; font-size:0.82rem;">
                         <span style="font-size:1.2rem;">🦷</span>
                         <span>مخطط سني 5 أسطح + قياس الجيوب اللثوية</span>
                     </div>
-                    <div style="display:flex; align-items:center; gap:10px; background:rgba(255,255,255,0.1); padding:10px 14px; border-radius:12px; font-size:0.82rem;">
+                    <div style="display:flex; align-items:center; gap:10px; background:rgba(255,255,255,0.12); padding:10px 14px; border-radius:12px; font-size:0.82rem;">
                         <span style="font-size:1.2rem;">🧾</span>
                         <span>فوترة ضريبية QR، تأمين طبي، وأقساط مجدولة</span>
                     </div>
-                    <div style="display:flex; align-items:center; gap:10px; background:rgba(255,255,255,0.1); padding:10px 14px; border-radius:12px; font-size:0.82rem;">
+                    <div style="display:flex; align-items:center; gap:10px; background:rgba(255,255,255,0.12); padding:10px 14px; border-radius:12px; font-size:0.82rem;">
                         <span style="font-size:1.2rem;">🔊</span>
                         <span>شاشة انتظار ذكية مع نداء صوتي آلي للمرضى</span>
                     </div>
                 </div>
 
-                <div style="font-size:0.75rem; opacity:0.8; display:flex; justify-content:space-between; border-top:1px solid rgba(255,255,255,0.2); padding-top:12px;">
-                    <span>🔒 اتصال مشفر ومحمي</span>
+                <div style="font-size:0.75rem; opacity:0.85; display:flex; justify-content:space-between; border-top:1px solid rgba(255,255,255,0.2); padding-top:12px;">
+                    <span>🔒 اتصال مشفر وسريع</span>
                     <span>نظام صلاحيات متعدد (RBAC)</span>
                 </div>
             </div>
@@ -543,22 +548,22 @@
             <!-- Left Side: Interactive Role & PIN Login -->
             <div class="auth-form-side">
                 <h2 style="color: var(--text-main); font-size: 1.3rem; font-weight:800; margin-bottom: 2px;">بوابة الدخول الآمن</h2>
-                <p style="color: var(--text-muted); font-size: 0.82rem;">اختر الحساب الطبي أو الإداري لتسجيل الدخول</p>
+                <p style="color: var(--text-muted); font-size: 0.82rem;">اختر الحساب الطبي أو الإداري لتسجيل الدخول الفوري</p>
 
                 <div class="role-selector">
                     <div class="role-card active" id="role-admin" onclick="selectLoginAccount('admin')">
                         <span style="font-size:1.55rem;">👨‍⚕️</span>
-                        <span>د. بهاء الشيخ</span>
+                        <span>م. بهاء الشيخ</span>
                         <small style="color:var(--text-muted); font-size:0.68rem;">المدير الطبي</small>
                     </div>
                     <div class="role-card" id="role-doctor" onclick="selectLoginAccount('doctor')">
                         <span style="font-size:1.55rem;">👩‍⚕️</span>
-                        <span>د. ريم العلي</span>
+                        <span>د. ايهم الطويل </span>
                         <small style="color:var(--text-muted); font-size:0.68rem;">طبيب معالج</small>
                     </div>
                     <div class="role-card" id="role-reception" onclick="selectLoginAccount('reception')">
                         <span style="font-size:1.55rem;">🛎️</span>
-                        <span>أ. خالد المنصور</span>
+                        <span>أ. سعيد الحمصاني</span>
                         <small style="color:var(--text-muted); font-size:0.68rem;">استقبال ومحاسبة</small>
                     </div>
                 </div>
@@ -591,7 +596,7 @@
                     </div>
                     <div id="auth-error-msg" style="color:var(--danger); font-size:0.8rem; margin-bottom:10px; display:none; text-align:center; font-weight:bold;">❌ رمز المرور غير صحيح، يرجى المحاولة مرة أخرى</div>
 
-                    <button type="submit" class="btn btn-primary" style="width:100%; padding:12px; font-size:0.95rem; margin-top:4px;">🔓 الدخول إلى المنظومة</button>
+                    <button type="submit" class="btn btn-primary" style="width:100%; padding:12px; font-size:0.95rem; margin-top:4px;">🔓 الدخول السريع إلى المنظومة</button>
                 </form>
 
                 <div style="margin-top: 14px; padding-top: 10px; border-top: 1px dashed var(--border); font-size: 0.74rem; color: var(--text-muted); display:flex; justify-content:space-around;">
@@ -603,9 +608,22 @@
         </div>
     </div>
 
-    <!-- Header Section -->
+    <!-- Header Section: الشعار الكبير واسم العيادة في الجهة اليمنى -->
     <header>
-        <div class="header-section">
+        <div class="header-right-brand">
+            <button type="button" class="icon-btn" id="btn-hamburger" aria-label="القائمة الرئيسية" title="القائمة الجانبية">
+                <div class="hamburger-lines">
+                    <span></span><span></span><span></span>
+                </div>
+            </button>
+
+            <div class="clinic-title" onclick="navTo('dashboard')" style="cursor:pointer;">
+                <img src="logo3.png" alt="شعار العيادة" class="clinic-logo" onerror="this.onerror=null; this.src='data:image/svg+xml;utf8,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 64 64%22><rect width=%2264%22 height=%2264%22 rx=%2214%22 fill=%22%23e0f2fe%22/><text x=%2250%25%22 y=%2256%25%22 font-size=%2234%22 text-anchor=%22middle%22 dominant-baseline=%22middle%22>🦷</text></svg>';">
+                <span id="header-clinic-name">عيادة ابتسامة الذكية ERP</span>
+            </div>
+        </div>
+
+        <div class="header-left-tools">
             <div style="position: relative;">
                 <button type="button" class="icon-btn" id="btn-waffle" aria-label="التطبيقات" title="تطبيقات المنظومة">
                     <div class="waffle-grid">
@@ -641,24 +659,13 @@
             <button type="button" class="icon-btn" onclick="lockSystemSession()" title="قفل الشاشة السريع / تبديل المستخدم" style="color:var(--danger);">🔒</button>
             <span class="role-badge-header" id="active-user-badge">👨‍⚕️ المدير الطبي</span>
         </div>
-
-        <div class="clinic-title" onclick="navTo('dashboard')" style="cursor:pointer;">
-            <img src="LOGO.PNG" alt="LOGO" class="clinic-logo" onerror="this.onerror=null; this.src='data:image/svg+xml;utf8,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 64 64%22><rect width=%2264%22 height=%2264%22 rx=%2214%22 fill=%22%23e0f2fe%22/><text x=%2250%25%22 y=%2256%25%22 font-size=%2234%22 text-anchor=%22middle%22 dominant-baseline=%22middle%22>🦷</text></svg>';">
-            <span id="header-clinic-name">عيادة ابتسامة الذكية ERP</span>
-        </div>
-
-        <button type="button" class="icon-btn" id="btn-hamburger" aria-label="القائمة الرئيسية">
-            <div class="hamburger-lines">
-                <span></span><span></span><span></span>
-            </div>
-        </button>
     </header>
 
     <!-- Navigation Drawer -->
     <div class="scrim" id="scrim"></div>
     <nav class="drawer" id="drawer">
         <div class="drawer-header">
-            <img src="LOGO.PNG" alt="LOGO" class="clinic-logo" style="width:52px; height:52px; border-radius:14px;" onerror="this.style.display='none'; document.getElementById('drawer-doc-avatar').style.display='flex';">
+            <img src="logo3.png" alt="شعار العيادة" class="clinic-logo" style="width:60px; height:60px; border-radius:14px;" onerror="this.style.display='none'; document.getElementById('drawer-doc-avatar').style.display='flex';">
             <div class="drawer-avatar" id="drawer-doc-avatar" style="display:none;">د</div>
             <div>
                 <h3 style="font-size: 1rem; margin-bottom: 3px;" id="drawer-doc-name">د. بهاء الشيخ</h3>
@@ -687,6 +694,21 @@
 
         <!-- 1. Dashboard Section -->
         <section id="sec-dashboard" class="section active">
+            <!-- ترويسة لوحة التحكم الداخلية بالشعار الكبير في الجهة اليمنى بجانب اسم العيادة -->
+            <div class="dashboard-hero-banner">
+                <div style="display:flex; align-items:center; gap:18px;">
+                    <img src="logo3.png" alt="شعار العيادة" class="dashboard-hero-logo" onerror="this.onerror=null; this.src='data:image/svg+xml;utf8,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 64 64%22><rect width=%2264%22 height=%2264%22 rx=%2214%22 fill=%22%230284c7%22/><text x=%2250%25%22 y=%2256%25%22 font-size=%2234%22 text-anchor=%22middle%22 dominant-baseline=%22middle%22>🦷</text></svg>';">
+                    <div>
+                        <h2 style="font-size:1.5rem; font-weight:800; color:var(--primary-dark);" id="dash-clinic-banner-title">عيادة ابتسامة الذكية ERP</h2>
+                        <p style="font-size:0.88rem; color:var(--text-muted); margin-top:2px;">مرحباً بك في لوحة التحكم المركزية — جميع المؤشرات السريرية والمالية محدثة لحظياً</p>
+                    </div>
+                </div>
+                <div style="display:flex; gap:10px; flex-wrap:wrap;">
+                    <button type="button" class="btn btn-primary" onclick="openNewPatientModal()">+ تسجيل مريض جديد</button>
+                    <button type="button" class="btn btn-outline" onclick="navTo('appointments'); openApptModal()">📅 حجز موعد سريع</button>
+                </div>
+            </div>
+
             <div class="dashboard-stats">
                 <div class="stat-card">
                     <div class="stat-icon" style="background: var(--primary);">📅</div>
@@ -1020,7 +1042,6 @@
 
         <!-- 5. Dental Chart Section (5-Surface + Adult/Pediatric + Perio) -->
         <section id="sec-chart" class="section">
-            <!-- Medical Alert inside Chart too -->
             <div class="medical-alert-banner" id="chart-medical-alert">
                 <div><strong>⚠️ تنبيه طبي للمريض الحالي:</strong> <span id="chart-alert-text"></span></div>
             </div>
@@ -1454,9 +1475,9 @@
         <div class="modal-content" style="max-width:540px;">
             <div style="display:flex; justify-content:space-between; align-items:flex-start; border-bottom:2px solid var(--primary); padding-bottom:12px; margin-bottom:14px;">
                 <div style="display:flex; align-items:center; gap:12px;">
-                    <img src="LOGO.PNG" alt="LOGO" class="clinic-logo" style="width:52px; height:52px;" onerror="this.style.display='none'">
+                    <img src="logo3.png" alt="شعار العيادة" class="clinic-logo" style="width:56px; height:56px;" onerror="this.style.display='none'">
                     <div>
-                        <h3 style="color:var(--primary); font-size:1.2rem;" id="inv-clinic-name">عيادة ابتسامة الذكية</h3>
+                        <h3 style="color:var(--primary); font-size:1.2rem;" id="inv-clinic-name">عيادة ابتسامة الذكية ERP</h3>
                         <p style="font-size:0.78rem; color:var(--text-muted);">فاتورة ضريبية مبسطة (Tax Invoice)</p>
                         <p style="font-size:0.78rem; color:var(--text-muted);">الرقم الضريبي: <span id="inv-vat-number">300123456700003</span></p>
                     </div>
@@ -1481,9 +1502,9 @@
         <div class="modal-content" style="max-width:500px;">
             <div style="display:flex; justify-content:space-between; align-items:center; border-bottom:2px solid var(--primary); padding-bottom:10px; margin-bottom:14px;">
                 <div style="display:flex; align-items:center; gap:10px;">
-                    <img src="LOGO.PNG" alt="LOGO" class="clinic-logo" style="width:46px; height:46px;" onerror="this.style.display='none'">
+                    <img src="logo3.png" alt="شعار العيادة" class="clinic-logo" style="width:52px; height:52px;" onerror="this.style.display='none'">
                     <div>
-                        <h3 style="color:var(--primary);" id="rx-clinic-title">عيادة ابتسامة الذكية</h3>
+                        <h3 style="color:var(--primary);" id="rx-clinic-title">عيادة ابتسامة الذكية ERP</h3>
                         <p style="font-size:0.8rem; color:var(--text-muted);" id="rx-doc-name">د. بهاء الشيخ</p>
                     </div>
                 </div>
@@ -1549,7 +1570,7 @@
                 </div>
             </div>
             <div style="background:#000; border-radius:8px; overflow:hidden; display:flex; justify-content:center; align-items:center; min-height:320px;">
-                <img id="lightbox-img" src="" alt="X-Ray" style="max-width:100%; max-height:460px; transition: filter 0.25s;">
+                <img id="lightbox-img" src="" alt="X-Ray" style="max-width:100%; max-height:460px; transition: filter 0.2s;">
             </div>
         </div>
     </div>
@@ -1807,10 +1828,10 @@
             document.getElementById('auth-error-msg').style.display = 'none';
             currentUser = acc;
             try { sessionStorage.setItem('DENTAL_ACTIVE_ROLE', selectedAuthKey); } catch (err) {}
-            applyRolePermissions();
             document.getElementById('auth-screen').classList.add('hidden');
-            showToast(`مرحباً بك ${acc.name} — تم تسجيل الدخول بنجاح`);
+            applyRolePermissions();
             navTo('dashboard');
+            showToast(`مرحباً بك ${acc.name} — تم تسجيل الدخول بنجاح`);
         }
 
         function lockSystemSession() {
@@ -1934,7 +1955,7 @@
             if (!toast) return;
             toast.textContent = msg;
             toast.classList.add('show');
-            setTimeout(() => toast.classList.remove('show'), 3200);
+            setTimeout(() => toast.classList.remove('show'), 2800);
         }
         function closeModal(id) {
             const el = document.getElementById(id);
@@ -1953,7 +1974,7 @@
             if (btn) btn.textContent = clinicSettings.darkMode ? '☀️' : '🌙';
         }
 
-        // --- NAVIGATION & BREADCRUMBS ---
+        // --- FAST NAVIGATION & LAZY RENDERING ---
         function navTo(target, extraName = null) {
             const roleRestrictions = {
                 chart: ['admin', 'doctor'],
@@ -1997,19 +2018,20 @@
                 if (extraName) bc.innerHTML += `<li>${extraName}</li>`;
             }
 
-            if (target === 'dashboard') updateDashboardStats();
-            if (target === 'patients') renderPatients();
-            if (target === 'appointments') { renderCalendar(); renderTimeline(); }
-            if (target === 'chart') renderDentalChartArch();
-            if (target === 'finance') renderFinanceSection();
-            if (target === 'inventory') renderInventorySection();
-            if (target === 'lab') renderLabSection();
-            if (target === 'reports') renderReportsSection();
-            if (target === 'settings') populateSettingsForm();
-
+            // Close Drawers immediately for snappy UX
             if (document.getElementById('drawer').classList.contains('open')) toggleDrawer();
             document.getElementById('waffle-panel').classList.remove('open');
-            window.scrollTo(0, 0);
+
+            // Render only the requested view on demand
+            if (target === 'dashboard') updateDashboardStats();
+            else if (target === 'patients') renderPatients();
+            else if (target === 'appointments') { renderCalendar(); renderTimeline(); }
+            else if (target === 'chart') renderDentalChartArch();
+            else if (target === 'finance') renderFinanceSection();
+            else if (target === 'inventory') renderInventorySection();
+            else if (target === 'lab') renderLabSection();
+            else if (target === 'reports') renderReportsSection();
+            else if (target === 'settings') populateSettingsForm();
         }
 
         const btnHamburger = document.getElementById('btn-hamburger');
@@ -2049,6 +2071,7 @@
             document.getElementById('count-insured').textContent = mockPatients.filter(p => p.insuranceCompany).length;
 
             const waitContainer = document.getElementById('dashboard-waiting-list');
+            if (!waitContainer) return;
             if (waitingPatients.length === 0) {
                 waitContainer.innerHTML = `<p style="color:var(--text-muted); text-align:center; padding:24px;">غرفة الانتظار خالية حالياً.</p>`;
             } else {
@@ -2181,7 +2204,6 @@
         function renderPatients() {
             const tbody = document.getElementById('patients-tbody');
             if (!tbody) return;
-            tbody.innerHTML = '';
             const start = (currPage - 1) * perPage;
             const end = start + perPage;
             const toShow = filteredPatients.slice(start, end);
@@ -2189,14 +2211,14 @@
             if (toShow.length === 0) {
                 tbody.innerHTML = `<tr><td colspan="7"><div class="empty-state">لا توجد سجلات مطابقة للفلتر المحدد.</div></td></tr>`;
             } else {
-                toShow.forEach(p => {
+                tbody.innerHTML = toShow.map(p => {
                     recalcPatientFinance(p);
                     let statusBadge = p.isWaiting ? `<span class="tag warning">⏳ انتظار</span>` : `<span class="tag">خارج العيادة</span>`;
                     if (p.isEmergency) statusBadge += ` <span class="tag danger">🚨 طوارئ</span>`;
                     const insBadge = p.insuranceCompany ? `<span class="tag purple">🛡️ ${p.insuranceCompany} (${p.insuranceRate}%)</span>` : `<span class="tag">نقدي</span>`;
                     const balanceColor = p.balance > 0 ? 'var(--danger)' : 'var(--success)';
 
-                    tbody.innerHTML += `<tr>
+                    return `<tr>
                         <td style="font-family:monospace; font-weight:bold;">#${p.id}</td>
                         <td style="font-weight:bold; color:var(--primary); cursor:pointer;" onclick="openPatientProfile('${p.id}')">${p.name}</td>
                         <td style="font-family:monospace;" dir="ltr">${p.phone}</td>
@@ -2210,7 +2232,7 @@
                             </div>
                         </td>
                     </tr>`;
-                });
+                }).join('');
             }
             document.getElementById('page-info').textContent = `عرض ${toShow.length > 0 ? start + 1 : 0}-${Math.min(end, filteredPatients.length)} من ${filteredPatients.length}`;
             const ul = document.getElementById('pagination-controls');
@@ -2730,14 +2752,15 @@
             const firstDay = new Date(year, month, 1).getDay();
             const daysInMonth = new Date(year, month + 1, 0).getDate();
             const grid = document.getElementById('mini-cal-grid');
-            grid.innerHTML = '';
-            for (let i = 0; i < firstDay; i++) grid.innerHTML += `<div class="cal-day empty"></div>`;
+            let html = '';
+            for (let i = 0; i < firstDay; i++) html += `<div class="cal-day empty"></div>`;
             for (let i = 1; i <= daysInMonth; i++) {
                 const dKey = formatDateKey(new Date(year, month, i));
                 const hasAppt = appointments.some(a => a.dateKey === dKey);
                 const isSelected = (selectedDate.getDate() === i && selectedDate.getMonth() === month && selectedDate.getFullYear() === year);
-                grid.innerHTML += `<div class="cal-day ${isSelected ? 'active' : ''} ${hasAppt ? 'has-appt' : ''}" onclick="selectDate(${i}, ${month}, ${year})">${i}</div>`;
+                html += `<div class="cal-day ${isSelected ? 'active' : ''} ${hasAppt ? 'has-appt' : ''}" onclick="selectDate(${i}, ${month}, ${year})">${i}</div>`;
             }
+            grid.innerHTML = html;
             document.getElementById('timeline-date-display').textContent = selectedDate.toLocaleDateString('ar-SA', {weekday:'long', year:'numeric', month:'long', day:'numeric'});
         }
 
@@ -2746,12 +2769,12 @@
 
         function renderTimeline() {
             const slots = document.getElementById('timeline-slots');
-            slots.innerHTML = '';
             const selKey = formatDateKey(selectedDate);
             const docFilter = document.getElementById('sched-doctor-filter').value;
             const dayAppts = appointments.filter(a => a.dateKey === selKey && (docFilter === 'all' || a.doctor === docFilter));
             document.getElementById('timeline-count-tag').textContent = `${dayAppts.length} مواعيد`;
 
+            let html = '';
             for (let i = 8; i <= 21; i++) {
                 const hourStr = i > 12 ? `${i - 12}:00 PM` : (i === 12 ? '12:00 PM' : `${i}:00 AM`);
                 const slotAppts = dayAppts.filter(a => Number(a.hour) === i);
@@ -2767,11 +2790,12 @@
                     </div>`;
                 }).join('');
 
-                slots.innerHTML += `<div class="time-slot" onclick="prefillAppt(${i})">
+                html += `<div class="time-slot" onclick="prefillAppt(${i})">
                     <div class="time-label">${hourStr}</div>
                     <div class="slot-content">${contentHTML}</div>
                 </div>`;
             }
+            slots.innerHTML = html;
         }
 
         function toggleApptStatus(apptId) {
@@ -2836,7 +2860,7 @@
                 scrollWheelToValue('wh-h', hour12);
                 scrollWheelToValue('wh-m', '00');
                 scrollWheelToValue('wh-a', ampm);
-            }, 60);
+            }, 40);
         }
 
         function openApptModal(patientId = null) { prefillAppt(10, patientId); }
@@ -3376,6 +3400,8 @@
         // --- SETTINGS & JSON BACKUP / RESTORE ---
         function applySettingsToHeader() {
             document.getElementById('header-clinic-name').textContent = clinicSettings.clinicName;
+            const dashBannerTitle = document.getElementById('dash-clinic-banner-title');
+            if (dashBannerTitle) dashBannerTitle.textContent = clinicSettings.clinicName;
             const authTitle = document.getElementById('auth-clinic-title');
             if (authTitle) authTitle.textContent = clinicSettings.clinicName;
             if (currentUser && currentUser.role === 'admin') {
@@ -3438,7 +3464,6 @@
                         localStorage.setItem(STORAGE_KEY, JSON.stringify(parsed));
                         loadState();
                         applySettingsToHeader();
-                        renderPatients();
                         updateDashboardStats();
                         showToast('تم استيراد النسخة الاحتياطية بنجاح');
                     }
@@ -3453,15 +3478,13 @@
             try { localStorage.removeItem(STORAGE_KEY); } catch (err) {}
             loadState();
             applySettingsToHeader();
-            renderPatients();
-            renderCalendar();
-            renderTimeline();
             updateDashboardStats();
             navTo('dashboard');
             showToast('تمت استعادة بيانات المصنع الافتراضية');
         }
 
-        window.onload = () => {
+        // Fast Initialization on DOMContentLoaded
+        document.addEventListener('DOMContentLoaded', () => {
             loadState();
             applySettingsToHeader();
             let savedRole = null;
@@ -3476,13 +3499,8 @@
             applyRolePermissions();
             initWheel();
             initSignatureCanvas();
-            renderDentalChartArch();
-            renderPatients();
-            renderCalendar();
-            renderTimeline();
             updateDashboardStats();
-            navTo('dashboard');
-        };
+        });
     </script>
 </body>
 </html>
