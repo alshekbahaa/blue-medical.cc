@@ -3,12 +3,12 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>منظومة إدارة عيادة الأسنان الشاملة - Enterprise Dental ERP</title>
+    <title>عيادة الابتسامة الذكية - منظومة إدارة عيادات الأسنان</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <style>
-        /* === التصميم العام والمتغيرات الفاخرة سريعة الأداء (High-Performance Luxury UI) === */
+        /* === التصميم العام والمتغيرات الفاخرة سريعة الأداء === */
         :root {
             --primary: #0284c7; 
             --primary-dark: #0369a1;
@@ -18,7 +18,6 @@
             --bg-main: #f1f5f9;
             --surface: #ffffff;
             --surface-alt: #f8fafc;
-            --surface-glass: #ffffff;
             --text-main: #0f172a;
             --text-muted: #64748b;
             --border: #e2e8f0;
@@ -45,7 +44,6 @@
             --bg-main: #0b1120;
             --surface: #1e293b;
             --surface-alt: #0f172a;
-            --surface-glass: #1e293b;
             --text-main: #f8fafc;
             --text-muted: #94a3b8;
             --border: #334155;
@@ -79,13 +77,11 @@
             border-bottom: 1px solid var(--border);
             flex-shrink: 0;
         }
-        /* الجهة اليمنى: القائمة + الشعار الكبير + اسم العيادة */
         .header-right-brand {
             display: flex;
             align-items: center;
             gap: 14px;
         }
-        /* الجهة اليسرى: أدوات التحكم السريعة */
         .header-left-tools {
             display: flex;
             align-items: center;
@@ -111,14 +107,13 @@
             -webkit-text-fill-color: transparent;
         }
         .clinic-logo {
-            width: 58px;
-            height: 58px;
+            width: 64px;
+            height: 64px;
             object-fit: contain;
-            border-radius: 14px;
-            background: var(--surface);
-            padding: 4px;
-            border: 2px solid var(--primary-light);
-            box-shadow: var(--shadow-sm);
+            background: transparent;
+            border: none;
+            box-shadow: none;
+            padding: 0;
             flex-shrink: 0;
         }
         .dashboard-hero-banner {
@@ -126,35 +121,43 @@
             border: 1px solid var(--border);
             border-right: 6px solid var(--primary);
             border-radius: var(--radius);
-            padding: 18px 24px;
+            padding: 24px 28px;
             margin-bottom: 22px;
             display: flex;
             justify-content: space-between;
             align-items: center;
             flex-wrap: wrap;
-            gap: 16px;
+            gap: 20px;
             box-shadow: var(--shadow-sm);
         }
+        .dashboard-hero-right {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+            flex: 1;
+            min-width: 260px;
+        }
         .dashboard-hero-logo {
-            width: 74px;
-            height: 74px;
+            width: 115px;
+            height: 115px;
             object-fit: contain;
-            border-radius: 16px;
-            background: #ffffff;
-            padding: 6px;
-            border: 2px solid var(--primary);
-            box-shadow: var(--shadow-md);
+            background: transparent;
+            border: none;
+            box-shadow: none;
+            padding: 0;
+            margin-bottom: 10px;
             flex-shrink: 0;
         }
         .auth-logo {
-            width: 88px;
-            height: 88px;
+            width: 135px;
+            height: 135px;
             object-fit: contain;
-            border-radius: 20px;
-            background: #ffffff;
-            padding: 8px;
-            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.22);
-            border: 2px solid rgba(255, 255, 255, 0.8);
+            background: transparent;
+            padding: 0;
+            box-shadow: none;
+            border: none;
+            margin-bottom: 12px;
         }
         
         .icon-btn {
@@ -509,19 +512,12 @@
     <!-- === AUTHENTICATION & LUXURY SPLIT LOGIN SCREEN === -->
     <div class="auth-screen" id="auth-screen">
         <div class="auth-split-wrapper">
-            <!-- Right Side: Medical Branding & Live Features -->
+            <!-- Right Side: الشعار حر بدون مربع في المنتصف وتحته اسم العيادة والوصف المختصر -->
             <div class="auth-brand-side">
-                <div>
-                    <div style="display:flex; align-items:center; gap:14px; margin-bottom:16px;">
-                        <img src="logo3.png" alt="شعار العيادة" class="auth-logo" onerror="this.onerror=null; this.src='data:image/svg+xml;utf8,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 64 64%22><rect width=%2264%22 height=%2264%22 rx=%2214%22 fill=%22%230284c7%22/><text x=%2250%25%22 y=%2256%25%22 font-size=%2234%22 text-anchor=%22middle%22 dominant-baseline=%22middle%22>🦷</text></svg>';">
-                        <div>
-                            <div style="display:inline-flex; align-items:center; gap:6px; background:rgba(255,255,255,0.18); padding:5px 12px; border-radius:30px; font-size:0.75rem; font-weight:700; margin-bottom:6px;">
-                                <span>✨ الإصدار المؤسسي الفاخر V4.5</span>
-                            </div>
-                            <h1 style="font-size:1.55rem; font-weight:800; line-height:1.3;" id="auth-clinic-title">عيادة ابتسامة الذكية ERP</h1>
-                        </div>
-                    </div>
-                    <p style="font-size:0.88rem; opacity:0.92; line-height:1.6;">منظومة سحابية فائقة السرعة لإدارة عيادات ومراكز طب وجراحة الأسنان، تخطيط الأسطح الخمسة، الأشعة، والفوترة الضريبية.</p>
+                <div style="display:flex; flex-direction:column; align-items:center; text-align:center; margin-top:10px;">
+                    <img src="logo3.png" alt="شعار العيادة" class="auth-logo" onerror="this.onerror=null; this.src='data:image/svg+xml;utf8,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 64 64%22><text x=%2250%25%22 y=%2256%25%22 font-size=%2248%22 text-anchor=%22middle%22 dominant-baseline=%22middle%22>🦷</text></svg>';">
+                    <h1 style="font-size:1.75rem; font-weight:800; line-height:1.3; margin-bottom:8px;" id="auth-clinic-title">عيادة الابتسامة الذكية</h1>
+                    <p style="font-size:0.92rem; opacity:0.92; line-height:1.6; max-width:320px;">منظومة سحابية لإدارة عيادات الأسنان، المخطط السني، الأشعة، والفوترة الضريبية.</p>
                 </div>
 
                 <div style="display:flex; flex-direction:column; gap:10px; margin:20px 0;">
@@ -552,26 +548,26 @@
 
                 <div class="role-selector">
                     <div class="role-card active" id="role-admin" onclick="selectLoginAccount('admin')">
-                        <span style="font-size:1.55rem;">👨‍⚕️</span>
-                        <span>م. بهاء الشيخ</span>
-                        <small style="color:var(--text-muted); font-size:0.68rem;">المدير الطبي</small>
+                        <span style="font-size:1.55rem;">👨‍💼</span>
+                        <span>المدير العام</span>
+                        <small style="color:var(--text-muted); font-size:0.72rem; font-weight:700;">م. بهاء الشيخ</small>
                     </div>
                     <div class="role-card" id="role-doctor" onclick="selectLoginAccount('doctor')">
-                        <span style="font-size:1.55rem;">👩‍⚕️</span>
-                        <span>د. ايهم الطويل </span>
-                        <small style="color:var(--text-muted); font-size:0.68rem;">طبيب معالج</small>
+                        <span style="font-size:1.55rem;">👨‍⚕️</span>
+                        <span>الطبيب المعالج</span>
+                        <small style="color:var(--text-muted); font-size:0.72rem; font-weight:700;">د. أيهم الطويل</small>
                     </div>
                     <div class="role-card" id="role-reception" onclick="selectLoginAccount('reception')">
                         <span style="font-size:1.55rem;">🛎️</span>
-                        <span>أ. سعيد الحمصاني</span>
-                        <small style="color:var(--text-muted); font-size:0.68rem;">استقبال ومحاسبة</small>
+                        <span>استقبال ومحاسبة</span>
+                        <small style="color:var(--text-muted); font-size:0.72rem; font-weight:700;">أ. سعيد شكيب</small>
                     </div>
                 </div>
 
                 <form onsubmit="handleAuthLogin(event)" style="text-align: right;">
                     <div class="input-group" style="margin-bottom:10px;">
                         <label>الحساب المحدد حالياً</label>
-                        <input type="text" id="auth-username" class="form-control" value="د. بهاء الشيخ (👨‍⚕️ المدير الطبي)" readonly style="font-weight:800;">
+                        <input type="text" id="auth-username" class="form-control" value="المدير العام — م. بهاء الشيخ" readonly style="font-weight:800;">
                     </div>
                     <div class="input-group" style="margin-bottom:10px;">
                         <div style="display:flex; justify-content:space-between; align-items:center;">
@@ -608,7 +604,7 @@
         </div>
     </div>
 
-    <!-- Header Section: الشعار الكبير واسم العيادة في الجهة اليمنى -->
+    <!-- Header Section: الشعار الحر واسم العيادة في الجهة اليمنى -->
     <header>
         <div class="header-right-brand">
             <button type="button" class="icon-btn" id="btn-hamburger" aria-label="القائمة الرئيسية" title="القائمة الجانبية">
@@ -618,8 +614,8 @@
             </button>
 
             <div class="clinic-title" onclick="navTo('dashboard')" style="cursor:pointer;">
-                <img src="logo3.png" alt="شعار العيادة" class="clinic-logo" onerror="this.onerror=null; this.src='data:image/svg+xml;utf8,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 64 64%22><rect width=%2264%22 height=%2264%22 rx=%2214%22 fill=%22%23e0f2fe%22/><text x=%2250%25%22 y=%2256%25%22 font-size=%2234%22 text-anchor=%22middle%22 dominant-baseline=%22middle%22>🦷</text></svg>';">
-                <span id="header-clinic-name">عيادة ابتسامة الذكية ERP</span>
+                <img src="logo3.png" alt="شعار العيادة" class="clinic-logo" onerror="this.onerror=null; this.src='data:image/svg+xml;utf8,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 64 64%22><text x=%2250%25%22 y=%2256%25%22 font-size=%2244%22 text-anchor=%22middle%22 dominant-baseline=%22middle%22>🦷</text></svg>';">
+                <span id="header-clinic-name">عيادة الابتسامة الذكية</span>
             </div>
         </div>
 
@@ -657,7 +653,7 @@
 
             <!-- Quick Lock Screen Button -->
             <button type="button" class="icon-btn" onclick="lockSystemSession()" title="قفل الشاشة السريع / تبديل المستخدم" style="color:var(--danger);">🔒</button>
-            <span class="role-badge-header" id="active-user-badge">👨‍⚕️ المدير الطبي</span>
+            <span class="role-badge-header" id="active-user-badge">👨‍💼 المدير العام</span>
         </div>
     </header>
 
@@ -665,11 +661,11 @@
     <div class="scrim" id="scrim"></div>
     <nav class="drawer" id="drawer">
         <div class="drawer-header">
-            <img src="logo3.png" alt="شعار العيادة" class="clinic-logo" style="width:60px; height:60px; border-radius:14px;" onerror="this.style.display='none'; document.getElementById('drawer-doc-avatar').style.display='flex';">
-            <div class="drawer-avatar" id="drawer-doc-avatar" style="display:none;">د</div>
+            <img src="logo3.png" alt="شعار العيادة" class="clinic-logo" style="width:64px; height:64px;" onerror="this.style.display='none'; document.getElementById('drawer-doc-avatar').style.display='flex';">
+            <div class="drawer-avatar" id="drawer-doc-avatar" style="display:none;">ب</div>
             <div>
-                <h3 style="font-size: 1rem; margin-bottom: 3px;" id="drawer-doc-name">د. بهاء الشيخ</h3>
-                <p style="font-size: 0.78rem; opacity: 0.9;" id="drawer-doc-title">استشاري طب وجراحة الأسنان</p>
+                <h3 style="font-size: 1rem; margin-bottom: 3px;" id="drawer-doc-name">م. بهاء الشيخ</h3>
+                <p style="font-size: 0.78rem; opacity: 0.9;" id="drawer-doc-title">المدير العام</p>
             </div>
         </div>
         <div class="drawer-nav">
@@ -694,16 +690,14 @@
 
         <!-- 1. Dashboard Section -->
         <section id="sec-dashboard" class="section active">
-            <!-- ترويسة لوحة التحكم الداخلية بالشعار الكبير في الجهة اليمنى بجانب اسم العيادة -->
+            <!-- ترويسة لوحة التحكم الداخلية بالشعار الحر في المنتصف وتحته اسم العيادة والوصف المختصر -->
             <div class="dashboard-hero-banner">
-                <div style="display:flex; align-items:center; gap:18px;">
-                    <img src="logo3.png" alt="شعار العيادة" class="dashboard-hero-logo" onerror="this.onerror=null; this.src='data:image/svg+xml;utf8,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 64 64%22><rect width=%2264%22 height=%2264%22 rx=%2214%22 fill=%22%230284c7%22/><text x=%2250%25%22 y=%2256%25%22 font-size=%2234%22 text-anchor=%22middle%22 dominant-baseline=%22middle%22>🦷</text></svg>';">
-                    <div>
-                        <h2 style="font-size:1.5rem; font-weight:800; color:var(--primary-dark);" id="dash-clinic-banner-title">عيادة ابتسامة الذكية ERP</h2>
-                        <p style="font-size:0.88rem; color:var(--text-muted); margin-top:2px;">مرحباً بك في لوحة التحكم المركزية — جميع المؤشرات السريرية والمالية محدثة لحظياً</p>
-                    </div>
+                <div class="dashboard-hero-right">
+                    <img src="logo3.png" alt="شعار العيادة" class="dashboard-hero-logo" onerror="this.onerror=null; this.src='data:image/svg+xml;utf8,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 64 64%22><text x=%2250%25%22 y=%2256%25%22 font-size=%2248%22 text-anchor=%22middle%22 dominant-baseline=%22middle%22>🦷</text></svg>';">
+                    <h2 style="font-size:1.55rem; font-weight:800; color:var(--primary-dark);" id="dash-clinic-banner-title">عيادة الابتسامة الذكية</h2>
+                    <p style="font-size:0.9rem; color:var(--text-muted); margin-top:4px;">منظومة سحابية لإدارة عيادات الأسنان، المخطط السني، الأشعة، والفوترة الضريبية.</p>
                 </div>
-                <div style="display:flex; gap:10px; flex-wrap:wrap;">
+                <div style="display:flex; gap:10px; flex-wrap:wrap; justify-content:center;">
                     <button type="button" class="btn btn-primary" onclick="openNewPatientModal()">+ تسجيل مريض جديد</button>
                     <button type="button" class="btn btn-outline" onclick="navTo('appointments'); openApptModal()">📅 حجز موعد سريع</button>
                 </div>
@@ -753,7 +747,7 @@
                     <div class="card-header">
                         <h2 class="card-title">⚡ الوصول السريع للأطباء والعمليات</h2>
                     </div>
-                    <p style="color: var(--text-muted); font-size: 0.86rem; margin-bottom: 14px;">نظام ERP متكامل يشمل تخطيط الأسطح الخمسة، الجيوب اللثوية، الأشعة، الإقرارات الإلكترونية، الفاتورة الضريبية، وإدارة المخزون.</p>
+                    <p style="color: var(--text-muted); font-size: 0.86rem; margin-bottom: 14px;">منظومة سحابية لإدارة عيادات الأسنان، المخطط السني، الأشعة، والفوترة الضريبية.</p>
                     <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
                         <button type="button" class="btn btn-primary" onclick="openNewPatientModal()">+ تسجيل مريض جديد</button>
                         <button type="button" class="btn btn-outline" onclick="navTo('appointments'); openApptModal()">📅 حجز موعد بعيادة</button>
@@ -1008,7 +1002,7 @@
                 <div style="display:flex; gap:10px; align-items:center; flex-wrap:wrap;">
                     <select id="sched-doctor-filter" class="form-control" style="width:auto;" onchange="renderTimeline()">
                         <option value="all">👨‍⚕️ كل الأطباء والعيادات</option>
-                        <option value="د. بهاء الشيخ (عيادة 1)">د. بهاء الشيخ (عيادة 1 - جراحة وتركيبات)</option>
+                        <option value="د. أيهم الطويل (عيادة 1)">د. أيهم الطويل (عيادة 1 - جراحة وتركيبات)</option>
                         <option value="د. ريم العلي (عيادة 2)">د. ريم العلي (عيادة 2 - عصب وحشوات)</option>
                         <option value="د. طارق منصور (عيادة 3)">د. طارق منصور (عيادة 3 - تقويم وأطفال)</option>
                     </select>
@@ -1233,11 +1227,11 @@
                             <input type="text" id="set-clinic-name" class="form-control" required>
                         </div>
                         <div class="input-group">
-                            <label>اسم المدير الطبي</label>
+                            <label>اسم المدير العام</label>
                             <input type="text" id="set-doc-name" class="form-control" required>
                         </div>
                         <div class="input-group">
-                            <label>المسمى الوظيفي / التخصص</label>
+                            <label>المسمى الوظيفي</label>
                             <input type="text" id="set-doc-title" class="form-control" required>
                         </div>
                         <div class="input-group">
@@ -1290,7 +1284,7 @@
                     <div class="input-group">
                         <label>الطبيب المعالج</label>
                         <select id="np-doc" class="form-control">
-                            <option value="د. بهاء الشيخ (عيادة 1)">د. بهاء الشيخ (عيادة 1)</option>
+                            <option value="د. أيهم الطويل (عيادة 1)">د. أيهم الطويل (عيادة 1)</option>
                             <option value="د. ريم العلي (عيادة 2)">د. ريم العلي (عيادة 2)</option>
                             <option value="د. طارق منصور (عيادة 3)">د. طارق منصور (عيادة 3)</option>
                         </select>
@@ -1403,7 +1397,7 @@
             <div class="input-group">
                 <label>الطبيب المعالج وغرفة الكشف</label>
                 <select class="form-control" id="appt-doc-select">
-                    <option value="د. بهاء الشيخ (عيادة 1)">د. بهاء الشيخ (عيادة 1 - جراحة وتركيبات)</option>
+                    <option value="د. أيهم الطويل (عيادة 1)">د. أيهم الطويل (عيادة 1 - جراحة وتركيبات)</option>
                     <option value="د. ريم العلي (عيادة 2)">د. ريم العلي (عيادة 2 - عصب وحشوات)</option>
                     <option value="د. طارق منصور (عيادة 3)">د. طارق منصور (عيادة 3 - تقويم وأطفال)</option>
                 </select>
@@ -1477,7 +1471,7 @@
                 <div style="display:flex; align-items:center; gap:12px;">
                     <img src="logo3.png" alt="شعار العيادة" class="clinic-logo" style="width:56px; height:56px;" onerror="this.style.display='none'">
                     <div>
-                        <h3 style="color:var(--primary); font-size:1.2rem;" id="inv-clinic-name">عيادة ابتسامة الذكية ERP</h3>
+                        <h3 style="color:var(--primary); font-size:1.2rem;" id="inv-clinic-name">عيادة الابتسامة الذكية</h3>
                         <p style="font-size:0.78rem; color:var(--text-muted);">فاتورة ضريبية مبسطة (Tax Invoice)</p>
                         <p style="font-size:0.78rem; color:var(--text-muted);">الرقم الضريبي: <span id="inv-vat-number">300123456700003</span></p>
                     </div>
@@ -1504,8 +1498,8 @@
                 <div style="display:flex; align-items:center; gap:10px;">
                     <img src="logo3.png" alt="شعار العيادة" class="clinic-logo" style="width:52px; height:52px;" onerror="this.style.display='none'">
                     <div>
-                        <h3 style="color:var(--primary);" id="rx-clinic-title">عيادة ابتسامة الذكية ERP</h3>
-                        <p style="font-size:0.8rem; color:var(--text-muted);" id="rx-doc-name">د. بهاء الشيخ</p>
+                        <h3 style="color:var(--primary);" id="rx-clinic-title">عيادة الابتسامة الذكية</h3>
+                        <p style="font-size:0.8rem; color:var(--text-muted);" id="rx-doc-name">د. أيهم الطويل</p>
                     </div>
                 </div>
                 <div style="font-size:1.8rem; font-weight:bold; color:var(--primary);">℞</div>
@@ -1660,12 +1654,12 @@
 
     <!-- === JAVASCRIPT LOGIC === -->
     <script>
-        const STORAGE_KEY = 'ULTIMATE_DENTAL_ERP_V4';
+        const STORAGE_KEY = 'ULTIMATE_DENTAL_ERP_V6_CLEAN';
         
         const defaultSettings = {
-            clinicName: 'عيادة ابتسامة الذكية ERP',
-            docName: 'د. بهاء الشيخ',
-            docTitle: 'استشاري طب وجراحة الأسنان - المدير الطبي',
+            clinicName: 'عيادة الابتسامة الذكية',
+            docName: 'م. بهاء الشيخ',
+            docTitle: 'المدير العام',
             vatNumber: '300123456700003',
             darkMode: false,
             prices: { decay: 350, endo: 800, crown: 1200, implant: 3500, extracted: 400 }
@@ -1683,7 +1677,7 @@
         const defaultPatients = [
             {
                 id: '1001', name: 'أحمد عبدالله السالم', phone: '0551234567', gender: 'male',
-                doctor: 'د. بهاء الشيخ (عيادة 1)', tags: ['سكري', 'ضغط دم'],
+                doctor: 'د. أيهم الطويل (عيادة 1)', tags: ['سكري', 'ضغط دم'],
                 insuranceCompany: 'بوبا العربية', insuranceRate: 20, discount: 50, vatRate: 0,
                 baseTotal: 300, total: 0, paid: 300, balance: 0,
                 isWaiting: true, waitingSince: Date.now() - 18 * 60000, isEmergency: false,
@@ -1699,7 +1693,7 @@
             },
             {
                 id: '1002', name: 'فاطمة محمد العتيبي', phone: '0509876543', gender: 'female',
-                doctor: 'د. ريم العلي (عيادة 2)', tags: ['عميل VIP'],
+                doctor: 'د. أيهم الطويل (عيادة 1)', tags: ['عميل VIP'],
                 insuranceCompany: '', insuranceRate: 0, discount: 0, vatRate: 0,
                 baseTotal: 650, total: 0, paid: 850, balance: 0,
                 isWaiting: true, waitingSince: Date.now() - 9 * 60000, isEmergency: false,
@@ -1720,7 +1714,7 @@
             },
             {
                 id: '1004', name: 'عمر فهد القحطاني', phone: '0543332221', gender: 'male',
-                doctor: 'د. بهاء الشيخ (عيادة 1)', tags: ['أمراض قلب/سيولة'],
+                doctor: 'د. أيهم الطويل (عيادة 1)', tags: ['أمراض قلب/سيولة'],
                 insuranceCompany: '', insuranceRate: 0, discount: 0, vatRate: 15,
                 baseTotal: 0, total: 0, paid: 200, balance: 0,
                 isWaiting: true, waitingSince: Date.now() - 32 * 60000, isEmergency: true,
@@ -1734,8 +1728,8 @@
 
         const defaultAppointments = [
             { id: 'A1', dateKey: todayKey, hour: 10, minute: '00', patientId: '1003', name: 'سارة خالد الدوسري', doctor: 'د. طارق منصور (عيادة 3)', type: 'تنظيف وتلميع', status: 'completed' },
-            { id: 'A2', dateKey: todayKey, hour: 14, minute: '30', patientId: '1001', name: 'أحمد عبدالله السالم', doctor: 'د. بهاء الشيخ (عيادة 1)', type: 'حشوة تجميلية', status: 'waiting' },
-            { id: 'A3', dateKey: todayKey, hour: 17, minute: '00', patientId: '1002', name: 'فاطمة محمد العتيبي', doctor: 'د. ريم العلي (عيادة 2)', type: 'تركيبات وزيركون', status: 'scheduled' }
+            { id: 'A2', dateKey: todayKey, hour: 14, minute: '30', patientId: '1001', name: 'أحمد عبدالله السالم', doctor: 'د. أيهم الطويل (عيادة 1)', type: 'حشوة تجميلية', status: 'waiting' },
+            { id: 'A3', dateKey: todayKey, hour: 17, minute: '00', patientId: '1002', name: 'فاطمة محمد العتيبي', doctor: 'د. أيهم الطويل (عيادة 1)', type: 'تركيبات وزيركون', status: 'scheduled' }
         ];
 
         const defaultPayments = [
@@ -1781,9 +1775,9 @@
 
         // --- AUTHENTICATION & RBAC STATE ---
         const staffAccounts = {
-            admin: { role: 'admin', name: 'د. بهاء الشيخ', title: 'استشاري طب وجراحة الأسنان - المدير الطبي', badge: '👨‍⚕️ المدير الطبي', pin: '1234', avatar: 'د' },
-            doctor: { role: 'doctor', name: 'د. ريم العلي', title: 'أخصائية علاج العصب والتركيبات (عيادة 2)', badge: '👩‍⚕️ طبيب معالج', pin: '2222', avatar: 'ر' },
-            reception: { role: 'reception', name: 'أ. خالد المنصور', title: 'مسؤول الاستقبال والفوترة والمواعيد', badge: '🛎️ الاستقبال والمحاسبة', pin: '3333', avatar: 'خ' }
+            admin: { role: 'admin', name: 'م. بهاء الشيخ', title: 'المدير العام', badge: '👨‍💼 المدير العام', pin: '1234', avatar: 'ب' },
+            doctor: { role: 'doctor', name: 'د. أيهم الطويل', title: 'الطبيب المعالج', badge: '👨‍⚕️ الطبيب المعالج', pin: '2222', avatar: 'أ' },
+            reception: { role: 'reception', name: 'أ. سعيد شكيب', title: 'استقبال ومحاسبة', badge: '🛎️ استقبال ومحاسبة', pin: '3333', avatar: 'س' }
         };
         let selectedAuthKey = 'admin';
         let currentUser = staffAccounts.admin;
@@ -1794,7 +1788,7 @@
             const card = document.getElementById('role-' + key);
             if (card) card.classList.add('active');
             const acc = staffAccounts[key];
-            document.getElementById('auth-username').value = `${acc.name} (${acc.badge})`;
+            document.getElementById('auth-username').value = `${acc.title} — ${acc.name}`;
             document.getElementById('auth-pin').value = acc.pin;
             document.getElementById('auth-error-msg').style.display = 'none';
         }
@@ -1831,7 +1825,7 @@
             document.getElementById('auth-screen').classList.add('hidden');
             applyRolePermissions();
             navTo('dashboard');
-            showToast(`مرحباً بك ${acc.name} — تم تسجيل الدخول بنجاح`);
+            showToast(`مرحباً بك ${acc.name} (${acc.title})`);
         }
 
         function lockSystemSession() {
@@ -1843,7 +1837,7 @@
         }
 
         function applyRolePermissions() {
-            document.getElementById('active-user-badge').textContent = currentUser.badge;
+            document.getElementById('active-user-badge').textContent = `${currentUser.badge} (${currentUser.name})`;
             document.getElementById('drawer-doc-name').textContent = currentUser.name;
             document.getElementById('drawer-doc-title').textContent = currentUser.title;
             document.getElementById('drawer-doc-avatar').textContent = currentUser.avatar;
@@ -1861,7 +1855,7 @@
 
         function normalizePatientRecord(p) {
             p.tags = p.tags || [];
-            p.doctor = p.doctor || 'د. بهاء الشيخ (عيادة 1)';
+            p.doctor = p.doctor || 'د. أيهم الطويل (عيادة 1)';
             p.insuranceCompany = p.insuranceCompany || '';
             p.insuranceRate = Number(p.insuranceRate) || 0;
             p.discount = Number(p.discount) || 0;
@@ -2018,11 +2012,9 @@
                 if (extraName) bc.innerHTML += `<li>${extraName}</li>`;
             }
 
-            // Close Drawers immediately for snappy UX
             if (document.getElementById('drawer').classList.contains('open')) toggleDrawer();
             document.getElementById('waffle-panel').classList.remove('open');
 
-            // Render only the requested view on demand
             if (target === 'dashboard') updateDashboardStats();
             else if (target === 'patients') renderPatients();
             else if (target === 'appointments') { renderCalendar(); renderTimeline(); }
@@ -2697,7 +2689,7 @@
             const p = mockPatients.find(x => x.id === currentProfileId);
             if (!p) return;
             document.getElementById('rx-clinic-title').textContent = clinicSettings.clinicName;
-            document.getElementById('rx-doc-name').textContent = p.doctor || clinicSettings.docName;
+            document.getElementById('rx-doc-name').textContent = p.doctor || 'د. أيهم الطويل';
             document.getElementById('rx-patient-name').textContent = p.name;
             document.getElementById('rx-date').textContent = todayKey;
             document.getElementById('rx-text').value = '';
