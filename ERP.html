@@ -50,11 +50,12 @@
             --scrim: rgba(0, 0, 0, 0.75);
         }
 
-        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Cairo', 'Segoe UI', Tahoma, sans-serif; }
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Cairo', 'Segoe UI', Tahoma, sans-serif; -webkit-tap-highlight-color: transparent; }
         body {
             background-color: var(--bg-main);
             color: var(--text-main);
             height: 100vh;
+            height: 100dvh;
             display: flex;
             flex-direction: column;
             overflow: hidden;
@@ -69,8 +70,8 @@
             justify-content: space-between;
             align-items: center;
             background: var(--surface);
-            height: 82px;
-            padding: 0 26px;
+            height: 76px;
+            padding: 0 clamp(12px, 3vw, 26px);
             box-shadow: var(--shadow-sm);
             z-index: 40;
             position: relative;
@@ -80,26 +81,31 @@
         .header-right-brand {
             display: flex;
             align-items: center;
-            gap: 14px;
+            gap: clamp(8px, 2vw, 14px);
+            min-width: 0;
         }
         .header-left-tools {
             display: flex;
             align-items: center;
-            gap: 10px;
+            gap: clamp(6px, 1.5vw, 10px);
             position: relative;
             direction: ltr;
+            flex-shrink: 0;
         }
         .header-left-tools > * { direction: rtl; }
 
         .clinic-title {
-            font-size: 1.35rem;
+            font-size: clamp(1rem, 2.5vw, 1.35rem);
             font-weight: 800;
             background: linear-gradient(135deg, var(--primary-dark), var(--secondary));
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
             display: flex;
             align-items: center;
-            gap: 14px;
+            gap: clamp(8px, 1.8vw, 14px);
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
         }
         body.dark-mode .clinic-title {
             background: linear-gradient(135deg, #38bdf8, #2dd4bf);
@@ -107,8 +113,8 @@
             -webkit-text-fill-color: transparent;
         }
         .clinic-logo {
-            width: 64px;
-            height: 64px;
+            width: clamp(44px, 7vw, 62px);
+            height: clamp(44px, 7vw, 62px);
             object-fit: contain;
             background: transparent;
             border: none;
@@ -121,13 +127,13 @@
             border: 1px solid var(--border);
             border-right: 6px solid var(--primary);
             border-radius: var(--radius);
-            padding: 24px 28px;
-            margin-bottom: 22px;
+            padding: clamp(16px, 3vw, 24px) clamp(14px, 3.5vw, 28px);
+            margin-bottom: clamp(14px, 2.5vw, 22px);
             display: flex;
-            justify-content: space-between;
+            flex-direction: column;
             align-items: center;
-            flex-wrap: wrap;
-            gap: 20px;
+            text-align: center;
+            gap: 16px;
             box-shadow: var(--shadow-sm);
         }
         .dashboard-hero-right {
@@ -135,34 +141,33 @@
             flex-direction: column;
             align-items: center;
             text-align: center;
-            flex: 1;
-            min-width: 260px;
+            width: 100%;
         }
         .dashboard-hero-logo {
-            width: 115px;
-            height: 115px;
+            width: clamp(88px, 16vw, 115px);
+            height: clamp(88px, 16vw, 115px);
             object-fit: contain;
             background: transparent;
             border: none;
             box-shadow: none;
             padding: 0;
-            margin-bottom: 10px;
+            margin-bottom: 8px;
             flex-shrink: 0;
         }
         .auth-logo {
-            width: 135px;
-            height: 135px;
+            width: clamp(92px, 18vw, 135px);
+            height: clamp(92px, 18vw, 135px);
             object-fit: contain;
             background: transparent;
             padding: 0;
             box-shadow: none;
             border: none;
-            margin-bottom: 12px;
+            margin-bottom: 10px;
         }
         
         .icon-btn {
-            width: 42px;
-            height: 42px;
+            width: 40px;
+            height: 40px;
             border-radius: 12px;
             display: flex;
             justify-content: center;
@@ -171,6 +176,7 @@
             transition: var(--transition);
             border: 1px solid var(--border);
             background: var(--surface);
+            flex-shrink: 0;
         }
         .icon-btn:hover, .icon-btn.active {
             background: var(--primary-light);
@@ -183,17 +189,17 @@
         
         .waffle-panel {
             position: absolute;
-            top: 54px;
+            top: 52px;
             left: 0;
             background: var(--surface);
             border-radius: var(--radius);
             box-shadow: var(--shadow-lg);
             border: 1px solid var(--border);
-            padding: 18px;
-            width: 340px;
+            padding: 16px;
+            width: min(330px, calc(100vw - 24px));
             display: grid;
             grid-template-columns: repeat(3, 1fr);
-            gap: 12px;
+            gap: 10px;
             z-index: 50;
             opacity: 0;
             pointer-events: none;
@@ -202,9 +208,9 @@
             direction: rtl;
         }
         .waffle-panel.open { opacity: 1; pointer-events: auto; transform: translateY(0); }
-        .app-tile { display: flex; flex-direction: column; align-items: center; gap: 6px; font-size: 0.78rem; font-weight: 700; color: var(--text-main); transition: var(--transition); padding: 12px 6px; border-radius: 12px; text-align: center; border: 1px solid transparent; }
+        .app-tile { display: flex; flex-direction: column; align-items: center; gap: 6px; font-size: 0.76rem; font-weight: 700; color: var(--text-main); transition: var(--transition); padding: 10px 4px; border-radius: 12px; text-align: center; border: 1px solid transparent; }
         .app-tile:hover { background: var(--primary-light); color: var(--primary); border-color: var(--primary-glow); }
-        .app-icon { width: 46px; height: 46px; border-radius: 14px; display: flex; justify-content: center; align-items: center; color: white; font-size: 1.35rem; }
+        .app-icon { width: 44px; height: 44px; border-radius: 14px; display: flex; justify-content: center; align-items: center; color: white; font-size: 1.25rem; }
 
         .hamburger-lines { display: flex; flex-direction: column; gap: 4px; width: 20px; }
         .hamburger-lines span { display: block; height: 2.2px; width: 100%; background: currentColor; border-radius: 2px; }
@@ -213,34 +219,41 @@
         .scrim { position: fixed; inset: 0; background: var(--scrim); z-index: 90; opacity: 0; pointer-events: none; transition: opacity 0.15s ease; }
         .scrim.open { opacity: 1; pointer-events: auto; }
         
-        .drawer { position: fixed; top: 0; right: 0; bottom: 0; width: 295px; background: var(--surface); box-shadow: -8px 0 25px rgba(0,0,0,0.15); z-index: 100; transform: translateX(100%); transition: transform 0.18s ease-out; display: flex; flex-direction: column; border-left: 1px solid var(--border); will-change: transform; }
+        .drawer { position: fixed; top: 0; right: 0; bottom: 0; width: min(295px, 84vw); background: var(--surface); box-shadow: -8px 0 25px rgba(0,0,0,0.15); z-index: 100; transform: translateX(100%); transition: transform 0.18s ease-out; display: flex; flex-direction: column; border-left: 1px solid var(--border); will-change: transform; }
         .drawer.open { transform: translateX(0); }
-        .drawer-header { padding: 24px 20px; background: linear-gradient(135deg, #0f172a 0%, #0369a1 60%, #0d9488 100%); color: white; display: flex; align-items: center; gap: 14px; }
-        .drawer-avatar { width: 58px; height: 58px; background: rgba(255,255,255,0.2); border-radius: 16px; display: flex; justify-content: center; align-items: center; font-size: 1.5rem; font-weight: 800; border: 2px solid rgba(255,255,255,0.45); flex-shrink: 0; }
-        .drawer-nav { flex: 1; padding: 14px 10px; overflow-y: auto; display: flex; flex-direction: column; gap: 4px; }
-        .nav-item { display: flex; align-items: center; gap: 12px; padding: 12px 16px; width: 100%; font-size: 0.92rem; font-weight: 600; color: var(--text-main); transition: var(--transition); border-radius: 12px; text-align: right; }
+        .drawer-header { padding: 20px 18px; background: linear-gradient(135deg, #0f172a 0%, #0369a1 60%, #0d9488 100%); color: white; display: flex; align-items: center; gap: 14px; }
+        .drawer-avatar { width: 54px; height: 54px; background: rgba(255,255,255,0.2); border-radius: 16px; display: flex; justify-content: center; align-items: center; font-size: 1.4rem; font-weight: 800; border: 2px solid rgba(255,255,255,0.45); flex-shrink: 0; }
+        .drawer-nav { flex: 1; padding: 12px 10px; overflow-y: auto; display: flex; flex-direction: column; gap: 4px; }
+        .nav-item { display: flex; align-items: center; gap: 12px; padding: 11px 14px; width: 100%; font-size: 0.9rem; font-weight: 600; color: var(--text-main); transition: var(--transition); border-radius: 12px; text-align: right; }
         .nav-item:hover { background: var(--surface-alt); }
         .nav-item.active { background: var(--primary-light); color: var(--primary); font-weight: 800; box-shadow: inset -4px 0 0 var(--primary); }
 
-        /* === Main Area & Breadcrumbs === */
-        main { flex: 1; overflow-y: auto; padding: 0 26px 40px 26px; position: relative; }
-        .breadcrumbs { display: flex; gap: 8px; align-items: center; list-style: none; padding: 14px 0; font-size: 0.88rem; color: var(--text-muted); font-weight: 600; max-width: 1300px; margin: 0 auto; }
-        .breadcrumbs li { display: flex; align-items: center; gap: 8px; }
-        .breadcrumbs li:not(:last-child)::after { content: '›'; color: var(--text-muted); font-size: 1.1rem; }
+        /* === Main Area & Breadcrumbs (Responsive Margins) === */
+        main {
+            flex: 1;
+            overflow-y: auto;
+            overflow-x: hidden;
+            padding: 0 clamp(10px, 3vw, 26px) clamp(24px, 5vw, 40px) clamp(10px, 3vw, 26px);
+            position: relative;
+            -webkit-overflow-scrolling: touch;
+        }
+        .breadcrumbs { display: flex; gap: 6px; align-items: center; flex-wrap: wrap; list-style: none; padding: clamp(10px, 2vw, 14px) 2px; font-size: 0.84rem; color: var(--text-muted); font-weight: 600; max-width: 1300px; margin: 0 auto; }
+        .breadcrumbs li { display: flex; align-items: center; gap: 6px; }
+        .breadcrumbs li:not(:last-child)::after { content: '›'; color: var(--text-muted); font-size: 1.05rem; }
         .breadcrumbs a { color: var(--primary); text-decoration: none; cursor: pointer; padding: 2px 8px; border-radius: 6px; background: var(--primary-light); font-weight: 700; }
         
-        .section { display: none; max-width: 1300px; margin: 0 auto; }
+        .section { display: none; max-width: 1300px; margin: 0 auto; width: 100%; }
         .section.active { display: block; animation: fadeInFast 0.12s ease-out; }
         @keyframes fadeInFast { from { opacity: 0.4; transform: translateY(4px); } to { opacity: 1; transform: translateY(0); } }
 
-        .card { background: var(--surface); border-radius: var(--radius); padding: 24px; margin-bottom: 24px; box-shadow: var(--shadow-md); border: 1px solid var(--border); }
-        .card-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; padding-bottom: 14px; border-bottom: 1px solid var(--border); flex-wrap: wrap; gap: 12px; }
-        .card-title { font-size: 1.18rem; font-weight: 800; color: var(--text-main); display: flex; align-items: center; gap: 10px; }
-        .card-title::before { content: ''; width: 5px; height: 22px; border-radius: 4px; background: linear-gradient(180deg, var(--primary), var(--secondary)); display: inline-block; }
+        .card { background: var(--surface); border-radius: var(--radius); padding: clamp(14px, 3vw, 24px); margin-bottom: clamp(14px, 2.5vw, 24px); box-shadow: var(--shadow-md); border: 1px solid var(--border); }
+        .card-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: clamp(14px, 2.5vw, 20px); padding-bottom: 12px; border-bottom: 1px solid var(--border); flex-wrap: wrap; gap: 10px; }
+        .card-title { font-size: clamp(1rem, 2.2vw, 1.18rem); font-weight: 800; color: var(--text-main); display: flex; align-items: center; gap: 8px; }
+        .card-title::before { content: ''; width: 5px; height: 20px; border-radius: 4px; background: linear-gradient(180deg, var(--primary), var(--secondary)); display: inline-block; flex-shrink: 0; }
         
-        .btn { padding: 9px 18px; border-radius: 11px; font-weight: 700; font-size: 0.88rem; transition: var(--transition); display: inline-flex; align-items: center; gap: 7px; justify-content: center; border: 1px solid transparent; }
+        .btn { padding: 9px 16px; border-radius: 11px; font-weight: 700; font-size: 0.86rem; transition: var(--transition); display: inline-flex; align-items: center; gap: 6px; justify-content: center; border: 1px solid transparent; }
         .btn:active { transform: scale(0.98); }
-        .btn-sm { padding: 6px 12px; font-size: 0.78rem; border-radius: 8px; }
+        .btn-sm { padding: 6px 11px; font-size: 0.78rem; border-radius: 8px; }
         .btn-primary { background: linear-gradient(135deg, var(--primary), var(--primary-dark)); color: white; }
         .btn-primary:hover { filter: brightness(1.06); }
         .btn-success { background: linear-gradient(135deg, #10b981, #059669); color: white; }
@@ -251,31 +264,32 @@
         .btn-outline:hover { background: var(--primary-light); border-color: var(--primary); color: var(--primary); }
 
         /* Medical Critical Alert Banner */
-        .medical-alert-banner { background: rgba(239, 68, 68, 0.1); border: 1px solid rgba(239, 68, 68, 0.45); border-right: 5px solid var(--danger); color: #991b1b; padding: 14px 20px; border-radius: 14px; margin-bottom: 20px; display: none; align-items: center; justify-content: space-between; gap: 12px; }
+        .medical-alert-banner { background: rgba(239, 68, 68, 0.1); border: 1px solid rgba(239, 68, 68, 0.45); border-right: 5px solid var(--danger); color: #991b1b; padding: 12px 16px; border-radius: 14px; margin-bottom: 16px; display: none; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 10px; }
         body.dark-mode .medical-alert-banner { color: #fca5a5; }
 
         /* Sub-tabs Navigation */
-        .sub-tabs { display: flex; gap: 8px; background: var(--surface-alt); padding: 6px; border-radius: 14px; border: 1px solid var(--border); margin-bottom: 22px; overflow-x: auto; }
-        .sub-tab-btn { padding: 9px 18px; border-radius: 10px; font-weight: 700; font-size: 0.86rem; color: var(--text-muted); background: transparent; transition: 0.12s; white-space: nowrap; flex: 1; text-align: center; }
+        .sub-tabs { display: flex; gap: 6px; background: var(--surface-alt); padding: 6px; border-radius: 14px; border: 1px solid var(--border); margin-bottom: 18px; overflow-x: auto; -webkit-overflow-scrolling: touch; }
+        .sub-tab-btn { padding: 8px 14px; border-radius: 10px; font-weight: 700; font-size: 0.84rem; color: var(--text-muted); background: transparent; transition: 0.12s; white-space: nowrap; flex: 1; text-align: center; }
         .sub-tab-btn.active { background: var(--surface); color: var(--primary); box-shadow: var(--shadow-sm); }
         .sub-tab-pane { display: none; }
         .sub-tab-pane.active { display: block; }
 
         /* === Forms & Combobox === */
-        .input-group { display: flex; flex-direction: column; gap: 6px; margin-bottom: 14px; }
-        .input-group label { font-size: 0.83rem; font-weight: 700; color: var(--text-muted); }
-        .form-control { padding: 10px 14px; border: 1.5px solid var(--border); border-radius: 11px; font-size: 0.92rem; outline: none; transition: border-color 0.15s; width: 100%; background: var(--surface-alt); color: var(--text-main); }
+        .input-group { display: flex; flex-direction: column; gap: 5px; margin-bottom: 12px; }
+        .input-group label { font-size: 0.82rem; font-weight: 700; color: var(--text-muted); }
+        .form-control { padding: 9px 12px; border: 1.5px solid var(--border); border-radius: 11px; font-size: 0.9rem; outline: none; transition: border-color 0.15s; width: 100%; background: var(--surface-alt); color: var(--text-main); }
         .form-control:focus { border-color: var(--primary); background: var(--surface); }
+        .form-row-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
         
-        .combobox-container { position: relative; flex: 1; min-width: 240px; }
+        .combobox-container { position: relative; flex: 1; min-width: min(240px, 100%); }
         .combobox-input-wrapper { position: relative; }
-        .combobox-input-wrapper input { padding-right: 40px; border-radius: 12px; }
-        .search-icon { position: absolute; right: 13px; top: 50%; transform: translateY(-50%); color: var(--text-muted); width: 18px; pointer-events: none; }
-        .combobox-list { position: absolute; top: calc(100% + 6px); left: 0; right: 0; background: var(--surface); border: 1px solid var(--border); border-radius: 12px; box-shadow: var(--shadow-lg); z-index: 1000; max-height: 240px; overflow-y: auto; display: none; list-style: none; }
+        .combobox-input-wrapper input { padding-right: 38px; border-radius: 12px; }
+        .search-icon { position: absolute; right: 12px; top: 50%; transform: translateY(-50%); color: var(--text-muted); width: 18px; pointer-events: none; }
+        .combobox-list { position: absolute; top: calc(100% + 6px); left: 0; right: 0; background: var(--surface); border: 1px solid var(--border); border-radius: 12px; box-shadow: var(--shadow-lg); z-index: 1000; max-height: 230px; overflow-y: auto; display: none; list-style: none; }
         .combobox-list.show { display: block; }
-        .combobox-item { padding: 11px 16px; cursor: pointer; border-bottom: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center; font-size: 0.9rem; font-weight: 600; }
+        .combobox-item { padding: 10px 14px; cursor: pointer; border-bottom: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center; font-size: 0.88rem; font-weight: 600; }
         .combobox-item:hover, .combobox-item.active { background: var(--primary-light); color: var(--primary); }
-        .combobox-item-id { font-family: monospace; font-size: 0.78rem; background: var(--surface-alt); padding: 2px 8px; border-radius: 6px; color: var(--text-muted); }
+        .combobox-item-id { font-family: monospace; font-size: 0.76rem; background: var(--surface-alt); padding: 2px 8px; border-radius: 6px; color: var(--text-muted); }
 
         .switch { position: relative; display: inline-block; width: 46px; height: 25px; flex-shrink: 0; }
         .switch input { opacity: 0; width: 0; height: 0; }
@@ -285,30 +299,30 @@
         .switch input:checked + .slider:before { transform: translateX(21px); }
 
         /* === Tables, Pagination & Badges === */
-        .table-responsive { overflow-x: auto; border-radius: 14px; border: 1px solid var(--border); background: var(--surface); }
-        table { width: 100%; border-collapse: collapse; text-align: right; min-width: 720px; }
-        th, td { padding: 14px 16px; border-bottom: 1px solid var(--border); vertical-align: middle; font-size: 0.89rem; }
-        th { background: var(--surface-alt); color: var(--text-muted); font-weight: 700; font-size: 0.82rem; }
+        .table-responsive { overflow-x: auto; border-radius: 14px; border: 1px solid var(--border); background: var(--surface); -webkit-overflow-scrolling: touch; }
+        table { width: 100%; border-collapse: collapse; text-align: right; min-width: 650px; }
+        th, td { padding: 12px 14px; border-bottom: 1px solid var(--border); vertical-align: middle; font-size: 0.87rem; }
+        th { background: var(--surface-alt); color: var(--text-muted); font-weight: 700; font-size: 0.8rem; }
         tbody tr:hover td { background: var(--primary-light); }
         tbody tr:last-child td { border-bottom: none; }
         
-        .empty-state { text-align: center; padding: 44px 20px; color: var(--text-muted); display: flex; flex-direction: column; align-items: center; gap: 10px; background: var(--surface-alt); border-radius: 12px; }
-        .pagination-container { display: flex; justify-content: space-between; align-items: center; margin-top: 18px; flex-wrap: wrap; gap: 12px; }
+        .empty-state { text-align: center; padding: 36px 16px; color: var(--text-muted); display: flex; flex-direction: column; align-items: center; gap: 10px; background: var(--surface-alt); border-radius: 12px; }
+        .pagination-container { display: flex; justify-content: space-between; align-items: center; margin-top: 16px; flex-wrap: wrap; gap: 10px; }
         .pagination { display: flex; gap: 6px; list-style: none; }
-        .page-btn { min-width: 35px; height: 35px; display: flex; justify-content: center; align-items: center; border-radius: 9px; font-size: 0.85rem; font-weight: 700; color: var(--text-main); background: var(--surface); border: 1px solid var(--border); }
+        .page-btn { min-width: 34px; height: 34px; display: flex; justify-content: center; align-items: center; border-radius: 9px; font-size: 0.84rem; font-weight: 700; color: var(--text-main); background: var(--surface); border: 1px solid var(--border); }
         .page-btn:hover { border-color: var(--primary); color: var(--primary); }
         .page-btn[aria-current="page"] { background: var(--primary); color: white; border-color: transparent; }
 
-        .badge { position: absolute; top: -5px; right: -5px; background: var(--danger); color: white; border-radius: 50%; min-width: 20px; height: 20px; padding: 0 5px; font-size: 0.72rem; display: flex; justify-content: center; align-items: center; font-weight: 800; border: 2px solid var(--surface); }
-        .nav-badge { background: var(--danger); color: white; border-radius: 20px; padding: 2px 9px; font-size: 0.72rem; font-weight: 800; margin-right: auto; }
+        .badge { position: absolute; top: -5px; right: -5px; background: var(--danger); color: white; border-radius: 50%; min-width: 19px; height: 19px; padding: 0 4px; font-size: 0.7rem; display: flex; justify-content: center; align-items: center; font-weight: 800; border: 2px solid var(--surface); }
+        .nav-badge { background: var(--danger); color: white; border-radius: 20px; padding: 2px 8px; font-size: 0.72rem; font-weight: 800; margin-right: auto; }
         
-        .chip-container { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 18px; }
-        .chip { display: inline-flex; align-items: center; gap: 6px; padding: 7px 16px; border-radius: 30px; background: var(--surface-alt); border: 1px solid var(--border); font-size: 0.83rem; font-weight: 700; cursor: pointer; }
+        .chip-container { display: flex; gap: 7px; flex-wrap: wrap; margin-bottom: 16px; }
+        .chip { display: inline-flex; align-items: center; gap: 6px; padding: 6px 14px; border-radius: 30px; background: var(--surface-alt); border: 1px solid var(--border); font-size: 0.8rem; font-weight: 700; cursor: pointer; }
         .chip:hover { border-color: var(--primary); color: var(--primary); }
         .chip.active { background: var(--primary); border-color: transparent; color: white; }
 
         .tag-group { display: flex; gap: 6px; flex-wrap: wrap; margin-top: 6px; }
-        .tag { display: inline-flex; align-items: center; padding: 3px 10px; border-radius: 8px; font-size: 0.75rem; font-weight: 700; background: var(--surface-alt); color: var(--text-muted); border: 1px solid var(--border); }
+        .tag { display: inline-flex; align-items: center; padding: 3px 9px; border-radius: 8px; font-size: 0.74rem; font-weight: 700; background: var(--surface-alt); color: var(--text-muted); border: 1px solid var(--border); }
         .tag.danger { background: rgba(239, 68, 68, 0.14); color: #ef4444; border-color: rgba(239, 68, 68, 0.35); }
         .tag.warning { background: rgba(245, 158, 11, 0.14); color: #d97706; border-color: rgba(245, 158, 11, 0.35); }
         .tag.info { background: rgba(2, 132, 199, 0.14); color: var(--primary); border-color: rgba(2, 132, 199, 0.35); }
@@ -316,74 +330,74 @@
         .tag.purple { background: rgba(139, 92, 246, 0.14); color: var(--purple); border-color: rgba(139, 92, 246, 0.35); }
 
         /* === Profile & Finance Cards === */
-        .profile-header { display: flex; justify-content: space-between; align-items: flex-start; padding-bottom: 20px; border-bottom: 1px solid var(--border); margin-bottom: 20px; flex-wrap: wrap; gap: 16px; }
-        .profile-info { display: flex; gap: 18px; align-items: center; }
-        .profile-avatar { width: 76px; height: 76px; border-radius: 22px; background: linear-gradient(135deg, var(--primary), var(--secondary)); color: white; display: flex; justify-content: center; align-items: center; font-size: 2.1rem; font-weight: 800; flex-shrink: 0; }
+        .profile-header { display: flex; justify-content: space-between; align-items: flex-start; padding-bottom: 18px; border-bottom: 1px solid var(--border); margin-bottom: 18px; flex-wrap: wrap; gap: 14px; }
+        .profile-info { display: flex; gap: 14px; align-items: center; flex-wrap: wrap; }
+        .profile-avatar { width: 68px; height: 68px; border-radius: 20px; background: linear-gradient(135deg, var(--primary), var(--secondary)); color: white; display: flex; justify-content: center; align-items: center; font-size: 1.9rem; font-weight: 800; flex-shrink: 0; }
         
-        .finance-summary { display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 14px; margin-bottom: 22px; }
-        .finance-card { padding: 16px; border-radius: 14px; border: 1px solid var(--border); text-align: center; background: var(--surface-alt); }
-        .finance-card h4 { font-size: 0.78rem; font-weight: 700; color: var(--text-muted); margin-bottom: 6px; }
-        .finance-card .amount { font-size: 1.3rem; font-weight: 800; color: var(--text-main); }
+        .finance-summary { display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 10px; margin-bottom: 18px; }
+        .finance-card { padding: 14px 10px; border-radius: 14px; border: 1px solid var(--border); text-align: center; background: var(--surface-alt); }
+        .finance-card h4 { font-size: 0.76rem; font-weight: 700; color: var(--text-muted); margin-bottom: 5px; }
+        .finance-card .amount { font-size: 1.18rem; font-weight: 800; color: var(--text-main); }
         .finance-card.balance { border-color: rgba(239, 68, 68, 0.45); background: rgba(239, 68, 68, 0.05); }
         .finance-card.balance .amount { color: var(--danger); }
         .finance-card.paid { border-color: rgba(16, 185, 129, 0.45); background: rgba(16, 185, 129, 0.05); }
         .finance-card.paid .amount { color: var(--success); }
 
         /* === Dashboard & Appointments === */
-        .dashboard-stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 18px; margin-bottom: 24px; }
+        .dashboard-stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: clamp(10px, 2vw, 18px); margin-bottom: clamp(14px, 2.5vw, 24px); }
         .stat-card {
             background: var(--surface);
-            padding: 20px;
+            padding: clamp(14px, 2.2vw, 20px);
             border-radius: var(--radius);
             border: 1px solid var(--border);
             display: flex;
             align-items: center;
-            gap: 16px;
+            gap: 14px;
             box-shadow: var(--shadow-sm);
             position: relative;
             overflow: hidden;
         }
-        .stat-icon { width: 54px; height: 54px; border-radius: 16px; display: flex; justify-content: center; align-items: center; font-size: 1.55rem; color: white; flex-shrink: 0; }
+        .stat-icon { width: 48px; height: 48px; border-radius: 14px; display: flex; justify-content: center; align-items: center; font-size: 1.4rem; color: white; flex-shrink: 0; }
         
-        .sched-layout { display: grid; grid-template-columns: 330px 1fr; gap: 22px; align-items: start; }
+        .sched-layout { display: grid; grid-template-columns: 320px 1fr; gap: 18px; align-items: start; }
         @media(max-width: 900px) { .sched-layout { grid-template-columns: 1fr; } }
 
-        .mini-cal { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 20px; box-shadow: var(--shadow-sm); }
-        .cal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 14px; font-weight: 800; }
+        .mini-cal { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 16px; box-shadow: var(--shadow-sm); }
+        .cal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; font-weight: 800; }
         .cal-nav-btn { padding: 5px 12px; border-radius: 8px; background: var(--surface-alt); border: 1px solid var(--border); font-weight: bold; }
-        .cal-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 5px; text-align: center; }
-        .cal-day-name { font-size: 0.74rem; color: var(--text-muted); font-weight: 700; padding-bottom: 6px; }
-        .cal-day { aspect-ratio: 1; display: flex; justify-content: center; align-items: center; border-radius: 10px; font-size: 0.86rem; font-weight: 600; cursor: pointer; position: relative; }
+        .cal-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 4px; text-align: center; }
+        .cal-day-name { font-size: 0.72rem; color: var(--text-muted); font-weight: 700; padding-bottom: 6px; }
+        .cal-day { aspect-ratio: 1; display: flex; justify-content: center; align-items: center; border-radius: 10px; font-size: 0.84rem; font-weight: 600; cursor: pointer; position: relative; }
         .cal-day:hover { background: var(--primary-light); color: var(--primary); }
         .cal-day.active { background: var(--primary); color: white; font-weight: 800; }
         .cal-day.has-appt::after { content: ''; width: 5px; height: 5px; background: var(--secondary); border-radius: 50%; position: absolute; bottom: 3px; }
         .cal-day.empty { visibility: hidden; }
 
-        .timeline-container { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); height: 610px; overflow-y: auto; box-shadow: var(--shadow-sm); }
-        .timeline-header { padding: 16px 20px; border-bottom: 1px solid var(--border); background: var(--surface); position: sticky; top: 0; z-index: 10; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px; }
-        .time-slot { display: flex; border-bottom: 1px dashed var(--border); min-height: 76px; }
-        .time-label { width: 95px; padding: 12px; font-size: 0.82rem; color: var(--text-muted); font-weight: 700; border-left: 1px solid var(--border); text-align: center; background: var(--surface-alt); flex-shrink: 0; }
-        .slot-content { flex: 1; padding: 7px; cursor: pointer; display: flex; flex-direction: column; gap: 6px; }
+        .timeline-container { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); height: min(580px, 70vh); overflow-y: auto; box-shadow: var(--shadow-sm); -webkit-overflow-scrolling: touch; }
+        .timeline-header { padding: 14px 16px; border-bottom: 1px solid var(--border); background: var(--surface); position: sticky; top: 0; z-index: 10; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 8px; }
+        .time-slot { display: flex; border-bottom: 1px dashed var(--border); min-height: 72px; }
+        .time-label { width: 82px; padding: 10px 6px; font-size: 0.78rem; color: var(--text-muted); font-weight: 700; border-left: 1px solid var(--border); text-align: center; background: var(--surface-alt); flex-shrink: 0; }
+        .slot-content { flex: 1; padding: 6px; cursor: pointer; display: flex; flex-direction: column; gap: 6px; }
         .slot-content:hover { background: var(--primary-light); }
         
-        .appt-card { border-radius: 10px; padding: 9px 14px; font-size: 0.85rem; border-right: 4px solid var(--primary); background: var(--primary-light); color: var(--text-main); display: flex; justify-content: space-between; align-items: center; direction: rtl; }
+        .appt-card { border-radius: 10px; padding: 8px 12px; font-size: 0.82rem; border-right: 4px solid var(--primary); background: var(--primary-light); color: var(--text-main); display: flex; justify-content: space-between; align-items: center; direction: rtl; flex-wrap: wrap; gap: 6px; }
         .appt-card.completed { background: rgba(16, 185, 129, 0.15); border-right-color: var(--success); }
         .appt-card.waiting { background: rgba(245, 158, 11, 0.18); border-right-color: var(--warning); }
 
         /* === 5-Surface SVG Odontogram & Perio Chart === */
-        .chart-container { display: flex; flex-direction: column; align-items: center; padding: 24px 14px; background: var(--surface-alt); border-radius: 16px; border: 1px solid var(--border); overflow-x: auto; margin-bottom: 24px; position: relative; }
-        .chart-overlay { position: absolute; inset: 0; background: rgba(15, 23, 42, 0.72); z-index: 10; display: flex; justify-content: center; align-items: center; flex-direction: column; gap: 12px; border-radius: 16px; color: white; text-align: center; padding: 20px; }
-        .jaw-label { font-weight: 800; color: var(--primary); margin: 10px 0 8px; width: 100%; text-align: center; border-bottom: 1px dashed var(--border); padding-bottom: 6px; font-size: 0.92rem; }
-        .tooth-row { display: flex; gap: 7px; padding: 8px; align-items: center; }
-        .tooth-group { display: flex; gap: 7px; }
-        .tooth-divider { width: 2px; background: var(--primary); margin: 0 10px; align-self: stretch; opacity: 0.35; }
+        .chart-container { display: flex; flex-direction: column; align-items: center; padding: 18px 10px; background: var(--surface-alt); border-radius: 16px; border: 1px solid var(--border); overflow-x: auto; margin-bottom: 20px; position: relative; -webkit-overflow-scrolling: touch; }
+        .chart-overlay { position: absolute; inset: 0; background: rgba(15, 23, 42, 0.74); z-index: 10; display: flex; justify-content: center; align-items: center; flex-direction: column; gap: 12px; border-radius: 16px; color: white; text-align: center; padding: 20px; }
+        .jaw-label { font-weight: 800; color: var(--primary); margin: 8px 0 6px; width: 100%; text-align: center; border-bottom: 1px dashed var(--border); padding-bottom: 6px; font-size: 0.88rem; }
+        .tooth-row { display: flex; gap: 6px; padding: 6px; align-items: center; min-width: max-content; }
+        .tooth-group { display: flex; gap: 6px; }
+        .tooth-divider { width: 2px; background: var(--primary); margin: 0 8px; align-self: stretch; opacity: 0.35; }
         
-        .tooth-wrapper { display: flex; flex-direction: column; align-items: center; gap: 4px; cursor: pointer; position: relative; padding: 5px; border-radius: 10px; border: 1px solid transparent; }
+        .tooth-wrapper { display: flex; flex-direction: column; align-items: center; gap: 4px; cursor: pointer; position: relative; padding: 4px; border-radius: 10px; border: 1px solid transparent; }
         .tooth-wrapper:hover { background: var(--primary-light); border-color: var(--primary-glow); }
-        .tooth-num { font-size: 0.76rem; color: var(--text-main); font-weight: 800; }
-        .tooth-badge-icon { font-size: 0.75rem; height: 16px; line-height: 16px; font-weight: bold; }
+        .tooth-num { font-size: 0.74rem; color: var(--text-main); font-weight: 800; }
+        .tooth-badge-icon { font-size: 0.74rem; height: 16px; line-height: 16px; font-weight: bold; }
 
-        .tooth-svg { width: 42px; height: 42px; overflow: visible; }
+        .tooth-svg { width: 40px; height: 40px; overflow: visible; }
         .surf-poly { fill: #ffffff; stroke: #64748b; stroke-width: 1.5; cursor: pointer; }
         body.dark-mode .surf-poly { fill: #1e293b; stroke: #94a3b8; }
         .surf-poly:hover { stroke: var(--primary); stroke-width: 2.5; }
@@ -393,49 +407,49 @@
         .surf-poly.state-crown { fill: #f59e0b !important; }
         .surf-poly.state-implant { fill: #64748b !important; }
 
-        .perio-pill { font-size: 0.68rem; padding: 1px 6px; border-radius: 6px; background: var(--surface); border: 1px solid var(--border); font-family: monospace; font-weight: bold; }
+        .perio-pill { font-size: 0.66rem; padding: 1px 5px; border-radius: 6px; background: var(--surface); border: 1px solid var(--border); font-family: monospace; font-weight: bold; }
         .perio-pill.deep { background: #fee2e2; color: #991b1b; border-color: #ef4444; }
         .bop-dot { width: 7px; height: 7px; border-radius: 50%; background: var(--danger); display: inline-block; }
 
-        .interactive-tooth-box { display: flex; flex-direction: column; align-items: center; gap: 10px; margin: 12px 0; padding: 16px; background: var(--surface-alt); border-radius: 14px; border: 1px solid var(--border); }
-        .modal-tooth-svg { width: 135px; height: 135px; }
+        .interactive-tooth-box { display: flex; flex-direction: column; align-items: center; gap: 10px; margin: 10px 0; padding: 14px; background: var(--surface-alt); border-radius: 14px; border: 1px solid var(--border); }
+        .modal-tooth-svg { width: 125px; height: 125px; }
         .modal-tooth-svg .surf-poly.selected-surf { stroke: #0284c7; stroke-width: 3.5; fill: #bae6fd; }
 
         /* === X-Ray Gallery & Lightbox === */
-        .gallery-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); gap: 16px; margin-top: 14px; }
+        .gallery-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(155px, 1fr)); gap: 12px; margin-top: 12px; }
         .gallery-card { border: 1px solid var(--border); border-radius: 12px; overflow: hidden; background: var(--surface-alt); position: relative; }
-        .gallery-card img { width: 100%; height: 130px; object-fit: cover; cursor: zoom-in; display: block; background: #000; }
-        .gallery-meta { padding: 10px 12px; font-size: 0.78rem; display: flex; justify-content: space-between; align-items: center; }
+        .gallery-card img { width: 100%; height: 125px; object-fit: cover; cursor: zoom-in; display: block; background: #000; }
+        .gallery-meta { padding: 8px 10px; font-size: 0.76rem; display: flex; justify-content: space-between; align-items: center; }
 
         /* === Modals & Scroll Wheel === */
-        .modal-overlay { position: fixed; inset: 0; background: var(--scrim); z-index: 1000; display: flex; justify-content: center; align-items: center; opacity: 0; pointer-events: none; transition: opacity 0.12s ease; padding: 15px; }
+        .modal-overlay { position: fixed; inset: 0; background: var(--scrim); z-index: 1000; display: flex; justify-content: center; align-items: center; opacity: 0; pointer-events: none; transition: opacity 0.12s ease; padding: clamp(8px, 2.5vw, 18px); }
         .modal-overlay.open { opacity: 1; pointer-events: auto; }
-        .modal-content { background: var(--surface); border-radius: 20px; width: 100%; max-width: 530px; padding: 26px; box-shadow: var(--shadow-lg); max-height: 92vh; overflow-y: auto; border: 1px solid var(--border); }
+        .modal-content { background: var(--surface); border-radius: 18px; width: 100%; max-width: 520px; padding: clamp(16px, 3.5vw, 26px); box-shadow: var(--shadow-lg); max-height: 92dvh; overflow-y: auto; border: 1px solid var(--border); -webkit-overflow-scrolling: touch; }
         
-        .wheel-picker-box { display: flex; justify-content: center; align-items: center; gap: 10px; background: var(--surface-alt); border: 1px solid var(--border); border-radius: 14px; height: 140px; position: relative; overflow: hidden; margin: 12px 0; direction: ltr; }
+        .wheel-picker-box { display: flex; justify-content: center; align-items: center; gap: 8px; background: var(--surface-alt); border: 1px solid var(--border); border-radius: 14px; height: 135px; position: relative; overflow: hidden; margin: 10px 0; direction: ltr; }
         .wheel-highlight { position: absolute; top: 50%; transform: translateY(-50%); width: 100%; height: 40px; background: var(--primary-light); border-top: 1px solid var(--primary); border-bottom: 1px solid var(--primary); pointer-events: none; }
-        .wheel-col { height: 100%; overflow-y: scroll; scroll-snap-type: y mandatory; scrollbar-width: none; padding: 50px 0; text-align: center; flex: 1; }
+        .wheel-col { height: 100%; overflow-y: scroll; scroll-snap-type: y mandatory; scrollbar-width: none; padding: 48px 0; text-align: center; flex: 1; }
         .wheel-col::-webkit-scrollbar { display: none; }
-        .wheel-item { height: 40px; line-height: 40px; scroll-snap-align: center; font-size: 1.15rem; color: var(--text-muted); cursor: pointer; user-select: none; }
-        .wheel-item.active { font-size: 1.35rem; font-weight: 800; color: var(--primary); }
+        .wheel-item { height: 40px; line-height: 40px; scroll-snap-align: center; font-size: 1.1rem; color: var(--text-muted); cursor: pointer; user-select: none; }
+        .wheel-item.active { font-size: 1.3rem; font-weight: 800; color: var(--primary); }
 
-        .action-sheet { display: grid; grid-template-columns: repeat(2, 1fr); gap: 8px; margin-top: 12px; }
-        .action-btn { padding: 10px 12px; border-radius: 10px; border: 1px solid var(--border); background: var(--surface); display: flex; align-items: center; gap: 8px; font-size: 0.84rem; font-weight: 700; }
+        .action-sheet { display: grid; grid-template-columns: repeat(2, 1fr); gap: 8px; margin-top: 10px; }
+        .action-btn { padding: 9px 10px; border-radius: 10px; border: 1px solid var(--border); background: var(--surface); display: flex; align-items: center; gap: 7px; font-size: 0.8rem; font-weight: 700; }
         .action-btn:hover { background: var(--primary-light); border-color: var(--primary); color: var(--primary); }
-        .color-dot { width: 14px; height: 14px; border-radius: 50%; flex-shrink: 0; }
+        .color-dot { width: 13px; height: 13px; border-radius: 50%; flex-shrink: 0; }
 
         .treatment-plan { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); overflow: hidden; }
-        .tp-header { background: var(--primary-light); padding: 16px 20px; font-weight: 800; color: var(--primary); display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px; border-bottom: 1px solid var(--border); }
+        .tp-header { background: var(--primary-light); padding: 14px 16px; font-weight: 800; color: var(--primary); display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px; border-bottom: 1px solid var(--border); }
         .tp-list { list-style: none; }
-        .tp-item { display: flex; justify-content: space-between; align-items: center; padding: 14px 20px; border-bottom: 1px solid var(--border); flex-wrap: wrap; gap: 10px; }
-        .tp-tooth { background: var(--primary); color: white; width: 34px; height: 34px; display: flex; justify-content: center; align-items: center; border-radius: 10px; font-size: 0.84rem; font-weight: 800; flex-shrink: 0; }
+        .tp-item { display: flex; justify-content: space-between; align-items: center; padding: 12px 16px; border-bottom: 1px solid var(--border); flex-wrap: wrap; gap: 10px; }
+        .tp-tooth { background: var(--primary); color: white; width: 32px; height: 32px; display: flex; justify-content: center; align-items: center; border-radius: 10px; font-size: 0.82rem; font-weight: 800; flex-shrink: 0; }
 
-        .signature-pad { border: 2px dashed var(--border); border-radius: 12px; background: #fff; cursor: crosshair; touch-action: none; width: 100%; height: 150px; }
+        .signature-pad { border: 2px dashed var(--border); border-radius: 12px; background: #fff; cursor: crosshair; touch-action: none; width: 100%; height: 145px; }
 
-        .toast { position: fixed; bottom: 26px; left: 50%; transform: translateX(-50%) translateY(50px); background: #0f172a; color: white; padding: 12px 26px; border-radius: 30px; font-weight: 700; font-size: 0.88rem; box-shadow: var(--shadow-lg); z-index: 2500; opacity: 0; pointer-events: none; transition: 0.2s ease; border: 1px solid #334155; }
+        .toast { position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%) translateY(50px); background: #0f172a; color: white; padding: 11px 22px; border-radius: 30px; font-weight: 700; font-size: 0.84rem; box-shadow: var(--shadow-lg); z-index: 2500; opacity: 0; pointer-events: none; transition: 0.2s ease; border: 1px solid #334155; max-width: 92vw; text-align: center; }
         .toast.show { transform: translateX(-50%) translateY(0); opacity: 1; }
 
-        /* === Fast Split-Screen Login Overlay === */
+        /* === Fast Split-Screen Login Overlay (Desktop & Mobile) === */
         .auth-screen {
             position: fixed;
             inset: 0;
@@ -444,7 +458,9 @@
             display: flex;
             justify-content: center;
             align-items: center;
-            padding: 20px;
+            padding: clamp(10px, 3vw, 24px);
+            overflow-y: auto;
+            -webkit-overflow-scrolling: touch;
         }
         .auth-screen.hidden { display: none !important; }
         .auth-split-wrapper {
@@ -452,49 +468,67 @@
             color: var(--text-main);
             width: 100%;
             max-width: 880px;
-            border-radius: 26px;
+            border-radius: 22px;
             overflow: hidden;
             box-shadow: 0 25px 50px -12px rgba(0,0,0,0.5);
             border: 1px solid rgba(255,255,255,0.12);
             display: grid;
             grid-template-columns: 1.05fr 1.25fr;
-        }
-        @media(max-width: 780px) {
-            .auth-split-wrapper { grid-template-columns: 1fr; max-width: 440px; }
-            .auth-brand-side { display: none !important; }
+            margin: auto;
         }
         .auth-brand-side {
             background: linear-gradient(145deg, #0284c7 0%, #0369a1 45%, #0d9488 100%);
             color: white;
-            padding: 38px 32px;
+            padding: clamp(20px, 3.5vw, 36px) clamp(16px, 3vw, 30px);
             display: flex;
             flex-direction: column;
             justify-content: space-between;
             position: relative;
             overflow: hidden;
         }
-        .auth-form-side { padding: 32px 30px; text-align: center; display: flex; flex-direction: column; justify-content: center; }
-        .role-selector { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin: 14px 0; }
+        .auth-form-side { padding: clamp(18px, 3.5vw, 30px) clamp(16px, 3vw, 28px); text-align: center; display: flex; flex-direction: column; justify-content: center; }
+        .role-selector { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin: 12px 0; }
         .role-card {
-            padding: 12px 6px;
-            border-radius: 14px;
+            padding: 10px 4px;
+            border-radius: 12px;
             border: 2px solid var(--border);
             background: var(--surface-alt);
             cursor: pointer;
             display: flex;
             flex-direction: column;
             align-items: center;
-            gap: 4px;
-            font-size: 0.78rem;
+            gap: 3px;
+            font-size: 0.75rem;
             font-weight: 700;
         }
         .role-card:hover { border-color: var(--primary); }
         .role-card.active { border-color: var(--primary); background: var(--primary-light); color: var(--primary); }
-        .pin-input { text-align: center; font-size: 1.55rem; letter-spacing: 12px; font-weight: 800; font-family: monospace; padding: 8px; background: var(--surface-alt); }
+        .pin-input { text-align: center; font-size: 1.45rem; letter-spacing: 10px; font-weight: 800; font-family: monospace; padding: 8px; background: var(--surface-alt); }
         .pin-keypad { display: grid; grid-template-columns: repeat(4, 1fr); gap: 6px; margin-top: 8px; direction: ltr; }
         .pin-key { padding: 8px 0; border-radius: 9px; background: var(--surface-alt); border: 1px solid var(--border); font-weight: 800; font-size: 0.92rem; }
         .pin-key:hover { background: var(--primary-light); color: var(--primary); border-color: var(--primary); }
-        .role-badge-header { font-size: 0.76rem; padding: 5px 12px; border-radius: 20px; background: var(--primary-light); color: var(--primary); font-weight: 800; border: 1px solid var(--primary-glow); white-space: nowrap; }
+        .role-badge-header { font-size: 0.75rem; padding: 5px 10px; border-radius: 20px; background: var(--primary-light); color: var(--primary); font-weight: 800; border: 1px solid var(--primary-glow); white-space: nowrap; }
+
+        /* === Mobile & Tablet Responsive Optimizations === */
+        @media(max-width: 780px) {
+            .auth-split-wrapper { grid-template-columns: 1fr; max-width: 460px; }
+            .auth-brand-features, .auth-brand-footer { display: none !important; }
+            .auth-brand-side { padding: 18px 16px; }
+            .auth-logo { width: 82px; height: 82px; margin-bottom: 6px; }
+            header { height: 64px; }
+            .role-badge-header { display: none; }
+            .form-row-2 { grid-template-columns: 1fr; gap: 8px; }
+            .dashboard-stats { grid-template-columns: repeat(2, 1fr); }
+            .profile-header { flex-direction: column; align-items: stretch; }
+            .profile-actions { justify-content: center !important; width: 100%; max-width: 100% !important; }
+        }
+        @media(max-width: 480px) {
+            .dashboard-stats { grid-template-columns: 1fr; }
+            .action-sheet { grid-template-columns: 1fr; }
+            .role-selector { gap: 6px; }
+            .role-card { font-size: 0.7rem; padding: 8px 2px; }
+            .waffle-panel { position: fixed; top: 68px; left: 12px; right: 12px; width: auto; }
+        }
 
         @media print {
             body { height: auto; overflow: visible; background: white !important; color: black !important; }
@@ -514,13 +548,13 @@
         <div class="auth-split-wrapper">
             <!-- Right Side: الشعار حر بدون مربع في المنتصف وتحته اسم العيادة والوصف المختصر -->
             <div class="auth-brand-side">
-                <div style="display:flex; flex-direction:column; align-items:center; text-align:center; margin-top:10px;">
+                <div style="display:flex; flex-direction:column; align-items:center; text-align:center;">
                     <img src="logo3.png" alt="شعار العيادة" class="auth-logo" onerror="this.onerror=null; this.src='data:image/svg+xml;utf8,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 64 64%22><text x=%2250%25%22 y=%2256%25%22 font-size=%2248%22 text-anchor=%22middle%22 dominant-baseline=%22middle%22>🦷</text></svg>';">
-                    <h1 style="font-size:1.75rem; font-weight:800; line-height:1.3; margin-bottom:8px;" id="auth-clinic-title">عيادة الابتسامة الذكية</h1>
-                    <p style="font-size:0.92rem; opacity:0.92; line-height:1.6; max-width:320px;">منظومة سحابية لإدارة عيادات الأسنان، المخطط السني، الأشعة، والفوترة الضريبية.</p>
+                    <h1 style="font-size:clamp(1.3rem, 3vw, 1.75rem); font-weight:800; line-height:1.3; margin-bottom:6px;" id="auth-clinic-title">عيادة الابتسامة الذكية</h1>
+                    <p style="font-size:0.86rem; opacity:0.92; line-height:1.5; max-width:320px;">منظومة سحابية لإدارة عيادات الأسنان، المخطط السني، الأشعة، والفوترة الضريبية.</p>
                 </div>
 
-                <div style="display:flex; flex-direction:column; gap:10px; margin:20px 0;">
+                <div class="auth-brand-features" style="display:flex; flex-direction:column; gap:10px; margin:18px 0;">
                     <div style="display:flex; align-items:center; gap:10px; background:rgba(255,255,255,0.12); padding:10px 14px; border-radius:12px; font-size:0.82rem;">
                         <span style="font-size:1.2rem;">🦷</span>
                         <span>مخطط سني 5 أسطح + قياس الجيوب اللثوية</span>
@@ -535,7 +569,7 @@
                     </div>
                 </div>
 
-                <div style="font-size:0.75rem; opacity:0.85; display:flex; justify-content:space-between; border-top:1px solid rgba(255,255,255,0.2); padding-top:12px;">
+                <div class="auth-brand-footer" style="font-size:0.75rem; opacity:0.85; display:flex; justify-content:space-between; border-top:1px solid rgba(255,255,255,0.2); padding-top:12px;">
                     <span>🔒 اتصال مشفر وسريع</span>
                     <span>نظام صلاحيات متعدد (RBAC)</span>
                 </div>
@@ -543,33 +577,33 @@
 
             <!-- Left Side: Interactive Role & PIN Login -->
             <div class="auth-form-side">
-                <h2 style="color: var(--text-main); font-size: 1.3rem; font-weight:800; margin-bottom: 2px;">بوابة الدخول الآمن</h2>
-                <p style="color: var(--text-muted); font-size: 0.82rem;">اختر الحساب الطبي أو الإداري لتسجيل الدخول الفوري</p>
+                <h2 style="color: var(--text-main); font-size: 1.25rem; font-weight:800; margin-bottom: 2px;">بوابة الدخول الآمن</h2>
+                <p style="color: var(--text-muted); font-size: 0.8rem;">اختر الحساب الطبي أو الإداري لتسجيل الدخول الفوري</p>
 
                 <div class="role-selector">
                     <div class="role-card active" id="role-admin" onclick="selectLoginAccount('admin')">
-                        <span style="font-size:1.55rem;">👨‍💼</span>
+                        <span style="font-size:1.45rem;">👨‍💼</span>
                         <span>المدير العام</span>
-                        <small style="color:var(--text-muted); font-size:0.72rem; font-weight:700;">م. بهاء الشيخ</small>
+                        <small style="color:var(--text-muted); font-size:0.7rem; font-weight:700;">م. بهاء الشيخ</small>
                     </div>
                     <div class="role-card" id="role-doctor" onclick="selectLoginAccount('doctor')">
-                        <span style="font-size:1.55rem;">👨‍⚕️</span>
+                        <span style="font-size:1.45rem;">👨‍⚕️</span>
                         <span>الطبيب المعالج</span>
-                        <small style="color:var(--text-muted); font-size:0.72rem; font-weight:700;">د. أيهم الطويل</small>
+                        <small style="color:var(--text-muted); font-size:0.7rem; font-weight:700;">د. أيهم الطويل</small>
                     </div>
                     <div class="role-card" id="role-reception" onclick="selectLoginAccount('reception')">
-                        <span style="font-size:1.55rem;">🛎️</span>
+                        <span style="font-size:1.45rem;">🛎️</span>
                         <span>استقبال ومحاسبة</span>
-                        <small style="color:var(--text-muted); font-size:0.72rem; font-weight:700;">أ. سعيد شكيب</small>
+                        <small style="color:var(--text-muted); font-size:0.7rem; font-weight:700;">أ. سعيد شكيب</small>
                     </div>
                 </div>
 
                 <form onsubmit="handleAuthLogin(event)" style="text-align: right;">
-                    <div class="input-group" style="margin-bottom:10px;">
+                    <div class="input-group" style="margin-bottom:8px;">
                         <label>الحساب المحدد حالياً</label>
                         <input type="text" id="auth-username" class="form-control" value="المدير العام — م. بهاء الشيخ" readonly style="font-weight:800;">
                     </div>
-                    <div class="input-group" style="margin-bottom:10px;">
+                    <div class="input-group" style="margin-bottom:8px;">
                         <div style="display:flex; justify-content:space-between; align-items:center;">
                             <label>رمز المرور السري (PIN Code)</label>
                             <button type="button" style="font-size:0.75rem; color:var(--primary); font-weight:700; cursor:pointer;" onclick="fillDemoPin()">تعبئة تلقائية للرمز ⚡</button>
@@ -590,12 +624,12 @@
                             <button type="button" class="pin-key" style="color:var(--danger);" onclick="appendPinDigit('C')" title="مسح الكل">C</button>
                         </div>
                     </div>
-                    <div id="auth-error-msg" style="color:var(--danger); font-size:0.8rem; margin-bottom:10px; display:none; text-align:center; font-weight:bold;">❌ رمز المرور غير صحيح، يرجى المحاولة مرة أخرى</div>
+                    <div id="auth-error-msg" style="color:var(--danger); font-size:0.8rem; margin-bottom:8px; display:none; text-align:center; font-weight:bold;">❌ رمز المرور غير صحيح، يرجى المحاولة مرة أخرى</div>
 
-                    <button type="submit" class="btn btn-primary" style="width:100%; padding:12px; font-size:0.95rem; margin-top:4px;">🔓 الدخول السريع إلى المنظومة</button>
+                    <button type="submit" class="btn btn-primary" style="width:100%; padding:11px; font-size:0.92rem; margin-top:4px;">🔓 الدخول السريع إلى المنظومة</button>
                 </form>
 
-                <div style="margin-top: 14px; padding-top: 10px; border-top: 1px dashed var(--border); font-size: 0.74rem; color: var(--text-muted); display:flex; justify-content:space-around;">
+                <div style="margin-top: 12px; padding-top: 8px; border-top: 1px dashed var(--border); font-size: 0.72rem; color: var(--text-muted); display:flex; justify-content:space-around;">
                     <span>المدير: <strong>1234</strong></span>
                     <span>الطبيب: <strong>2222</strong></span>
                     <span>الاستقبال: <strong>3333</strong></span>
@@ -661,11 +695,11 @@
     <div class="scrim" id="scrim"></div>
     <nav class="drawer" id="drawer">
         <div class="drawer-header">
-            <img src="logo3.png" alt="شعار العيادة" class="clinic-logo" style="width:64px; height:64px;" onerror="this.style.display='none'; document.getElementById('drawer-doc-avatar').style.display='flex';">
+            <img src="logo3.png" alt="شعار العيادة" class="clinic-logo" style="width:58px; height:58px;" onerror="this.style.display='none'; document.getElementById('drawer-doc-avatar').style.display='flex';">
             <div class="drawer-avatar" id="drawer-doc-avatar" style="display:none;">ب</div>
             <div>
-                <h3 style="font-size: 1rem; margin-bottom: 3px;" id="drawer-doc-name">م. بهاء الشيخ</h3>
-                <p style="font-size: 0.78rem; opacity: 0.9;" id="drawer-doc-title">المدير العام</p>
+                <h3 style="font-size: 0.98rem; margin-bottom: 2px;" id="drawer-doc-name">م. بهاء الشيخ</h3>
+                <p style="font-size: 0.76rem; opacity: 0.9;" id="drawer-doc-title">المدير العام</p>
             </div>
         </div>
         <div class="drawer-nav">
@@ -694,8 +728,8 @@
             <div class="dashboard-hero-banner">
                 <div class="dashboard-hero-right">
                     <img src="logo3.png" alt="شعار العيادة" class="dashboard-hero-logo" onerror="this.onerror=null; this.src='data:image/svg+xml;utf8,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 64 64%22><text x=%2250%25%22 y=%2256%25%22 font-size=%2248%22 text-anchor=%22middle%22 dominant-baseline=%22middle%22>🦷</text></svg>';">
-                    <h2 style="font-size:1.55rem; font-weight:800; color:var(--primary-dark);" id="dash-clinic-banner-title">عيادة الابتسامة الذكية</h2>
-                    <p style="font-size:0.9rem; color:var(--text-muted); margin-top:4px;">منظومة سحابية لإدارة عيادات الأسنان، المخطط السني، الأشعة، والفوترة الضريبية.</p>
+                    <h2 style="font-size:clamp(1.25rem, 3vw, 1.55rem); font-weight:800; color:var(--primary-dark);" id="dash-clinic-banner-title">عيادة الابتسامة الذكية</h2>
+                    <p style="font-size:0.86rem; color:var(--text-muted); margin-top:4px; max-width:520px;">منظومة سحابية لإدارة عيادات الأسنان، المخطط السني، الأشعة، والفوترة الضريبية.</p>
                 </div>
                 <div style="display:flex; gap:10px; flex-wrap:wrap; justify-content:center;">
                     <button type="button" class="btn btn-primary" onclick="openNewPatientModal()">+ تسجيل مريض جديد</button>
@@ -708,33 +742,33 @@
                     <div class="stat-icon" style="background: var(--primary);">📅</div>
                     <div>
                         <h4 style="color:var(--text-muted); font-size:0.8rem;">مواعيد اليوم</h4>
-                        <p id="stat-today-appts" style="font-size:1.45rem; font-weight:bold;">0</p>
+                        <p id="stat-today-appts" style="font-size:1.4rem; font-weight:bold;">0</p>
                     </div>
                 </div>
                 <div class="stat-card">
                     <div class="stat-icon" style="background: var(--warning);">⏳</div>
                     <div>
                         <h4 style="color:var(--text-muted); font-size:0.8rem;">في غرفة الانتظار</h4>
-                        <p id="stat-waiting" style="font-size:1.45rem; font-weight:bold;">0</p>
+                        <p id="stat-waiting" style="font-size:1.4rem; font-weight:bold;">0</p>
                     </div>
                 </div>
                 <div class="stat-card">
                     <div class="stat-icon" style="background: var(--success);">💵</div>
                     <div>
                         <h4 style="color:var(--text-muted); font-size:0.8rem;">صافي ربح العيادة</h4>
-                        <p id="stat-net-profit" style="font-size:1.35rem; font-weight:bold; color:var(--success);">0 ر.س</p>
+                        <p id="stat-net-profit" style="font-size:1.3rem; font-weight:bold; color:var(--success);">0 ر.س</p>
                     </div>
                 </div>
                 <div class="stat-card">
                     <div class="stat-icon" style="background: #f97316;">📦</div>
                     <div>
                         <h4 style="color:var(--text-muted); font-size:0.8rem;">نواقص المخزون</h4>
-                        <p id="stat-low-stock" style="font-size:1.45rem; font-weight:bold; color:var(--danger);">0</p>
+                        <p id="stat-low-stock" style="font-size:1.4rem; font-weight:bold; color:var(--danger);">0</p>
                     </div>
                 </div>
             </div>
             
-            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(340px, 1fr)); gap: 22px;">
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 320px), 1fr)); gap: clamp(14px, 2.5vw, 22px);">
                 <div class="card">
                     <div class="card-header">
                         <h2 class="card-title">📺 شاشة الانتظار والنداء الصوتي الذكي</h2>
@@ -747,14 +781,14 @@
                     <div class="card-header">
                         <h2 class="card-title">⚡ الوصول السريع للأطباء والعمليات</h2>
                     </div>
-                    <p style="color: var(--text-muted); font-size: 0.86rem; margin-bottom: 14px;">منظومة سحابية لإدارة عيادات الأسنان، المخطط السني، الأشعة، والفوترة الضريبية.</p>
-                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
-                        <button type="button" class="btn btn-primary" onclick="openNewPatientModal()">+ تسجيل مريض جديد</button>
-                        <button type="button" class="btn btn-outline" onclick="navTo('appointments'); openApptModal()">📅 حجز موعد بعيادة</button>
-                        <button type="button" class="btn btn-outline" data-role-allow="admin,doctor" onclick="navTo('chart')">🦷 المخطط السني 5-أسطح</button>
-                        <button type="button" class="btn btn-outline" data-role-allow="admin,doctor" onclick="navTo('inventory')">📦 جرد المخزون الطبي</button>
+                    <p style="color: var(--text-muted); font-size: 0.84rem; margin-bottom: 14px;">منظومة سحابية لإدارة عيادات الأسنان، المخطط السني، الأشعة، والفوترة الضريبية.</p>
+                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(135px, 1fr)); gap: 10px;">
+                        <button type="button" class="btn btn-primary" onclick="openNewPatientModal()">+ تسجيل مريض</button>
+                        <button type="button" class="btn btn-outline" onclick="navTo('appointments'); openApptModal()">📅 حجز موعد</button>
+                        <button type="button" class="btn btn-outline" data-role-allow="admin,doctor" onclick="navTo('chart')">🦷 المخطط السني</button>
+                        <button type="button" class="btn btn-outline" data-role-allow="admin,doctor" onclick="navTo('inventory')">📦 جرد المخزون</button>
                         <button type="button" class="btn btn-outline" data-role-allow="admin,reception" onclick="navTo('finance')">🧾 الفواتير والمصروفات</button>
-                        <button type="button" class="btn btn-outline" data-role-allow="admin" onclick="exportBackupJSON()">💾 نسخ احتياطي فوري</button>
+                        <button type="button" class="btn btn-outline" data-role-allow="admin" onclick="exportBackupJSON()">💾 نسخ احتياطي</button>
                     </div>
                 </div>
             </div>
@@ -815,10 +849,10 @@
             <!-- Critical Medical Alert Banner -->
             <div class="medical-alert-banner" id="prof-medical-alert">
                 <div style="display:flex; align-items:center; gap:10px;">
-                    <span style="font-size:1.5rem;">⚠️</span>
+                    <span style="font-size:1.4rem;">⚠️</span>
                     <div>
-                        <strong style="font-size:0.95rem;">تنبيه طبي حرج (Medical Alert):</strong>
-                        <p id="prof-alert-text" style="font-size:0.85rem; margin-top:2px;"></p>
+                        <strong style="font-size:0.9rem;">تنبيه طبي حرج (Medical Alert):</strong>
+                        <p id="prof-alert-text" style="font-size:0.82rem; margin-top:2px;"></p>
                     </div>
                 </div>
                 <span class="tag danger">يرجى الحذر قبل التخدير أو الجراحة</span>
@@ -829,17 +863,17 @@
                     <div class="profile-info">
                         <div class="profile-avatar" id="prof-avatar">م</div>
                         <div>
-                            <div style="display:flex; align-items:center; gap:10px; flex-wrap:wrap;">
-                                <h3 style="font-size: 1.4rem; color: var(--primary);" id="prof-name">اسم المريض</h3>
+                            <div style="display:flex; align-items:center; gap:8px; flex-wrap:wrap;">
+                                <h3 style="font-size: 1.3rem; color: var(--primary);" id="prof-name">اسم المريض</h3>
                                 <span id="prof-waiting-badge"></span>
                                 <span id="prof-insurance-badge"></span>
                             </div>
-                            <p style="color: var(--text-muted); font-family: monospace; font-size: 1rem; margin-top:2px;" id="prof-phone" dir="ltr">05XXXXXXXX</p>
-                            <p style="color: var(--text-muted); font-size: 0.82rem; margin-top: 3px;">رقم الملف: <strong id="prof-id"></strong> | الطبيب المعالج: <strong id="prof-doc"></strong></p>
+                            <p style="color: var(--text-muted); font-family: monospace; font-size: 0.96rem; margin-top:2px;" id="prof-phone" dir="ltr">05XXXXXXXX</p>
+                            <p style="color: var(--text-muted); font-size: 0.8rem; margin-top: 3px;">رقم الملف: <strong id="prof-id"></strong> | الطبيب المعالج: <strong id="prof-doc"></strong></p>
                             <div class="tag-group" id="prof-tags"></div>
                         </div>
                     </div>
-                    <div style="display:flex; gap:7px; flex-wrap:wrap; max-width: 480px; justify-content: flex-end;">
+                    <div class="profile-actions" style="display:flex; gap:6px; flex-wrap:wrap; max-width: 480px; justify-content: flex-end;">
                         <button type="button" class="btn btn-primary btn-sm" data-role-allow="admin,doctor" onclick="goToChartFromProfile()">🦷 المخطط السني</button>
                         <button type="button" class="btn btn-success btn-sm" data-role-allow="admin,reception" onclick="openPaymentModal()">💵 سند قبض</button>
                         <button type="button" class="btn btn-outline btn-sm" data-role-allow="admin,reception" onclick="openTaxInvoiceModal()">🧾 فاتورة ضريبية QR</button>
@@ -858,7 +892,7 @@
                     </div>
                     <div class="finance-card">
                         <h4>الخصم + ضريبة القيمة المضافة</h4>
-                        <div class="amount" id="prof-tax-disc" style="font-size:1rem;">0 ر.س</div>
+                        <div class="amount" id="prof-tax-disc" style="font-size:0.95rem;">0 ر.س</div>
                     </div>
                     <div class="finance-card">
                         <h4>تغطية التأمين الطبي</h4>
@@ -884,7 +918,7 @@
 
                 <!-- Tab 1: Clinical Notes & Payments -->
                 <div id="prof-tab-clinical" class="sub-tab-pane active">
-                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 20px;">
+                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 280px), 1fr)); gap: 18px;">
                         <div>
                             <h3 style="font-size:0.95rem; margin-bottom:8px; color:var(--primary);">📝 الملاحظات السريرية والتشخيص</h3>
                             <textarea class="form-control" id="prof-notes" rows="5" placeholder="اكتب التشخيص، الشكوى الرئيسية، وتفاصيل الجلسات..."></textarea>
@@ -901,8 +935,8 @@
                 <div id="prof-tab-xray" class="sub-tab-pane">
                     <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px; margin-bottom:12px;">
                         <div>
-                            <h3 style="font-size:1rem; color:var(--primary);">🩻 أرشيف الأشعة السينية والصور الفوتوغرافية</h3>
-                            <p style="font-size:0.8rem; color:var(--text-muted);">ارفع صور البانوراما أو الذروية أو أنشئ أشعة رقمية تجريبية مع دعم عكس الألوان (Invert) والتباين.</p>
+                            <h3 style="font-size:0.98rem; color:var(--primary);">🩻 أرشيف الأشعة السينية والصور الفوتوغرافية</h3>
+                            <p style="font-size:0.78rem; color:var(--text-muted);">ارفع صور البانوراما أو الذروية أو أنشئ أشعة رقمية تجريبية مع دعم عكس الألوان (Invert) والتباين.</p>
                         </div>
                         <div style="display:flex; gap:8px; flex-wrap:wrap;">
                             <label class="btn btn-primary btn-sm" style="cursor:pointer;">
@@ -917,9 +951,9 @@
 
                 <!-- Tab 3: Digital Consent Forms & E-Signature -->
                 <div id="prof-tab-consent" class="sub-tab-pane">
-                    <div style="display:grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap:20px;">
+                    <div style="display:grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 280px), 1fr)); gap:18px;">
                         <div>
-                            <h3 style="font-size:1rem; color:var(--primary); margin-bottom:10px;">✍️ إصدار إقرار طبي وتوقيع المريض</h3>
+                            <h3 style="font-size:0.98rem; color:var(--primary); margin-bottom:10px;">✍️ إصدار إقرار طبي وتوقيع المريض</h3>
                             <div class="input-group">
                                 <label>نوع الإقرار الطبي</label>
                                 <select id="consent-type" class="form-control" onchange="updateConsentTemplateText()">
@@ -937,13 +971,13 @@
                                 <label>توقيع المريض الإلكتروني (ارسم بالماوس أو اللمس):</label>
                                 <canvas id="consent-canvas" class="signature-pad" width="420" height="140"></canvas>
                             </div>
-                            <div style="display:flex; gap:8px;">
+                            <div style="display:flex; gap:8px; flex-wrap:wrap;">
                                 <button type="button" class="btn btn-outline btn-sm" onclick="clearConsentCanvas()">مسح التوقيع</button>
                                 <button type="button" class="btn btn-primary btn-sm" onclick="saveSignedConsent()">✅ اعتماد وحفظ الإقرار الموقع</button>
                             </div>
                         </div>
                         <div>
-                            <h3 style="font-size:1rem; color:var(--primary); margin-bottom:10px;">📁 الإقرارات الموقعة المحفوظة</h3>
+                            <h3 style="font-size:0.98rem; color:var(--primary); margin-bottom:10px;">📁 الإقرارات الموقعة المحفوظة</h3>
                             <div id="prof-consents-list" style="display:flex; flex-direction:column; gap:10px;"></div>
                         </div>
                     </div>
@@ -951,10 +985,10 @@
 
                 <!-- Tab 4: Installments, Discounts & Tax Settings for Patient -->
                 <div id="prof-tab-installments" class="sub-tab-pane">
-                    <div style="display:grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap:22px;">
-                        <div style="background:var(--surface-alt); padding:16px; border-radius:10px; border:1px solid var(--border);">
-                            <h3 style="font-size:0.95rem; color:var(--primary); margin-bottom:12px;">🏷️ الخصم والضريبة والتأمين للمريض</h3>
-                            <div style="display:grid; grid-template-columns: 1fr 1fr; gap:10px;">
+                    <div style="display:grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 280px), 1fr)); gap:18px;">
+                        <div style="background:var(--surface-alt); padding:14px; border-radius:10px; border:1px solid var(--border);">
+                            <h3 style="font-size:0.92rem; color:var(--primary); margin-bottom:12px;">🏷️ الخصم والضريبة والتأمين للمريض</h3>
+                            <div class="form-row-2">
                                 <div class="input-group">
                                     <label>قيمة الخصم (ر.س)</label>
                                     <input type="number" id="prof-discount-input" class="form-control" min="0" value="0">
@@ -968,7 +1002,7 @@
                                 </div>
                                 <div class="input-group">
                                     <label>شركة التأمين</label>
-                                    <input type="text" id="prof-ins-company" class="form-control" placeholder="مثل: بوبا، التعاونية (أو اتركه فارغاً)">
+                                    <input type="text" id="prof-ins-company" class="form-control" placeholder="مثل: بوبا، التعاونية">
                                 </div>
                                 <div class="input-group">
                                     <label>نسبة تغطية التأمين (%)</label>
@@ -978,11 +1012,11 @@
                             <button type="button" class="btn btn-primary btn-sm" onclick="savePatientFinancialSettings()">تحديث الحسابات والضرائب</button>
                         </div>
 
-                        <div style="background:var(--surface-alt); padding:16px; border-radius:10px; border:1px solid var(--border);">
-                            <h3 style="font-size:0.95rem; color:var(--primary); margin-bottom:12px;">📆 جدولة الأقساط الشهرية</h3>
-                            <div style="display:flex; gap:8px; margin-bottom:12px;">
-                                <input type="number" id="inst-amount" class="form-control" placeholder="مبلغ القسط (ر.س)">
-                                <input type="date" id="inst-date" class="form-control">
+                        <div style="background:var(--surface-alt); padding:14px; border-radius:10px; border:1px solid var(--border);">
+                            <h3 style="font-size:0.92rem; color:var(--primary); margin-bottom:12px;">📆 جدولة الأقساط الشهرية</h3>
+                            <div style="display:flex; gap:8px; margin-bottom:12px; flex-wrap:wrap;">
+                                <input type="number" id="inst-amount" class="form-control" style="flex:1; min-width:120px;" placeholder="مبلغ القسط (ر.س)">
+                                <input type="date" id="inst-date" class="form-control" style="flex:1; min-width:130px;">
                                 <button type="button" class="btn btn-primary btn-sm" onclick="addInstallmentPlan()">+ قسط</button>
                             </div>
                             <div id="prof-installments-list" style="max-height:160px; overflow-y:auto;"></div>
@@ -994,12 +1028,12 @@
 
         <!-- 4. Appointments Section -->
         <section id="sec-appointments" class="section">
-            <div class="card-header" style="background:var(--surface); padding:16px 20px; border-radius:var(--radius); margin-bottom:18px; border:1px solid var(--border);">
+            <div class="card-header" style="background:var(--surface); padding:14px 18px; border-radius:var(--radius); margin-bottom:16px; border:1px solid var(--border);">
                 <div>
                     <h2 class="card-title" style="margin:0;">📅 جدولة المواعيد متعددة الأطباء والغرف</h2>
-                    <p style="font-size:0.82rem; color:var(--text-muted); margin-top:4px;">فلترة حسب الطبيب المعالج أو غرفة الكشف، مع تحديث حالة الموعد بضغطة زر</p>
+                    <p style="font-size:0.8rem; color:var(--text-muted); margin-top:4px;">فلترة حسب الطبيب المعالج أو غرفة الكشف، مع تحديث حالة الموعد بضغطة زر</p>
                 </div>
-                <div style="display:flex; gap:10px; align-items:center; flex-wrap:wrap;">
+                <div style="display:flex; gap:8px; align-items:center; flex-wrap:wrap;">
                     <select id="sched-doctor-filter" class="form-control" style="width:auto;" onchange="renderTimeline()">
                         <option value="all">👨‍⚕️ كل الأطباء والعيادات</option>
                         <option value="د. أيهم الطويل (عيادة 1)">د. أيهم الطويل (عيادة 1 - جراحة وتركيبات)</option>
@@ -1026,7 +1060,7 @@
 
                 <div class="timeline-container">
                     <div class="timeline-header">
-                        <span style="font-weight:bold; font-size:1rem;" id="timeline-date-display"></span>
+                        <span style="font-weight:bold; font-size:0.95rem;" id="timeline-date-display"></span>
                         <span class="tag info" id="timeline-count-tag">0 مواعيد</span>
                     </div>
                     <div id="timeline-slots" dir="ltr"></div>
@@ -1044,10 +1078,10 @@
                 <div class="card-header">
                     <div>
                         <h2 class="card-title">🦷 المخطط السني التفاعلي (5 أسطح + الجيوب اللثوية)</h2>
-                        <p style="font-size:0.82rem; color:var(--text-muted);">اضغط على أي سطح من أسطح السن الخمسة للتشخيص، أو بدّل بين أسنان البالغين والأطفال</p>
+                        <p style="font-size:0.8rem; color:var(--text-muted);">اضغط على أي سطح من أسطح السن الخمسة للتشخيص، أو بدّل بين أسنان البالغين والأطفال</p>
                     </div>
                     
-                    <div style="display:flex; gap:10px; align-items:center; flex-wrap:wrap;">
+                    <div style="display:flex; gap:8px; align-items:center; flex-wrap:wrap;">
                         <div style="display:flex; background:var(--surface-alt); padding:4px; border-radius:8px; border:1px solid var(--border);">
                             <button type="button" class="btn btn-sm btn-primary" id="btn-arch-adult" onclick="switchArchMode('adult')">البالغين (32 سن)</button>
                             <button type="button" class="btn btn-sm" id="btn-arch-pediatric" onclick="switchArchMode('pediatric')">الأطفال اللبنية (20 سن)</button>
@@ -1067,8 +1101,8 @@
                 
                 <div class="chart-container">
                     <div class="chart-overlay" id="chart-overlay">
-                        <svg style="width:52px; height:52px; fill:var(--primary);" viewBox="0 0 24 24"><path d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"/></svg>
-                        <h3 style="font-size:1.05rem;">الرجاء اختيار مريض من البحث أعلاه لفتح المخطط السني</h3>
+                        <svg style="width:48px; height:48px; fill:var(--primary);" viewBox="0 0 24 24"><path d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"/></svg>
+                        <h3 style="font-size:1rem;">الرجاء اختيار مريض من البحث أعلاه لفتح المخطط السني</h3>
                     </div>
 
                     <div class="jaw-label" id="upper-jaw-label">الفك العلوي (Maxillary Arch) - الأسطح الخمسة (M, D, O, B, L)</div>
@@ -1080,7 +1114,7 @@
                         <div class="tooth-group" id="lower-right"></div><div class="tooth-divider"></div><div class="tooth-group" id="lower-left"></div>
                     </div>
 
-                    <div style="display:flex; gap:14px; flex-wrap:wrap; justify-content:center; margin-top:14px; padding-top:12px; border-top:1px solid var(--border); width:100%; font-size:0.78rem; color:var(--text-muted);">
+                    <div style="display:flex; gap:12px; flex-wrap:wrap; justify-content:center; margin-top:12px; padding-top:10px; border-top:1px solid var(--border); width:100%; font-size:0.76rem; color:var(--text-muted);">
                         <span><strong style="color:#ef4444;">■</strong> تسوس / حشوة مطلوبة</span>
                         <span><strong style="color:#8b5cf6;">■</strong> علاج عصب (Endo)</span>
                         <span><strong style="color:#0284c7;">■</strong> حشوة سابقة</span>
@@ -1100,7 +1134,7 @@
                             <button type="button" class="btn btn-sm btn-primary" onclick="window.print()">🖨️ طباعة الخطة</button>
                         </div>
                     </div>
-                    <div style="padding:10px 18px; background:var(--surface-alt); font-size:0.8rem; color:var(--text-muted); border-bottom:1px solid var(--border);">
+                    <div style="padding:10px 16px; background:var(--surface-alt); font-size:0.78rem; color:var(--text-muted); border-bottom:1px solid var(--border);">
                         💡 ملاحظة محاسبية: الإجراءات ذات الحالة <strong>"مقترح"</strong> لا تُحتسب كدين مستحق على المريض إلا عند تحويلها إلى <strong>"قيد التنفيذ"</strong> أو <strong>"مكتمل"</strong>.
                     </div>
                     <ul class="tp-list" id="treatment-plan-list"></ul>
@@ -1113,29 +1147,29 @@
             <div class="dashboard-stats">
                 <div class="stat-card">
                     <div class="stat-icon" style="background: var(--primary);">📊</div>
-                    <div><h4 style="color:var(--text-muted); font-size:0.8rem;">إجمالي الفواتير المعتمدة</h4><p id="fin-total-billed" style="font-size:1.3rem; font-weight:bold;">0 ر.س</p></div>
+                    <div><h4 style="color:var(--text-muted); font-size:0.8rem;">إجمالي الفواتير المعتمدة</h4><p id="fin-total-billed" style="font-size:1.25rem; font-weight:bold;">0 ر.س</p></div>
                 </div>
                 <div class="stat-card">
                     <div class="stat-icon" style="background: var(--success);">💰</div>
-                    <div><h4 style="color:var(--text-muted); font-size:0.8rem;">إجمالي المحصل (المدفوع)</h4><p id="fin-total-paid" style="font-size:1.3rem; font-weight:bold; color:var(--success);">0 ر.س</p></div>
+                    <div><h4 style="color:var(--text-muted); font-size:0.8rem;">إجمالي المحصل (المدفوع)</h4><p id="fin-total-paid" style="font-size:1.25rem; font-weight:bold; color:var(--success);">0 ر.س</p></div>
                 </div>
                 <div class="stat-card">
                     <div class="stat-icon" style="background: var(--warning);">📉</div>
-                    <div><h4 style="color:var(--text-muted); font-size:0.8rem;">إجمالي مصروفات العيادة</h4><p id="fin-total-expenses" style="font-size:1.3rem; font-weight:bold; color:var(--warning);">0 ر.س</p></div>
+                    <div><h4 style="color:var(--text-muted); font-size:0.8rem;">إجمالي مصروفات العيادة</h4><p id="fin-total-expenses" style="font-size:1.25rem; font-weight:bold; color:var(--warning);">0 ر.س</p></div>
                 </div>
                 <div class="stat-card">
                     <div class="stat-icon" style="background: var(--secondary);">💎</div>
-                    <div><h4 style="color:var(--text-muted); font-size:0.8rem;">صافي الربح الفعلي</h4><p id="fin-net-profit" style="font-size:1.3rem; font-weight:bold; color:var(--secondary);">0 ر.س</p></div>
+                    <div><h4 style="color:var(--text-muted); font-size:0.8rem;">صافي الربح الفعلي</h4><p id="fin-net-profit" style="font-size:1.25rem; font-weight:bold; color:var(--secondary);">0 ر.س</p></div>
                 </div>
             </div>
 
-            <div style="display:grid; grid-template-columns: repeat(auto-fit, minmax(380px, 1fr)); gap:22px;">
+            <div style="display:grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 340px), 1fr)); gap:clamp(14px, 2.5vw, 22px);">
                 <div class="card">
                     <div class="card-header">
                         <h2 class="card-title">🧾 سجل سندات القبض (الإيرادات)</h2>
                     </div>
                     <div class="table-responsive">
-                        <table style="min-width:500px;">
+                        <table style="min-width:460px;">
                             <thead>
                                 <tr><th>رقم السند</th><th>التاريخ</th><th>المريض</th><th>المبلغ</th><th>الطريقة</th></tr>
                             </thead>
@@ -1150,7 +1184,7 @@
                         <button type="button" class="btn btn-sm btn-warning" onclick="openExpenseModal()">+ تسجيل مصروف</button>
                     </div>
                     <div class="table-responsive">
-                        <table style="min-width:500px;">
+                        <table style="min-width:460px;">
                             <thead>
                                 <tr><th>التاريخ</th><th>بند المصروف</th><th>الفئة</th><th>المبلغ</th><th>حذف</th></tr>
                             </thead>
@@ -1167,7 +1201,7 @@
                 <div class="card-header">
                     <div>
                         <h2 class="card-title">📦 إدارة المخزون والمستهلكات الطبية</h2>
-                        <p style="font-size:0.82rem; color:var(--text-muted);">مراقبة الكميات، الحد الأدنى للطلب، وتواريخ انتهاء الصلاحية للمواد الطبية</p>
+                        <p style="font-size:0.8rem; color:var(--text-muted);">مراقبة الكميات، الحد الأدنى للطلب، وتواريخ انتهاء الصلاحية للمواد الطبية</p>
                     </div>
                     <button type="button" class="btn btn-primary" onclick="openInventoryModal()">+ إضافة مادة للمستودع</button>
                 </div>
@@ -1188,7 +1222,7 @@
                 <div class="card-header">
                     <div>
                         <h2 class="card-title">🔬 تتبع طلبات معمل الأسنان والتركيبات</h2>
-                        <p style="font-size:0.82rem; color:var(--text-muted);">متابعة حالات التيجان، الزيركون، الفينير، والأطقم المتحركة</p>
+                        <p style="font-size:0.8rem; color:var(--text-muted);">متابعة حالات التيجان، الزيركون، الفينير، والأطقم المتحركة</p>
                     </div>
                     <button type="button" class="btn btn-purple" onclick="openLabModal()">+ إرسال طلب معمل جديد</button>
                 </div>
@@ -1210,7 +1244,7 @@
                     <h2 class="card-title">📊 التقارير التحليلية والرسوم البيانية التفاعلية</h2>
                     <button type="button" class="btn btn-sm btn-outline" onclick="window.print()">🖨️ طباعة التقرير الشامل</button>
                 </div>
-                <div id="reports-content" style="display:grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap:22px;"></div>
+                <div id="reports-content" style="display:grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 300px), 1fr)); gap:18px;"></div>
             </div>
         </section>
 
@@ -1221,7 +1255,7 @@
                     <h2 class="card-title">⚙️ إعدادات العيادة، الأسعار، والنسخ الاحتياطي</h2>
                 </div>
                 <form onsubmit="saveClinicSettings(event)">
-                    <div style="display:grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap:14px;">
+                    <div style="display:grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap:12px;">
                         <div class="input-group">
                             <label>اسم العيادة / المركز الطبي</label>
                             <input type="text" id="set-clinic-name" class="form-control" required>
@@ -1240,8 +1274,8 @@
                         </div>
                     </div>
 
-                    <h3 style="margin: 18px 0 10px; font-size: 0.95rem; color: var(--primary); border-bottom: 1px solid var(--border); padding-bottom: 6px;">قائمة الأسعار الافتراضية للإجراءات (ر.س)</h3>
-                    <div style="display:grid; grid-template-columns: repeat(auto-fit, minmax(170px, 1fr)); gap:12px;">
+                    <h3 style="margin: 16px 0 10px; font-size: 0.92rem; color: var(--primary); border-bottom: 1px solid var(--border); padding-bottom: 6px;">قائمة الأسعار الافتراضية للإجراءات (ر.س)</h3>
+                    <div style="display:grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap:10px;">
                         <div class="input-group"><label>حشوة تجميلية (Composite)</label><input type="number" id="set-p-decay" class="form-control" required></div>
                         <div class="input-group"><label>سحب وعلاج عصب (Endo)</label><input type="number" id="set-p-endo" class="form-control" required></div>
                         <div class="input-group"><label>تاج زيركون (Crown)</label><input type="number" id="set-p-crown" class="form-control" required></div>
@@ -1249,7 +1283,7 @@
                         <div class="input-group"><label>خلع جراحي / عادي</label><input type="number" id="set-p-extract" class="form-control" required></div>
                     </div>
 
-                    <div style="display:flex; justify-content:space-between; align-items:center; margin-top:20px; padding-top:16px; border-top:1px solid var(--border); flex-wrap:wrap; gap:10px;">
+                    <div style="display:flex; justify-content:space-between; align-items:center; margin-top:18px; padding-top:14px; border-top:1px solid var(--border); flex-wrap:wrap; gap:10px;">
                         <button type="submit" class="btn btn-primary">💾 حفظ الإعدادات والأسعار</button>
                         <div style="display:flex; gap:8px; flex-wrap:wrap;">
                             <button type="button" class="btn btn-success" onclick="exportBackupJSON()">📥 تصدير نسخة احتياطية (JSON)</button>
@@ -1270,13 +1304,13 @@
     <!-- 1. New Patient Modal -->
     <div class="modal-overlay" id="new-patient-modal">
         <div class="modal-content">
-            <h3 style="margin-bottom: 14px; color: var(--primary); border-bottom:1px solid var(--border); padding-bottom:10px;">تسجيل ملف مريض جديد</h3>
+            <h3 style="margin-bottom: 12px; color: var(--primary); border-bottom:1px solid var(--border); padding-bottom:10px;">تسجيل ملف مريض جديد</h3>
             <form id="new-patient-form" onsubmit="saveNewPatient(event)">
                 <div class="input-group">
                     <label>الاسم الثلاثي أو الرباعي</label>
                     <input type="text" id="np-name" class="form-control" required placeholder="أدخل اسم المريض الكامل">
                 </div>
-                <div style="display:grid; grid-template-columns:1fr 1fr; gap:12px;">
+                <div class="form-row-2">
                     <div class="input-group">
                         <label>رقم الجوال</label>
                         <input type="tel" id="np-phone" class="form-control" required placeholder="05XXXXXXXX" dir="ltr">
@@ -1290,7 +1324,7 @@
                         </select>
                     </div>
                 </div>
-                <div style="display:grid; grid-template-columns:1fr 1fr; gap:12px;">
+                <div class="form-row-2">
                     <div class="input-group">
                         <label>شركة التأمين (اختياري)</label>
                         <input type="text" id="np-insurance" class="form-control" placeholder="مثل: بوبا / التعاونية">
@@ -1302,26 +1336,26 @@
                 </div>
                 <div class="input-group">
                     <label>التنبيهات الطبية الحرجة (تظهر كشريط تحذيري أحمر)</label>
-                    <div style="display:flex; gap:12px; flex-wrap:wrap; margin-top:4px;">
-                        <label style="display:flex; align-items:center; gap:5px; font-size:0.85rem;"><input type="checkbox" id="np-tag-sugar" value="سكري"> مريض سكري</label>
-                        <label style="display:flex; align-items:center; gap:5px; font-size:0.85rem;"><input type="checkbox" id="np-tag-bp" value="ضغط دم"> ضغط دم</label>
-                        <label style="display:flex; align-items:center; gap:5px; font-size:0.85rem;"><input type="checkbox" id="np-tag-heart" value="أمراض قلب/سيولة"> قلب / مسيلات دم</label>
-                        <label style="display:flex; align-items:center; gap:5px; font-size:0.85rem;"><input type="checkbox" id="np-tag-allergy" value="حساسية بنج/بنسلين"> حساسية بنج/مضاد</label>
-                        <label style="display:flex; align-items:center; gap:5px; font-size:0.85rem;"><input type="checkbox" id="np-tag-preg" value="حامل"> حامل</label>
-                        <label style="display:flex; align-items:center; gap:5px; font-size:0.85rem;"><input type="checkbox" id="np-tag-vip" value="عميل VIP"> عميل VIP</label>
+                    <div style="display:flex; gap:10px; flex-wrap:wrap; margin-top:4px;">
+                        <label style="display:flex; align-items:center; gap:5px; font-size:0.82rem;"><input type="checkbox" id="np-tag-sugar" value="سكري"> مريض سكري</label>
+                        <label style="display:flex; align-items:center; gap:5px; font-size:0.82rem;"><input type="checkbox" id="np-tag-bp" value="ضغط دم"> ضغط دم</label>
+                        <label style="display:flex; align-items:center; gap:5px; font-size:0.82rem;"><input type="checkbox" id="np-tag-heart" value="أمراض قلب/سيولة"> قلب / مسيلات دم</label>
+                        <label style="display:flex; align-items:center; gap:5px; font-size:0.82rem;"><input type="checkbox" id="np-tag-allergy" value="حساسية بنج/بنسلين"> حساسية بنج/مضاد</label>
+                        <label style="display:flex; align-items:center; gap:5px; font-size:0.82rem;"><input type="checkbox" id="np-tag-preg" value="حامل"> حامل</label>
+                        <label style="display:flex; align-items:center; gap:5px; font-size:0.82rem;"><input type="checkbox" id="np-tag-vip" value="عميل VIP"> عميل VIP</label>
                     </div>
                 </div>
-                <div class="input-group" style="flex-direction: row; justify-content: space-between; align-items: center; background: var(--surface-alt); padding: 10px 14px; border-radius: 8px;">
+                <div class="input-group" style="flex-direction: row; justify-content: space-between; align-items: center; background: var(--surface-alt); padding: 10px 12px; border-radius: 8px; flex-wrap: wrap; gap: 8px;">
                     <div>
-                        <label style="margin:0; font-size:0.88rem; color:var(--text-main);">إدخال لغرفة الانتظار مباشرة</label>
-                        <label style="margin-right:12px; font-size:0.82rem; color:var(--danger);"><input type="checkbox" id="np-emergency"> حالة طوارئ 🚨</label>
+                        <label style="margin:0; font-size:0.84rem; color:var(--text-main);">إدخال لغرفة الانتظار مباشرة</label>
+                        <label style="margin-right:10px; font-size:0.8rem; color:var(--danger);"><input type="checkbox" id="np-emergency"> حالة طوارئ 🚨</label>
                     </div>
                     <label class="switch">
                         <input type="checkbox" id="np-waiting" checked>
                         <span class="slider"></span>
                     </label>
                 </div>
-                <div style="display:flex; gap:10px; margin-top:18px;">
+                <div style="display:flex; gap:10px; margin-top:16px;">
                     <button type="button" class="btn btn-outline" style="flex:1;" onclick="closeModal('new-patient-modal')">إلغاء</button>
                     <button type="submit" class="btn btn-primary" style="flex:2;">حفظ وإنشاء الملف</button>
                 </div>
@@ -1333,7 +1367,7 @@
     <div class="modal-overlay" id="tooth-modal">
         <div class="modal-content" style="max-width:460px;">
             <h3 style="margin-bottom: 6px; color: var(--primary); text-align: center;">تشخيص السن رقم <span id="selected-tooth-num"></span></h3>
-            <p style="text-align:center; font-size:0.8rem; color:var(--text-muted);">اضغط لتحديد سطح أو أكثر (M, D, O, B, L) أو اختر(كامل السن) ثم اضغط على الإجراء:</p>
+            <p style="text-align:center; font-size:0.78rem; color:var(--text-muted);">اضغط لتحديد سطح أو أكثر (M, D, O, B, L) أو اختر (كامل السن) ثم اضغط على الإجراء:</p>
             
             <div class="interactive-tooth-box">
                 <svg viewBox="0 0 100 100" class="modal-tooth-svg" id="modal-interactive-svg">
@@ -1343,8 +1377,8 @@
                     <polygon points="72,28 100,0 100,100 72,72" data-surf="D" class="surf-poly" onclick="toggleSurfaceSelection('D', this)"><title>Distal</title></polygon>
                     <rect x="28" y="28" width="44" height="44" data-surf="O" class="surf-poly selected-surf" onclick="toggleSurfaceSelection('O', this)"><title>Occlusal / Incisal</title></rect>
                 </svg>
-                <div style="display:flex; gap:8px; align-items:center;">
-                    <span style="font-size:0.82rem; font-weight:bold;">الأسطح المحددة: <strong id="selected-surfaces-label" style="color:var(--primary);">O</strong></span>
+                <div style="display:flex; gap:8px; align-items:center; flex-wrap:wrap; justify-content:center;">
+                    <span style="font-size:0.8rem; font-weight:bold;">الأسطح المحددة: <strong id="selected-surfaces-label" style="color:var(--primary);">O</strong></span>
                     <button type="button" class="btn btn-sm btn-outline" onclick="selectAllToothSurfaces()">تحديد كامل السن (ALL)</button>
                 </div>
             </div>
@@ -1365,22 +1399,22 @@
                 <button type="button" class="action-btn" onclick="updateToothState('filled')"><div class="color-dot" style="background:var(--primary);"></div> حشوة سابقة</button>
                 <button type="button" class="action-btn" onclick="updateToothState('crown')"><div class="color-dot" style="background:var(--warning);"></div> تاج زيركون (Crown)</button>
                 <button type="button" class="action-btn" onclick="updateToothState('implant')"><div class="color-dot" style="background:#64748b;"></div> زراعة (Implant)</button>
-                <button type="button" class="action-btn" style="grid-column: span 2; justify-content:center;" onclick="updateToothState('extracted')"><span style="color:var(--danger); font-weight:bold;">✕</span> خلع السن بالكامل (Extraction)</button>
+                <button type="button" class="action-btn" style="grid-column: 1 / -1; justify-content:center;" onclick="updateToothState('extracted')"><span style="color:var(--danger); font-weight:bold;">✕</span> خلع السن بالكامل (Extraction)</button>
             </div>
 
             <!-- Periodontal Probing Mini Panel -->
-            <div style="margin-top:14px; padding-top:12px; border-top:1px solid var(--border); display:flex; align-items:center; justify-content:space-between; gap:10px; flex-wrap:wrap;">
-                <div style="display:flex; align-items:center; gap:8px;">
-                    <label style="font-size:0.82rem; font-weight:600;">عمق الجيب اللثوي (mm):</label>
-                    <input type="number" id="perio-depth-input" class="form-control" style="width:70px; padding:4px 8px;" min="1" max="12" value="2">
+            <div style="margin-top:12px; padding-top:10px; border-top:1px solid var(--border); display:flex; align-items:center; justify-content:space-between; gap:8px; flex-wrap:wrap;">
+                <div style="display:flex; align-items:center; gap:6px;">
+                    <label style="font-size:0.8rem; font-weight:600;">عمق الجيب اللثوي (mm):</label>
+                    <input type="number" id="perio-depth-input" class="form-control" style="width:65px; padding:4px 8px;" min="1" max="12" value="2">
                 </div>
-                <label style="font-size:0.82rem; display:flex; align-items:center; gap:5px; color:var(--danger); font-weight:bold;">
+                <label style="font-size:0.8rem; display:flex; align-items:center; gap:5px; color:var(--danger); font-weight:bold;">
                     <input type="checkbox" id="perio-bop-input"> نزيف اللثة (BOP)
                 </label>
                 <button type="button" class="btn btn-sm btn-primary" onclick="savePerioForTooth()">حفظ اللثة</button>
             </div>
 
-            <button type="button" class="btn btn-outline" style="width:100%; margin-top:14px;" onclick="closeModal('tooth-modal')">إغلاق</button>
+            <button type="button" class="btn btn-outline" style="width:100%; margin-top:12px;" onclick="closeModal('tooth-modal')">إغلاق</button>
         </div>
     </div>
 
@@ -1388,7 +1422,7 @@
     <div class="modal-overlay" id="appt-modal">
         <div class="modal-content" style="max-width:430px;">
             <h3 style="margin-bottom: 6px; color: var(--primary);">📅 حجز موعد جديد</h3>
-            <p style="font-size: 0.84rem; color: var(--text-muted); margin-bottom:10px;">التاريخ: <strong id="modal-date-text" style="color:var(--primary);"></strong></p>
+            <p style="font-size: 0.82rem; color: var(--text-muted); margin-bottom:10px;">التاريخ: <strong id="modal-date-text" style="color:var(--primary);"></strong></p>
             
             <div class="input-group">
                 <label>اختر المريض</label>
@@ -1467,23 +1501,23 @@
     <!-- 5. Tax Invoice with QR Modal -->
     <div class="modal-overlay print-modal" id="tax-invoice-modal">
         <div class="modal-content" style="max-width:540px;">
-            <div style="display:flex; justify-content:space-between; align-items:flex-start; border-bottom:2px solid var(--primary); padding-bottom:12px; margin-bottom:14px;">
-                <div style="display:flex; align-items:center; gap:12px;">
-                    <img src="logo3.png" alt="شعار العيادة" class="clinic-logo" style="width:56px; height:56px;" onerror="this.style.display='none'">
+            <div style="display:flex; justify-content:space-between; align-items:flex-start; border-bottom:2px solid var(--primary); padding-bottom:12px; margin-bottom:14px; flex-wrap:wrap; gap:10px;">
+                <div style="display:flex; align-items:center; gap:10px;">
+                    <img src="logo3.png" alt="شعار العيادة" class="clinic-logo" style="width:52px; height:52px;" onerror="this.style.display='none'">
                     <div>
-                        <h3 style="color:var(--primary); font-size:1.2rem;" id="inv-clinic-name">عيادة الابتسامة الذكية</h3>
-                        <p style="font-size:0.78rem; color:var(--text-muted);">فاتورة ضريبية مبسطة (Tax Invoice)</p>
-                        <p style="font-size:0.78rem; color:var(--text-muted);">الرقم الضريبي: <span id="inv-vat-number">300123456700003</span></p>
+                        <h3 style="color:var(--primary); font-size:1.15rem;" id="inv-clinic-name">عيادة الابتسامة الذكية</h3>
+                        <p style="font-size:0.76rem; color:var(--text-muted);">فاتورة ضريبية مبسطة (Tax Invoice)</p>
+                        <p style="font-size:0.76rem; color:var(--text-muted);">الرقم الضريبي: <span id="inv-vat-number">300123456700003</span></p>
                     </div>
                 </div>
-                <div id="inv-qr-box" style="width:76px; height:76px; border:1px solid var(--border); padding:4px; border-radius:6px; background:#fff;"></div>
+                <div id="inv-qr-box" style="width:72px; height:72px; border:1px solid var(--border); padding:4px; border-radius:6px; background:#fff;"></div>
             </div>
-            <div style="font-size:0.85rem; margin-bottom:12px; display:flex; justify-content:space-between; flex-wrap:wrap; gap:8px;">
+            <div style="font-size:0.84rem; margin-bottom:12px; display:flex; justify-content:space-between; flex-wrap:wrap; gap:8px;">
                 <span>المريض: <strong id="inv-patient-name"></strong> (#<span id="inv-patient-id"></span>)</span>
                 <span>التاريخ: <strong id="inv-date"></strong></span>
             </div>
-            <div id="inv-items-body" style="margin-bottom:14px;"></div>
-            <div id="inv-totals-footer" style="background:var(--surface-alt); padding:12px; border-radius:8px; font-size:0.88rem;"></div>
+            <div id="inv-items-body" style="margin-bottom:14px; overflow-x:auto;"></div>
+            <div id="inv-totals-footer" style="background:var(--surface-alt); padding:12px; border-radius:8px; font-size:0.85rem;"></div>
             <div style="display:flex; gap:10px; margin-top:16px;">
                 <button type="button" class="btn btn-outline" style="flex:1;" onclick="closeModal('tax-invoice-modal')">إغلاق</button>
                 <button type="button" class="btn btn-primary" style="flex:2;" onclick="window.print()">🖨️ طباعة الفاتورة الضريبية</button>
@@ -1496,7 +1530,7 @@
         <div class="modal-content" style="max-width:500px;">
             <div style="display:flex; justify-content:space-between; align-items:center; border-bottom:2px solid var(--primary); padding-bottom:10px; margin-bottom:14px;">
                 <div style="display:flex; align-items:center; gap:10px;">
-                    <img src="logo3.png" alt="شعار العيادة" class="clinic-logo" style="width:52px; height:52px;" onerror="this.style.display='none'">
+                    <img src="logo3.png" alt="شعار العيادة" class="clinic-logo" style="width:50px; height:50px;" onerror="this.style.display='none'">
                     <div>
                         <h3 style="color:var(--primary);" id="rx-clinic-title">عيادة الابتسامة الذكية</h3>
                         <p style="font-size:0.8rem; color:var(--text-muted);" id="rx-doc-name">د. أيهم الطويل</p>
@@ -1504,7 +1538,7 @@
                 </div>
                 <div style="font-size:1.8rem; font-weight:bold; color:var(--primary);">℞</div>
             </div>
-            <p style="font-size:0.88rem; margin-bottom:12px;">المريض: <strong id="rx-patient-name"></strong> | التاريخ: <span id="rx-date"></span></p>
+            <p style="font-size:0.86rem; margin-bottom:12px;">المريض: <strong id="rx-patient-name"></strong> | التاريخ: <span id="rx-date"></span></p>
             <div class="input-group">
                 <label>إدراج دواء جاهز:</label>
                 <select class="form-control" onchange="if(this.value){ document.getElementById('rx-text').value += '• ' + this.value + '\n'; this.value=''; }">
@@ -1555,16 +1589,16 @@
     <!-- 8. X-Ray Lightbox Viewer with Contrast & Invert Controls -->
     <div class="modal-overlay" id="xray-lightbox-modal">
         <div class="modal-content" style="max-width:680px; background:#0f172a; color:white;">
-            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px; flex-wrap:wrap; gap:8px;">
                 <h4 id="lightbox-title">عارض الأشعة التشخيصي المتقدم</h4>
-                <div style="display:flex; gap:8px;">
-                    <button type="button" class="btn btn-sm btn-outline" style="color:white; border-color:#475569;" onclick="toggleXrayFilter('invert')">🌓 عكس الأشعة (Invert)</button>
-                    <button type="button" class="btn btn-sm btn-outline" style="color:white; border-color:#475569;" onclick="toggleXrayFilter('contrast')">🔆 زيادة التباين (High Contrast)</button>
+                <div style="display:flex; gap:6px; flex-wrap:wrap;">
+                    <button type="button" class="btn btn-sm btn-outline" style="color:white; border-color:#475569;" onclick="toggleXrayFilter('invert')">🌓 عكس الأشعة</button>
+                    <button type="button" class="btn btn-sm btn-outline" style="color:white; border-color:#475569;" onclick="toggleXrayFilter('contrast')">🔆 زيادة التباين</button>
                     <button type="button" class="btn btn-sm btn-danger" onclick="closeModal('xray-lightbox-modal')">✕</button>
                 </div>
             </div>
-            <div style="background:#000; border-radius:8px; overflow:hidden; display:flex; justify-content:center; align-items:center; min-height:320px;">
-                <img id="lightbox-img" src="" alt="X-Ray" style="max-width:100%; max-height:460px; transition: filter 0.2s;">
+            <div style="background:#000; border-radius:8px; overflow:hidden; display:flex; justify-content:center; align-items:center; min-height:260px;">
+                <img id="lightbox-img" src="" alt="X-Ray" style="max-width:100%; max-height:420px; transition: filter 0.2s;">
             </div>
         </div>
     </div>
@@ -1599,7 +1633,7 @@
             <h3 style="margin-bottom: 14px; color: var(--primary);">📦 إضافة مادة للمستودع الطبي</h3>
             <form onsubmit="saveNewInventoryItem(event)">
                 <div class="input-group"><label>اسم المادة الطبية</label><input type="text" id="inv-name" class="form-control" required placeholder="مثال: كبسولات بنج Lidocaine"></div>
-                <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px;">
+                <div class="form-row-2">
                     <div class="input-group">
                         <label>الفئة</label>
                         <select id="inv-cat" class="form-control">
@@ -1628,7 +1662,7 @@
             <form onsubmit="saveNewLabOrder(event)">
                 <div class="input-group"><label>المريض</label><select id="lab-patient" class="form-control" required></select></div>
                 <div class="input-group"><label>نوع التركيبة ورقم السن / اللون (Shade)</label><input type="text" id="lab-item" class="form-control" required placeholder="مثال: تاج زيركون سن 36 - لون A2"></div>
-                <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px;">
+                <div class="form-row-2">
                     <div class="input-group"><label>اسم المعمل</label><input type="text" id="lab-name" class="form-control" required value="معمل الدقة الرقمي"></div>
                     <div class="input-group"><label>تكلفة المعمل (ر.س)</label><input type="number" id="lab-cost" class="form-control" required value="350"></div>
                 </div>
@@ -1645,7 +1679,7 @@
     <div class="modal-overlay" id="alerts-modal">
         <div class="modal-content" style="max-width:460px;">
             <h3 style="margin-bottom: 12px; color: var(--primary);">🔔 مركز التنبيهات الذكي بالعيادة</h3>
-            <div id="smart-alerts-list" style="display:flex; flex-direction:column; gap:10px; max-height:360px; overflow-y:auto;"></div>
+            <div id="smart-alerts-list" style="display:flex; flex-direction:column; gap:10px; max-height:340px; overflow-y:auto;"></div>
             <button type="button" class="btn btn-outline" style="width:100%; margin-top:14px;" onclick="closeModal('alerts-modal')">إغلاق</button>
         </div>
     </div>
@@ -2070,7 +2104,7 @@
                 waitContainer.innerHTML = waitingPatients.map(p => {
                     const mins = p.waitingSince ? Math.max(1, Math.round((Date.now() - p.waitingSince) / 60000)) : 5;
                     return `
-                    <div style="display:flex; justify-content:space-between; align-items:center; padding:10px 12px; border-bottom:1px solid var(--border); background:${p.isEmergency ? 'rgba(239,68,68,0.1)' : 'transparent'}; border-radius:8px; margin-bottom:6px;">
+                    <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:8px; padding:10px 12px; border-bottom:1px solid var(--border); background:${p.isEmergency ? 'rgba(239,68,68,0.1)' : 'transparent'}; border-radius:8px; margin-bottom:6px;">
                         <div>
                             <strong style="color:var(--primary); cursor:pointer;" onclick="openPatientProfile('${p.id}')">${p.name}</strong>
                             ${p.isEmergency ? '<span class="tag danger">🚨 طوارئ</span>' : ''}
@@ -2129,13 +2163,13 @@
             const list = document.getElementById('smart-alerts-list');
             const alerts = [];
             mockPatients.filter(p => p.isWaiting).forEach(p => {
-                alerts.push(`<div style="padding:10px; border-radius:8px; background:var(--surface-alt); border-right:4px solid var(--warning); display:flex; justify-content:space-between; align-items:center;">
+                alerts.push(`<div style="padding:10px; border-radius:8px; background:var(--surface-alt); border-right:4px solid var(--warning); display:flex; justify-content:space-between; align-items:center; gap:8px;">
                     <span>⏳ <strong>${p.name}</strong> في غرفة الانتظار (${p.doctor})</span>
                     <button type="button" class="btn btn-sm btn-primary" onclick="closeModal('alerts-modal'); openPatientProfile('${p.id}')">فتح</button>
                 </div>`);
             });
             inventory.filter(i => i.qty <= i.minQty).forEach(i => {
-                alerts.push(`<div style="padding:10px; border-radius:8px; background:var(--surface-alt); border-right:4px solid var(--danger); display:flex; justify-content:space-between; align-items:center;">
+                alerts.push(`<div style="padding:10px; border-radius:8px; background:var(--surface-alt); border-right:4px solid var(--danger); display:flex; justify-content:space-between; align-items:center; gap:8px;">
                     <span>📦 نقص مخزون: <strong>${i.name}</strong> (متبقي ${i.qty})</span>
                     <button type="button" class="btn btn-sm btn-outline" onclick="closeModal('alerts-modal'); navTo('inventory')">المستودع</button>
                 </div>`);
@@ -2520,12 +2554,12 @@
                 return;
             }
             container.innerHTML = p.consents.map(c => `
-                <div style="border:1px solid var(--border); border-radius:8px; padding:10px; background:var(--surface-alt); display:flex; justify-content:space-between; align-items:center;">
+                <div style="border:1px solid var(--border); border-radius:8px; padding:10px; background:var(--surface-alt); display:flex; justify-content:space-between; align-items:center; gap:8px;">
                     <div>
-                        <strong style="font-size:0.86rem; color:var(--primary);">${c.type}</strong>
-                        <div style="font-size:0.76rem; color:var(--text-muted);">تاريخ التوقيع: ${c.date}</div>
+                        <strong style="font-size:0.84rem; color:var(--primary);">${c.type}</strong>
+                        <div style="font-size:0.75rem; color:var(--text-muted);">تاريخ التوقيع: ${c.date}</div>
                     </div>
-                    <img src="${c.sigData}" alt="Signature" style="height:38px; background:#fff; border:1px solid var(--border); border-radius:4px;">
+                    <img src="${c.sigData}" alt="Signature" style="height:36px; background:#fff; border:1px solid var(--border); border-radius:4px;">
                 </div>
             `).join('');
         }
@@ -2563,7 +2597,7 @@
                 return;
             }
             el.innerHTML = p.installments.map((inst, idx) => `
-                <div style="display:flex; justify-content:space-between; align-items:center; padding:6px 8px; border-bottom:1px solid var(--border); font-size:0.84rem;">
+                <div style="display:flex; justify-content:space-between; align-items:center; padding:6px 8px; border-bottom:1px solid var(--border); font-size:0.82rem;">
                     <span><strong>${inst.amount} ر.س</strong> — استحقاق: ${inst.dueDate}</span>
                     ${inst.paid ? '<span class="tag success">مسدد ✓</span>' : `<button type="button" class="btn btn-sm btn-success" onclick="payInstallment(${idx})">تحصيل القسط</button>`}
                 </div>
@@ -2624,7 +2658,7 @@
                 <div style="display:flex; justify-content:space-between; margin-bottom:4px;"><span>الخصم الممنوح:</span><strong>- ${p.discount} ر.س</strong></div>
                 <div style="display:flex; justify-content:space-between; margin-bottom:4px;"><span>ضريبة القيمة المضافة (${p.vatRate}%):</span><strong>+ ${p.vatAmount} ر.س</strong></div>
                 <div style="display:flex; justify-content:space-between; margin-bottom:4px; color:var(--purple);"><span>حصة شركة التأمين (${p.insuranceCompany || 'لا يوجد'}):</span><strong>- ${p.insuranceCover} ر.س</strong></div>
-                <div style="display:flex; justify-content:space-between; border-top:1px solid var(--border); padding-top:6px; font-size:1rem;"><span>صافي المستحق على المريض:</span><strong>${p.total} ر.س</strong></div>
+                <div style="display:flex; justify-content:space-between; border-top:1px solid var(--border); padding-top:6px; font-size:0.95rem;"><span>صافي المستحق على المريض:</span><strong>${p.total} ر.س</strong></div>
                 <div style="display:flex; justify-content:space-between; color:var(--success);"><span>إجمالي المدفوع:</span><strong>${p.paid} ر.س</strong></div>
                 <div style="display:flex; justify-content:space-between; color:var(--danger); font-weight:bold;"><span>المتبقي للتحصيل:</span><strong>${p.balance} ر.س</strong></div>
             `;
@@ -2776,7 +2810,7 @@
                     return `<div class="appt-card ${appt.status}" onclick="event.stopPropagation(); toggleApptStatus('${appt.id}')">
                         <div>
                             <h4 style="margin-bottom:2px;">${appt.name} <span class="tag info" style="font-size:0.7rem;">${appt.doctor || 'عيادة 1'}</span></h4>
-                            <p style="font-size:0.78rem; opacity:0.9;">${appt.type} | الساعة ${i > 12 ? i - 12 : i}:${appt.minute || '00'}</p>
+                            <p style="font-size:0.76rem; opacity:0.9;">${appt.type} | الساعة ${i > 12 ? i - 12 : i}:${appt.minute || '00'}</p>
                         </div>
                         <span class="tag">${statusLabel}</span>
                     </div>`;
@@ -3127,11 +3161,11 @@
 
                 return `
                 <li class="tp-item">
-                    <div style="display:flex; align-items:center; gap:12px;">
+                    <div style="display:flex; align-items:center; gap:10px;">
                         <div class="tp-tooth">${item.tooth}</div>
                         <div>
-                            <div style="font-weight:bold;">${item.action} <span class="tag">السطح: ${item.surfaces || 'ALL'}</span> ${stageTag}</div>
-                            <div style="font-size:0.8rem; color:var(--primary); font-weight:600; margin-top:2px;">التكلفة: ${item.price} ر.س</div>
+                            <div style="font-weight:bold; font-size:0.88rem;">${item.action} <span class="tag">السطح: ${item.surfaces || 'ALL'}</span> ${stageTag}</div>
+                            <div style="font-size:0.78rem; color:var(--primary); font-weight:600; margin-top:2px;">التكلفة: ${item.price} ر.س</div>
                         </div>
                     </div>
                     <div style="display:flex; gap:6px;">
@@ -3362,8 +3396,8 @@
             });
 
             document.getElementById('reports-content').innerHTML = `
-                <div style="background:var(--surface-alt); padding:18px; border-radius:var(--radius); border:1px solid var(--border);">
-                    <h3 style="font-size:1rem; color:var(--primary); margin-bottom:12px;">📊 الأداء المالي (الإيرادات مقابل المصروفات وصافي الربح)</h3>
+                <div style="background:var(--surface-alt); padding:16px; border-radius:var(--radius); border:1px solid var(--border);">
+                    <h3 style="font-size:0.95rem; color:var(--primary); margin-bottom:12px;">📊 الأداء المالي (الإيرادات مقابل المصروفات وصافي الربح)</h3>
                     <svg viewBox="0 0 320 150" style="width:100%; height:150px;">
                         <rect x="30" y="${130 - Math.min(110, (totalRev/2500)*100)}" width="55" height="${Math.min(110, (totalRev/2500)*100)}" rx="6" fill="#10b981"/>
                         <text x="57" y="145" text-anchor="middle" font-size="11" fill="currentColor">الإيرادات (${totalRev})</text>
@@ -3376,9 +3410,9 @@
                     </svg>
                 </div>
 
-                <div style="background:var(--surface-alt); padding:18px; border-radius:var(--radius); border:1px solid var(--border);">
-                    <h3 style="font-size:1rem; color:var(--primary); margin-bottom:12px;">🦷 إحصائيات الخطط العلاجية حسب التخصص</h3>
-                    <div style="display:flex; flex-direction:column; gap:8px; font-size:0.88rem;">
+                <div style="background:var(--surface-alt); padding:16px; border-radius:var(--radius); border:1px solid var(--border);">
+                    <h3 style="font-size:0.95rem; color:var(--primary); margin-bottom:12px;">🦷 إحصائيات الخطط العلاجية حسب التخصص</h3>
+                    <div style="display:flex; flex-direction:column; gap:8px; font-size:0.86rem;">
                         <div style="display:flex; justify-content:space-between;"><span>حشوات وترميم (Composite):</span><strong>${counts.decay} إجراء</strong></div>
                         <div style="display:flex; justify-content:space-between;"><span>سحب وعلاج عصب (Endo):</span><strong>${counts.endo} إجراء</strong></div>
                         <div style="display:flex; justify-content:space-between;"><span>تركيبات وتيجان زيركون:</span><strong>${counts.crown} إجراء</strong></div>
