@@ -58,6 +58,77 @@
             font-weight: 700;
         }
 
+        /* تنسيق جدول بيانات العميل Client Details المطابق للصورة */
+        .client-details-wrapper {
+            width: 390px;
+            direction: ltr;
+            text-align: left;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin-top: 6px;
+        }
+        .client-details-header {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            margin-bottom: 4px;
+        }
+        .client-details-square {
+            width: 9px;
+            height: 9px;
+            background-color: #0284c7;
+            border-radius: 1px;
+            display: inline-block;
+        }
+        .client-details-title {
+            font-size: 12.5px;
+            font-weight: 800;
+            color: #1e3a5f;
+            text-decoration: underline;
+            text-underline-offset: 2px;
+            font-family: Georgia, 'Times New Roman', serif;
+        }
+        .client-details-table {
+            width: 100%;
+            border-collapse: collapse;
+            border: 1px solid #9ca3af;
+            font-size: 10.5px;
+            line-height: 1.25;
+            background-color: #ffffff;
+        }
+        .client-details-table tr {
+            border-bottom: 1px dotted #6b7280;
+        }
+        .client-details-table tr:last-child {
+            border-bottom: 1px solid #9ca3af;
+        }
+        .client-details-table td {
+            padding: 3.5px 6px;
+            color: #111827;
+            vertical-align: middle;
+        }
+        .client-details-table td.cd-label {
+            background-color: #e5e7eb;
+            font-weight: 600;
+            color: #1f2937;
+            width: 24%;
+            white-space: nowrap;
+        }
+        .client-details-table td.cd-label-mid {
+            background-color: #e5e7eb;
+            font-weight: 600;
+            color: #1f2937;
+            width: 16%;
+            white-space: nowrap;
+        }
+        .client-details-table td.cd-val {
+            background-color: #ffffff;
+            color: #111827;
+        }
+        .client-details-table td.cd-bold {
+            font-weight: 800;
+            color: #000000;
+        }
+
         .invoice-page {
             width: 210mm;
             height: 297mm;
@@ -76,7 +147,7 @@
 
         .invoice-content {
             flex: 1;
-            padding: 0.6cm 1.5cm;
+            padding: 0.45cm 1.5cm;
             display: flex;
             flex-direction: column;
         }
@@ -167,6 +238,9 @@
         body.dark-mode .invoice-page,
         body.dark-mode .invoice-page * {
             color: #0f172a;
+        }
+        body.dark-mode .client-details-title {
+            color: #1e3a5f !important;
         }
 
         /* دعم الإضاءة النهارية (Light Mode) لشاشة تسجيل الدخول عند عدم تفعيل الوضع الليلي */
@@ -699,7 +773,7 @@
             if (!borderEl || !glowEl) return;
 
             let startTime = performance.now();
-            const durationMs = 3000; // 3 ثوانٍ للدورة الكاملة كما في الكود الأصلي
+            const durationMs = 3000;
 
             function updateGradient(now) {
                 if (!loginScreen.classList.contains('hidden')) {
@@ -726,7 +800,6 @@
                     console.warn('Fallback hash check used');
                 }
             }
-            // Fallback pure JS SHA-256 implementation
             function rightRotate(value, amount) { return (value >>> amount) | (value << (32 - amount)); }
             let mathPow = Math.pow, maxWord = mathPow(2, 32), lengthProperty = 'length', i, j, result = '';
             let words = [], asciiBitLength = str[lengthProperty] * 8;
@@ -856,7 +929,6 @@
                 }
             };
 
-            // تحديث مفتاح الإضاءة في الهيدر الرئيسي وفي شاشة تسجيل الدخول معاً
             applyToggleUI('theme-btn-light', 'theme-btn-dark', 'theme-pill-thumb', 'theme-slider-toggle');
             applyToggleUI('login-theme-btn-light', 'login-theme-btn-dark', 'login-theme-pill-thumb', 'login-theme-slider-toggle');
 
@@ -931,12 +1003,10 @@
                 verifyScreen.classList.add('hidden');
             });
 
-            // تهيئة وضع الإضاءة المحفوظ فور فتح الصفحة (ليعمل في شاشة تسجيل الدخول أيضاً)
             let initialTheme = 'light';
             try { initialTheme = localStorage.getItem(STORAGE_KEYS.THEME) || 'light'; } catch (e) {}
             window.setAppTheme(initialTheme);
 
-            // التحقق من حالة تسجيل الدخول
             let isAuth = false;
             try {
                 isAuth = sessionStorage.getItem(STORAGE_KEYS.AUTH) === 'true';
@@ -951,7 +1021,6 @@
                 loginScreen.classList.remove('hidden');
             }
 
-            // معالجة زر تسجيل الدخول في بطاقة AI Gradient Card
             const handleLoginSubmit = async () => {
                 const VALID_HASH = "240be518fabd2724ddb6f04eeb1da5967448d7e831c08c8fa822809f74c720a9";
                 const VALID_USER = "admin";
@@ -1762,15 +1831,67 @@
                             <img src="صورة1.png" class="w-full object-contain max-h-40" alt="صورة1.png" onerror="this.style.display='none'">
                         </div>
                         <div class="invoice-content">
-                            <div class="flex justify-between items-start w-full mb-8 mt-4" dir="ltr">
-                                <div class="text-left font-bold text-slate-900 space-y-2.5 text-[14px]">
+                            <!-- الصف العلوي: معلومات الفاتورة على اليسار + الباركود وأسفله Client Details على اليمين -->
+                            <div class="flex justify-between items-start w-full mb-5 mt-2" dir="ltr">
+                                <!-- جهة اليسار: معلومات الفاتورة كما هي -->
+                                <div class="text-left font-bold text-slate-900 space-y-2.5 text-[14px] pt-1">
                                     <div class="underline">${t.invLabel} ${escapeHtmlAttr(invNo)}</div>
                                     <div class="underline">${t.dateLabel} ${escapeHtmlAttr(p.date)}</div>
                                     <div class="underline">VARNO:${brandVat}</div>
                                 </div>
-                                <div class="bg-white p-1.5 rounded border"><div id="${qrId}"></div></div>
+
+                                <!-- جهة اليمين: الباركود في الأعلى وأسفل منه جدول Client Details -->
+                                <div class="flex flex-col items-end">
+                                    <div class="bg-white p-1.5 rounded border shadow-2xs"><div id="${qrId}"></div></div>
+                                    
+                                    <!-- جدول Client Details أسفل الباركود تماماً كما في الصورة -->
+                                    <div class="client-details-wrapper">
+                                        <div class="client-details-header">
+                                            <span class="client-details-square"></span>
+                                            <span class="client-details-title">Client Details:</span>
+                                        </div>
+                                        <table class="client-details-table">
+                                            <tbody>
+                                                <tr>
+                                                    <td class="cd-label">Name:</td>
+                                                    <td class="cd-val cd-bold" colspan="3">CONSOLIDATED CONTRACTORS COMAPNY</td>
+                                                </tr>
+                                                <tr>
+                                                    <td class="cd-label">Street Name:</td>
+                                                    <td class="cd-val" colspan="3">AL-AHSA AL RABWAH DIST</td>
+                                                </tr>
+                                                <tr>
+                                                    <td class="cd-label">Building No:</td>
+                                                    <td class="cd-val" style="width: 26%;">7101</td>
+                                                    <td class="cd-label-mid">City:</td>
+                                                    <td class="cd-val" style="width: 34%;">RIYAD</td>
+                                                </tr>
+                                                <tr>
+                                                    <td class="cd-label">Addl. No:</td>
+                                                    <td class="cd-val">3074</td>
+                                                    <td class="cd-label-mid">District:</td>
+                                                    <td class="cd-val">AL RABWAH DIST</td>
+                                                </tr>
+                                                <tr>
+                                                    <td class="cd-label">Postal Code:</td>
+                                                    <td class="cd-val">12814</td>
+                                                    <td class="cd-label-mid">Country:</td>
+                                                    <td class="cd-val">Saudi Arabia</td>
+                                                </tr>
+                                                <tr>
+                                                    <td class="cd-label">VAT Number:</td>
+                                                    <td class="cd-val cd-bold">300056174300003</td>
+                                                    <td class="cd-label-mid">CRN</td>
+                                                    <td class="cd-val">1010003225</td>
+                                                </tr>
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
                             </div>
-                            <div class="text-center font-black text-slate-900 text-[19px] mb-5" dir="${lang === 'ar' ? 'rtl' : 'ltr'}">${headerExamTitle}</div>
+
+                            <!-- عنوان الفحص وجدول الأسعار والكميات أسفلها -->
+                            <div class="text-center font-black text-slate-900 text-[18px] mb-4 mt-2" dir="${lang === 'ar' ? 'rtl' : 'ltr'}">${headerExamTitle}</div>
                             <div class="w-full">
                                 <table class="invoice-table" dir="${lang === 'ar' ? 'rtl' : 'ltr'}">
                                     <thead>
@@ -1800,7 +1921,7 @@
                                     </tbody>
                                 </table>
                             </div>
-                            <div class="font-black text-slate-900 text-[18px] mt-14 mb-4 ${lang === 'ar' ? 'text-right' : 'text-left'}" dir="${lang === 'ar' ? 'rtl' : 'ltr'}">${t.finance}</div>
+                            <div class="font-black text-slate-900 text-[18px] mt-10 mb-3 ${lang === 'ar' ? 'text-right' : 'text-left'}" dir="${lang === 'ar' ? 'rtl' : 'ltr'}">${t.finance}</div>
                         </div>
                         <div class="invoice-footer">
                             <img src="صورة2.png" class="w-full object-cover max-h-none" alt="صورة2.png" onerror="this.style.display='none'">
@@ -1816,7 +1937,7 @@
                     const el = document.getElementById(task.id);
                     if (el) {
                         el.innerHTML = '';
-                        new QRCode(el, { text: task.text, width: 100, height: 100, colorDark: "#000", colorLight: "#fff", correctLevel: QRCode.CorrectLevel.M });
+                        new QRCode(el, { text: task.text, width: 92, height: 92, colorDark: "#000", colorLight: "#fff", correctLevel: QRCode.CorrectLevel.M });
                     }
                 });
             }, 120);
