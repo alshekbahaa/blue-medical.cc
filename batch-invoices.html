@@ -83,13 +83,13 @@
             border-radius: 1px;
             display: inline-block;
         }
-        .client-details-title {
-            font-size: 12.5px;
-            font-weight: 800;
-            color: #1e3a5f;
-            text-decoration: underline;
-            text-underline-offset: 2px;
-            font-family: Georgia, 'Times New Roman', serif;
+        /* تنسيق جدول بيانات العميل المطابق للصورة بدون عنوان Client Details */
+        .client-details-wrapper {
+            width: 390px;
+            direction: ltr;
+            text-align: left;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin-top: 8px;
         }
         .client-details-table {
             width: 100%;
@@ -131,6 +131,36 @@
         .client-details-table td.cd-bold {
             font-weight: 800;
             color: #000000;
+        }
+
+        /* تنسيق كتلة فاتورة ضريبية على جهة اليسار كما في الصورة */
+        .left-tax-block {
+            direction: ltr;
+            text-align: left;
+            color: #0f172a;
+            font-family: 'Tajawal', Arial, sans-serif;
+            margin-top: 8px;
+        }
+        .left-tax-title {
+            text-align: center;
+            font-weight: 800;
+            font-size: 16px;
+            border-bottom: 1.5px solid #0f172a;
+            padding: 0 18px 1px 18px;
+            display: inline-block;
+            margin-bottom: 2px;
+        }
+        .left-tax-line {
+            display: table;
+            font-weight: 800;
+            font-size: 13.5px;
+            line-height: 1.35;
+            letter-spacing: 0.2px;
+            color: #0f172a;
+            border-top: 1px solid #0f172a;
+            border-bottom: 3px double #0f172a;
+            padding: 1px 0;
+            margin-bottom: 3px;
         }
 
         .invoice-page {
@@ -1832,25 +1862,28 @@
                             <img src="صورة1.png" class="w-full object-contain max-h-40" alt="صورة1.png" onerror="this.style.display='none'">
                         </div>
                         <div class="invoice-content">
-                            <!-- الصف العلوي: معلومات الفاتورة على اليسار + الباركود وأسفله Client Details على اليمين -->
+                            <!-- الصف العلوي: معلومات الفاتورة والنص الضريبي على اليسار + الباركود وأسفله جدول العميل (بدون Client Details) على اليمين -->
                             <div class="flex justify-between items-start w-full mb-5 mt-2" dir="ltr">
-                                <!-- جهة اليسار: معلومات الفاتورة كما هي -->
-                                <div class="text-left font-bold text-slate-900 space-y-2.5 text-[14px] pt-1">
+                                <!-- جهة اليسار: رقم الفاتورة والتاريخ + النص الضريبي المرفق بالصورة -->
+                                <div class="text-left font-bold text-slate-900 space-y-1.5 text-[13.5px] pt-1">
                                     <div class="underline">${t.invLabel} ${escapeHtmlAttr(invNo)}</div>
                                     <div class="underline">${t.dateLabel} ${escapeHtmlAttr(p.date)}</div>
-                                    <div class="underline">VARNO:${brandVat}</div>
+                                    
+                                    <div class="left-tax-block">
+                                        <div style="width: 255px; text-align: center;">
+                                            <span class="left-tax-title">فاتورة ضريبية</span>
+                                        </div>
+                                        <div class="left-tax-line">MAIDAN MEDICAL CLINICCENTER</div>
+                                        <div class="left-tax-line">VAT #310503864910003</div>
+                                    </div>
                                 </div>
 
-                                <!-- جهة اليمين: الباركود في الأعلى وأسفل منه جدول Client Details -->
+                                <!-- جهة اليمين: الباركود في الأعلى وأسفل منه الجدول مباشرة بدون كلمة Client Details -->
                                 <div class="flex flex-col items-end">
                                     <div class="bg-white p-1.5 rounded border shadow-2xs"><div id="${qrId}"></div></div>
                                     
-                                    <!-- جدول Client Details أسفل الباركود تماماً كما في الصورة -->
+                                    <!-- جدول معلومات العميل أسفل الباركود بدون عنوان Client Details -->
                                     <div class="client-details-wrapper">
-                                        <div class="client-details-header">
-                                            <span class="client-details-square"></span>
-                                            <span class="client-details-title">Client Details:</span>
-                                        </div>
                                         <table class="client-details-table">
                                             <tbody>
                                                 <tr>
