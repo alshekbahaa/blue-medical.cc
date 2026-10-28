@@ -42,20 +42,24 @@
             border-collapse: collapse;
             font-size: 13px;
             text-align: center;
-            border: 2px solid #1e293b; 
+            border: 1.5px solid #000000; 
+            font-family: Arial, Helvetica, sans-serif;
         }
         .invoice-table th {
-            border: 1px solid #1e293b;
-            background-color: #f1f5f9;
-            color: #0f172a;
+            border: 1px solid #000000;
+            background-color: #a6a6a6;
+            color: #000000;
             padding: 10px 6px;
             font-weight: 800;
+            text-transform: uppercase;
+            vertical-align: middle;
         }
         .invoice-table td {
-            border: 1px solid #1e293b;
-            padding: 14px 6px;
-            color: #0f172a;
-            font-weight: 700;
+            border: 1px solid #000000;
+            padding: 18px 6px;
+            color: #000000;
+            font-weight: 800;
+            vertical-align: middle;
         }
 
         /* تنسيق جدول بيانات العميل Client Details المطابق للصورة */
@@ -555,7 +559,7 @@
                     </div>
                     <div>
                         <label class="block text-xs font-bold text-slate-600 mb-1.5">وصف الخدمة الافتراضي:</label>
-                        <input type="text" id="custom-exam-title" value="اصدار فحص طبي إقامة CCC" class="w-full px-3 py-2.5 border rounded-xl font-bold bg-white text-sm">
+                        <input type="text" id="custom-exam-title" value="MEDICAL FITNESS FOR CCC" class="w-full px-3 py-2.5 border rounded-xl font-bold bg-white text-sm">
                     </div>
                     <div>
                         <label class="block text-xs font-bold text-slate-600 mb-1.5">سعر الوحدة الأساسي (قبل الضريبة):</label>
@@ -656,7 +660,7 @@
                         <div class="grid grid-cols-1 md:grid-cols-5 gap-4">
                             <div class="md:col-span-2">
                                 <label class="block text-xs font-bold text-slate-700 mb-1.5">اسم الفحص / البيان في الفاتورة:</label>
-                                <input type="text" id="bulk-exam-name" value="اصدار فحص طبي إقامة CCC" class="w-full px-4 py-2.5 bg-white border rounded-xl font-bold text-sm">
+                                <input type="text" id="bulk-exam-name" value="MEDICAL FITNESS FOR CCC" class="w-full px-4 py-2.5 bg-white border rounded-xl font-bold text-sm">
                             </div>
                             <div>
                                 <label class="block text-xs font-black text-violet-800 mb-1.5">رقم الفاتورة (قبل الإصدار):</label>
@@ -1682,40 +1686,37 @@
             ar: { 
                 invLabel: 'فاتورة:', 
                 dateLabel: 'التاريخ:', 
-                defaultExamTitle: 'اصدار فحص طبي إقامة CCC', 
-                colName: 'الاسم ورقم الهوية', 
-                colExamOnly: 'بيان الفحص والخدمة', 
-                colPrice: 'السعر', 
-                colVat: 'Vat', 
-                colQty: 'العدد', 
-                colAmount: 'المبلغ', 
-                colTax: 'مبلغ الضريبة', 
-                colTotal: 'الإجمالي شامل الضريبة', 
+                defaultExamTitle: 'MEDICAL FITNESS FOR CCC', 
+                colName: 'MEDICAL FITNESS', 
+                colExamOnly: 'MEDICAL FITNESS', 
+                colPrice: 'PRICE', 
+                colVat: 'VAT', 
+                colQty: 'QUANITY', 
+                colAmount: 'AMOUNT', 
+                colTax: 'AMOUNT WITH VAT', 
+                colTotal: 'TOTAL AMOUNT WITH VAT', 
                 finance: 'المالية' 
             },
             en: { 
                 invLabel: 'Invoice:', 
                 dateLabel: 'Date:', 
-                defaultExamTitle: 'Issuance of CCC Iqama Medical Exam', 
-                colName: 'Patient Name & ID', 
-                colExamOnly: 'Exam Description', 
-                colPrice: 'Price', 
-                colVat: 'Vat', 
-                colQty: 'Qty', 
-                colAmount: 'Amount', 
-                colTax: 'Tax Amt', 
-                colTotal: 'Total w/ Tax', 
+                defaultExamTitle: 'MEDICAL FITNESS FOR CCC', 
+                colName: 'MEDICAL FITNESS', 
+                colExamOnly: 'MEDICAL FITNESS', 
+                colPrice: 'PRICE', 
+                colVat: 'VAT', 
+                colQty: 'QUANITY', 
+                colAmount: 'AMOUNT', 
+                colTax: 'AMOUNT WITH VAT', 
+                colTotal: 'TOTAL AMOUNT WITH VAT', 
                 finance: 'المالية' 
             }
         };
 
         function resolveLocalizedExamTitle(rawTitle, lang) {
             const trimmed = String(rawTitle || '').trim();
-            const arDefault = translations.ar.defaultExamTitle;
-            const enDefault = translations.en.defaultExamTitle;
-
-            if (!trimmed || trimmed === arDefault || trimmed === enDefault) {
-                return translations[lang].defaultExamTitle;
+            if (!trimmed || trimmed === 'اصدار فحص طبي إقامة CCC' || trimmed === 'Issuance of CCC Iqama Medical Exam') {
+                return 'MEDICAL FITNESS FOR CCC';
             }
             return trimmed;
         }
@@ -1891,32 +1892,36 @@
                             </div>
 
                             <!-- عنوان الفحص وجدول الأسعار والكميات أسفلها -->
-                            <div class="text-center font-black text-slate-900 text-[18px] mb-4 mt-2" dir="${lang === 'ar' ? 'rtl' : 'ltr'}">${headerExamTitle}</div>
-                            <div class="w-full">
-                                <table class="invoice-table" dir="${lang === 'ar' ? 'rtl' : 'ltr'}">
+                            <div class="w-full mt-4">
+                                <table class="invoice-table" dir="rtl">
                                     <thead>
                                         <tr>
-                                            <th class="w-1/3">${firstColHeader}</th>
-                                            <th>${t.colPrice}</th>
-                                            <th>${t.colVat}</th>
-                                            <th>${t.colQty}</th>
-                                            <th>${t.colAmount}</th>
-                                            <th>${t.colTax}</th>
-                                            <th>${t.colTotal}</th>
+                                            <th class="w-[28%]" style="font-family: Georgia, 'Times New Roman', serif; text-decoration: underline; text-underline-offset: 3px;">MEDICAL FITNESS</th>
+                                            <th class="w-[10%]">PRICE</th>
+                                            <th class="w-[9%]">VAT</th>
+                                            <th class="w-[12%]">QUANITY</th>
+                                            <th class="w-[13%]">AMOUNT</th>
+                                            <th class="w-[14%]">AMOUNT WITH<br>VAT</th>
+                                            <th class="w-[14%]">TOTAL AMOUNT<br>WITH VAT</th>
                                         </tr>
                                     </thead>
                                     <tbody>
                                         <tr>
-                                            <td class="py-4">
-                                                <div class="font-black text-[14px]">${tableCellPrimaryText}</div>
-                                                ${p.id ? `<div class="font-bold text-[13px] mt-1 text-slate-700" dir="ltr">${escapeHtmlAttr(p.id)}</div>` : ''}
+                                            <td class="py-6" style="font-family: Georgia, 'Times New Roman', serif;">
+                                                ${isBulkRow ? `
+                                                    <div class="font-black text-[15px] leading-relaxed tracking-wide">MEDICAL FITNESS FOR</div>
+                                                    <div class="font-black text-[18px] mt-2 tracking-wider">CCC</div>
+                                                ` : `
+                                                    <div class="font-black text-[14px]">${tableCellPrimaryText}</div>
+                                                    ${p.id ? `<div class="font-bold text-[13px] mt-1.5 text-black" dir="ltr">${escapeHtmlAttr(p.id)}</div>` : ''}
+                                                `}
                                             </td>
-                                            <td>${formatNum(c.unitPrice)}</td>
-                                            <td>15%</td>
-                                            <td class="font-black">${c.qty}</td>
-                                            <td>${formatNum(c.subTotalAmount)}</td>
-                                            <td>${formatNum(c.taxAmount)}</td>
-                                            <td class="font-black text-[15px] bg-slate-50">${formatNum(c.totalAmount)}</td>
+                                            <td class="text-[14px]" dir="ltr">${formatNum(+(c.unitPrice * 1.15).toFixed(2))}</td>
+                                            <td class="text-[14px]" dir="ltr">15%</td>
+                                            <td class="font-black text-[15px]" dir="ltr">${c.qty}</td>
+                                            <td class="text-[14px]" dir="ltr">${c.subTotalAmount.toFixed(2)}</td>
+                                            <td class="text-[14px]" dir="ltr">${c.taxAmount.toFixed(2)}</td>
+                                            <td class="font-black text-[15px]" dir="ltr">${formatNum(c.totalAmount)}</td>
                                         </tr>
                                     </tbody>
                                 </table>
