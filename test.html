@@ -858,254 +858,254 @@
                 <!-- التبويب الأول: [🧾 نظام الفواتير الطبية والضريبية]                                     -->
                 <!-- ===================================================================================== -->
                 <div id="system-invoices-view" class="w-full">
-                                    <h3 class="font-black text-violet-950 text-base">🧮 إصدار فاتورة إجمالية بالأعداد (بدون تحديد اسم شخص)</h3>
-                                    <p class="text-xs text-slate-500 font-bold mt-0.5">حدد رقم الفاتورة والعدد (مثلاً: 155) وسيقوم النظام بحساب المبلغ قبل وبعد الضريبة تلقائياً</p>
-                                </div>
-                                <span class="bg-violet-100 text-violet-800 text-xs font-black px-3 py-1 rounded-full">حاسبة فورية ذكية</span>
-                            </div>
-
-                            <div class="grid grid-cols-1 md:grid-cols-5 gap-4">
-                                <div class="md:col-span-2">
-                                    <label class="block text-xs font-bold text-slate-700 mb-1.5">اسم الفحص / البيان في الفاتورة:</label>
-                                    <input type="text" id="bulk-exam-name" value="MEDICAL FITNESS FOR CCC" class="w-full px-4 py-2.5 bg-white border rounded-xl font-bold text-sm">
-                                </div>
-                                <div>
-                                    <label class="block text-xs font-black text-violet-800 mb-1.5">رقم الفاتورة (قبل الإصدار):</label>
-                                    <div class="flex items-center bg-white border-2 border-violet-400 rounded-xl px-3 py-2" dir="ltr">
-                                        <span class="text-xs font-bold text-slate-400 select-none">2026-</span>
-                                        <input type="text" id="bulk-inv-num" class="w-full font-black text-violet-800 text-sm outline-none text-center" placeholder="101001">
-                                    </div>
-                                </div>
-                                <div>
-                                    <label class="block text-xs font-bold text-slate-700 mb-1.5">العدد (الكمية):</label>
-                                    <input type="number" id="bulk-qty" value="155" min="1" step="1" class="w-full px-4 py-2 bg-white border-2 border-violet-400 rounded-xl font-black text-base text-violet-950 text-center" dir="ltr">
-                                </div>
-                                <div>
-                                    <label class="block text-xs font-bold text-slate-700 mb-1.5">تاريخ الفاتورة:</label>
-                                    <input type="date" id="bulk-date" class="w-full px-3.5 py-2.5 bg-white border rounded-xl font-bold text-sm" dir="ltr">
-                                </div>
-                            </div>
-
-                            <div class="theme-card grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 bg-white p-4 rounded-xl border border-violet-200">
-                                <div>
-                                    <label class="block text-[11px] font-bold text-slate-500 mb-1">سعر الوحدة قبل الضريبة:</label>
-                                    <input type="number" id="bulk-unit-price" value="78.26" step="0.01" class="w-full px-3 py-2 bg-slate-50 border rounded-lg font-black text-sm" dir="ltr">
-                                </div>
-                                <div>
-                                    <label class="block text-[11px] font-bold text-blue-700 mb-1">سعر الوحدة شامل الضريبة (90):</label>
-                                    <input type="number" id="bulk-unit-gross" value="90.00" step="0.01" class="w-full px-3 py-2 bg-blue-50 border rounded-lg font-black text-sm text-blue-900" dir="ltr">
-                                </div>
-                                <div>
-                                    <label class="block text-[11px] font-bold text-slate-500 mb-1">الإجمالي قبل الضريبة:</label>
-                                    <input type="number" id="bulk-subtotal" step="0.01" class="w-full px-3 py-2 bg-amber-50 border rounded-lg font-black text-sm text-amber-900" dir="ltr">
-                                </div>
-                                <div>
-                                    <label class="block text-[11px] font-bold text-slate-500 mb-1">مبلغ الضريبة (15%):</label>
-                                    <input type="text" id="bulk-tax" readonly class="w-full px-3 py-2 bg-rose-50 border rounded-lg font-black text-sm text-rose-700" dir="ltr">
-                                </div>
-                                <div class="sm:col-span-2 lg:col-span-4">
-                                    <label class="block text-[11px] font-bold text-emerald-700 mb-1">المبلغ النهائي بعد الضريبة (شامل 15%):</label>
-                                    <input type="number" id="bulk-total" step="0.01" class="w-full px-3 py-2.5 bg-emerald-50 border-2 border-emerald-400 rounded-lg font-black text-lg text-emerald-800" dir="ltr">
-                                </div>
-                            </div>
-
-                            <div class="flex flex-wrap items-center justify-between gap-4 pt-1">
-                                <p id="bulk-formula-hint" class="text-xs font-bold text-violet-800 bg-violet-100 px-3.5 py-2 rounded-xl" dir="ltr"></p>
-                                <button type="button" id="add-bulk-btn" class="bg-violet-600 hover:bg-violet-700 text-white font-black px-8 py-3.5 rounded-xl transition shadow-lg">➕ إصدار وإضافة فاتورة الأعداد الآن</button>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- شريط الإجراءات وجدول المراجعة للفواتير -->
-                    <div id="inv-action-bar" class="hidden pt-6 border-t border-slate-200 space-y-6">
-                        <div class="theme-subcard flex flex-wrap justify-between items-center gap-4 bg-slate-50 p-4 rounded-xl border">
-                            <div class="w-full max-w-md">
-                                <input type="text" id="inv-search-input" placeholder="🔍 ابحث بالاسم، رقم الإقامة، أو رقم الفاتورة..." class="w-full px-4 py-2.5 bg-white border rounded-xl text-sm font-bold">
-                            </div>
-                            <div class="flex flex-wrap items-center gap-3">
-                                <div class="theme-card flex items-center gap-2 bg-white px-3 py-1.5 rounded-xl border">
-                                    <span class="text-xs font-bold text-slate-500">العداد القادم:</span>
-                                    <input type="number" id="seq-input" class="w-24 font-black text-blue-600 text-sm border-b text-center outline-none" dir="ltr">
-                                </div>
-                                <button type="button" id="inv-export-csv-btn" class="bg-teal-50 hover:bg-teal-100 text-teal-700 font-bold text-xs px-3.5 py-2.5 rounded-xl border">📊 تصدير الكشف (CSV)</button>
-                                <button type="button" id="inv-clear-all-btn" class="bg-red-50 hover:bg-red-100 text-red-600 font-bold text-xs px-3.5 py-2.5 rounded-xl border">🗑️ تفريغ القائمة</button>
-                            </div>
-                        </div>
-
-                        <div class="border rounded-xl overflow-hidden">
-                            <div class="theme-subcard bg-slate-100 px-4 py-2.5 flex justify-between items-center border-b">
-                                <span class="font-black text-xs text-slate-700">📋 جدول المراجعة والتحرير المباشر (يمكنك تعديل أرقام الفواتير، المبالغ، أو معاينة شاشة الـ QR)</span>
-                                <span id="inv-filtered-count-badge" class="text-xs font-bold bg-blue-100 text-blue-800 px-2.5 py-0.5 rounded-full"></span>
-                            </div>
-                            <div class="max-h-64 overflow-y-auto">
-                                <table class="w-full text-sm text-right">
-                                    <thead class="theme-subcard bg-slate-50 text-slate-600 sticky top-0 border-b text-xs z-10">
-                                        <tr>
-                                            <th class="py-2.5 px-4">#</th>
-                                            <th class="py-2.5 px-4">رقم الفاتورة</th>
-                                            <th class="py-2.5 px-4">الاسم / بيان الفحص</th>
-                                            <th class="py-2.5 px-4">رقم الهوية</th>
-                                            <th class="py-2.5 px-4">العدد</th>
-                                            <th class="py-2.5 px-4">التاريخ</th>
-                                            <th class="py-2.5 px-4">المبلغ قبل الضريبة</th>
-                                            <th class="py-2.5 px-4">الإجمالي شامل الضريبة</th>
-                                            <th class="py-2.5 px-4 text-center">إجراءات</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody id="inv-patients-table-body" class="divide-y divide-slate-100"></tbody>
-                                </table>
-                            </div>
-                        </div>
-
-                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                            <button type="button" onclick="printAllInvoices()" class="w-full bg-slate-800 hover:bg-slate-900 text-white font-bold py-4 px-6 rounded-2xl transition text-base shadow-lg flex justify-center items-center gap-3">🖨️ طباعة الكل / حفظ PDF موحد</button>
-                            <button type="button" id="zip-btn" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-4 px-6 rounded-2xl transition text-base shadow-lg flex justify-center items-center gap-3">
-                                <span id="zip-text">🗂️ تحميل الفواتير كملفات PDF منفصلة (مضغوط ZIP)</span>
-                            </button>
-                        </div>
-                        <div id="zip-progress" class="hidden w-full bg-slate-200 rounded-full h-3 overflow-hidden">
-                            <div id="zip-progress-bar" class="bg-indigo-600 h-3 rounded-full transition-all duration-300" style="width: 0%;"></div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- حاوية صفحات الفواتير للطباعة والمعاينة -->
-            <main id="invoices-container" class="w-full flex flex-col items-center mt-8"></main>
-        </div>
-
-        <!-- ===================================================================================== -->
-        <!-- التبويب الثاني: [🔬 نظام توثيق الفحوصات وباركود PDF وصلاحية الانتهاء]                 -->
-        <!-- ===================================================================================== -->
-        <div id="system-reports-view" class="hidden w-full max-w-[1600px] mx-auto px-4 sm:px-6 mt-6 flex-1 flex flex-col no-print">
-            
-            <!-- شريط أدوات نظام التقارير والنسخ الاحتياطي -->
-            <div class="theme-card bg-white rounded-2xl shadow-sm border border-gray-100 p-4 mb-4 flex flex-col md:flex-row justify-between items-center gap-4">
-                <div class="flex items-center gap-3">
-                    <img src="Blue.png" alt="Logo" class="h-10 object-contain bg-white rounded-lg px-2 py-1" onerror="this.onerror=null; this.src='https://placehold.co/120x40/ffffff/059669?text=Logo'">
-                    <div>
-                        <h2 class="text-base sm:text-lg font-black text-gray-800">إدارة تقارير الفحوصات الطبية ودمج باركود PDF</h2>
-                        <p class="text-xs text-gray-500 font-bold">تحديد صلاحية التقرير (7 أيام، 30 يوماً، 3 أشهر، سنة كاملة) مع فحص فوري للعميل</p>
-                    </div>
-                </div>
-                <div class="flex items-center gap-2 flex-wrap justify-center">
-                    <button type="button" id="rep-open-settings-btn" class="bg-emerald-50 hover:bg-emerald-100 text-emerald-700 px-3.5 py-2.5 rounded-xl font-bold transition-colors text-xs sm:text-sm flex items-center gap-2 border border-emerald-200" title="إعدادات مكان وحجم QR">
-                        <i class="fa-solid fa-gear"></i> إعدادات الـ QR والربط
-                    </button>
-                    <button type="button" id="rep-export-backup-btn" class="bg-blue-50 hover:bg-blue-100 text-blue-700 px-3.5 py-2.5 rounded-xl font-bold transition-colors text-xs sm:text-sm flex items-center gap-2 border border-blue-200" title="تنزيل نسخة احتياطية">
-                        <i class="fa-solid fa-cloud-arrow-down"></i> نسخة احتياطية
-                    </button>
-                    <label for="rep-import-backup-file" class="bg-indigo-50 hover:bg-indigo-100 text-indigo-700 px-3.5 py-2.5 rounded-xl font-bold transition-colors text-xs sm:text-sm flex items-center gap-2 border border-indigo-200 cursor-pointer" title="استعادة السجلات">
-                        <i class="fa-solid fa-cloud-arrow-up"></i> استعادة
-                    </label>
-                    <input type="file" id="rep-import-backup-file" accept=".json" class="hidden">
-                    <button type="button" id="rep-clear-db-btn" class="bg-rose-50 hover:bg-rose-100 text-rose-700 px-3.5 py-2.5 rounded-xl font-bold transition-colors text-xs sm:text-sm flex items-center gap-2 border border-rose-200">
-                        <i class="fa-solid fa-broom"></i> تصفير السجلات
-                    </button>
-                </div>
-            </div>
-
-            <!-- إحصائيات التقارير الطبية -->
-            <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-3 mb-4">
-                <div class="theme-card bg-white p-3.5 rounded-xl shadow-sm border border-gray-100 flex flex-col gap-1 border-b-4 border-gray-400">
-                    <div class="flex justify-between items-center"><p class="text-[11px] sm:text-xs text-gray-500 font-bold">إجمالي التقارير</p><i class="fa-solid fa-folder-open text-gray-400"></i></div>
-                    <h3 id="rep-stat-total" class="text-lg font-bold text-gray-800">0</h3>
-                </div>
-                <div class="theme-card bg-white p-3.5 rounded-xl shadow-sm border border-gray-100 flex flex-col gap-1 border-b-4 border-green-500">
-                    <div class="flex justify-between items-center"><p class="text-[11px] sm:text-xs text-gray-500 font-bold">تقارير نشطة</p><i class="fa-solid fa-check-circle text-green-500"></i></div>
-                    <h3 id="rep-stat-active" class="text-lg font-bold text-gray-800">0</h3>
-                </div>
-                <div class="theme-card bg-white p-3.5 rounded-xl shadow-sm border border-gray-100 flex flex-col gap-1 border-b-4 border-red-500">
-                    <div class="flex justify-between items-center"><p class="text-[11px] sm:text-xs text-gray-500 font-bold">تقارير منتهية</p><i class="fa-solid fa-clock text-red-500"></i></div>
-                    <h3 id="rep-stat-expired" class="text-lg font-bold text-gray-800">0</h3>
-                </div>
-                <div class="theme-card bg-white p-3.5 rounded-xl shadow-sm border border-gray-100 flex flex-col gap-1 border-b-4 border-blue-500">
-                    <div class="flex justify-between items-center"><p class="text-[11px] sm:text-xs text-gray-500 font-bold">تقارير هذا الشهر</p><i class="fa-solid fa-calendar-day text-blue-500"></i></div>
-                    <h3 id="rep-stat-month" class="text-lg font-bold text-gray-800">0</h3>
-                </div>
-                <div class="theme-card bg-white p-3.5 rounded-xl shadow-sm border border-gray-100 flex flex-col gap-1 border-b-4 border-orange-500">
-                    <div class="flex justify-between items-center"><p class="text-[11px] sm:text-xs text-gray-500 font-bold">قريبة من الانتهاء</p><i class="fa-solid fa-bell text-orange-500"></i></div>
-                    <h3 id="rep-stat-soon" class="text-lg font-bold text-gray-800">0</h3>
-                </div>
-                <div id="rep-card-duplicates" class="theme-card bg-white p-3.5 rounded-xl shadow-sm border border-gray-100 flex flex-col gap-1 border-b-4 border-amber-400 cursor-pointer hover:bg-amber-50" title="انقر لتصفية المكرر">
-                    <div class="flex justify-between items-center"><p class="text-[11px] sm:text-xs text-amber-600 font-bold">تكرار بالهوية</p><i class="fa-solid fa-triangle-exclamation text-amber-500"></i></div>
-                    <h3 id="rep-stat-duplicates" class="text-lg font-bold text-gray-800">0</h3>
-                </div>
-            </div>
-
-            <!-- مساحة العمل المقسمة: نموذج الإضافة السريعة على اليمين + جدول السجلات على اليسار -->
-            <div class="flex flex-col xl:flex-row gap-6 mb-6 w-full items-start">
-                
-                <!-- نموذج الإضافة السريعة ودمج الـ PDF -->
-                <div class="theme-card w-full xl:w-[440px] flex-shrink-0 bg-white rounded-2xl shadow-sm border border-gray-100 p-5 sm:p-6 relative overflow-hidden flex flex-col max-h-[85vh]">
-                    <div id="rep-form-indicator" class="absolute top-0 right-0 w-1.5 h-full bg-emerald-600 transition-colors"></div>
-                    
-                    <div class="flex justify-between items-center mb-4 border-b border-gray-100 pb-3">
-                        <h3 id="rep-form-title" class="text-lg font-bold text-gray-800 flex items-center gap-2">
-                            <i class="fa-solid fa-bolt text-emerald-600"></i> الإضافة السريعة (Batch)
-                        </h3>
-                        <span class="bg-emerald-50 text-emerald-700 text-[11px] font-bold px-2.5 py-1 rounded-full border border-emerald-100 shadow-sm" id="rep-batch-counter">طلب واحد</span>
-                    </div>
-                    
-                    <form id="rep-create-form" class="space-y-4 overflow-y-auto pr-2 custom-scrollbar flex-1 pb-2">
-                        <input type="hidden" id="rep-edit-record-id" value="">
+                    <div class="no-print max-w-7xl mx-auto px-4 sm:px-6 mt-6 space-y-6">
                         
-                        <!-- الإعدادات العامة للدفعة -->
-                        <div class="theme-subcard bg-gray-50 p-4 rounded-xl border border-gray-200 space-y-3 shadow-sm mb-2">
-                            <div>
-                                <label class="block text-[11px] font-bold text-gray-600 mb-1">اسم العيادة / المستشفى</label>
-                                <input type="text" id="rep-input-clinic" required class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 outline-none text-sm bg-white font-bold" value="Blue Medical Field Complex" dir="ltr">
+                        <!-- 1. بطاقات الإحصائيات الأربع لنظام الفواتير -->
+                        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+                            <div class="theme-card bg-white p-5 rounded-2xl border border-slate-200 shadow-xs flex items-center justify-between">
+                                <div><p class="text-xs font-bold text-slate-400 mb-1">إجمالي الفواتير</p><p id="inv-stat-count" class="text-3xl font-black text-slate-800">0</p></div>
+                                <div class="w-12 h-12 bg-blue-50 text-blue-600 rounded-xl flex items-center justify-center text-xl">📄</div>
                             </div>
-                            <div class="grid grid-cols-2 gap-3">
-                                <div>
-                                    <label class="block text-[11px] font-bold text-gray-600 mb-1">صلاحية التقرير</label>
-                                    <select id="rep-input-validity" required class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 outline-none bg-white text-sm cursor-pointer font-bold">
-                                        <option value="365">سنة كاملة</option>
-                                        <option value="90">3 أشهر</option>
-                                        <option value="30">30 يوماً</option>
-                                        <option value="7">7 أيام</option>
-                                    </select>
-                                </div>
-                                <div>
-                                    <label class="block text-[11px] font-bold text-gray-600 mb-1">الجنس (للجميع)</label>
-                                    <select id="rep-input-global-gender" required class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 outline-none bg-white text-sm font-bold english-ui cursor-pointer" dir="ltr">
-                                        <option value="Male">Male</option>
-                                        <option value="Female">Female</option>
-                                    </select>
-                                </div>
+                            <div class="theme-card bg-white p-5 rounded-2xl border border-slate-200 shadow-xs flex items-center justify-between">
+                                <div><p class="text-xs font-bold text-slate-400 mb-1">المبيعات (قبل الضريبة)</p><p id="inv-stat-sub" class="text-2xl font-black text-slate-700" dir="ltr">0.00 SAR</p></div>
+                                <div class="w-12 h-12 bg-amber-50 text-amber-600 rounded-xl flex items-center justify-center text-xl">💵</div>
+                            </div>
+                            <div class="theme-card bg-white p-5 rounded-2xl border border-slate-200 shadow-xs flex items-center justify-between">
+                                <div><p class="text-xs font-bold text-slate-400 mb-1">إجمالي الضريبة (15%)</p><p id="inv-stat-tax" class="text-2xl font-black text-rose-600" dir="ltr">0.00 SAR</p></div>
+                                <div class="w-12 h-12 bg-rose-50 text-rose-600 rounded-xl flex items-center justify-center text-xl">📊</div>
+                            </div>
+                            <div class="theme-card bg-white p-5 rounded-2xl border border-emerald-200 shadow-xs flex items-center justify-between bg-gradient-to-br from-white to-emerald-50/30">
+                                <div><p class="text-xs font-bold text-emerald-700 mb-1">الإجمالي شامل الضريبة</p><p id="inv-stat-total" class="text-2xl font-black text-emerald-600" dir="ltr">0.00 SAR</p></div>
+                                <div class="w-12 h-12 bg-emerald-100 text-emerald-700 rounded-xl flex items-center justify-center text-xl">💰</div>
                             </div>
                         </div>
 
-                        <!-- أداة استيراد إكسيل + ربط ملفات PDF دفعة واحدة -->
-                        <div id="rep-excel-batch-import-box" class="bg-emerald-50/70 p-3 rounded-xl border border-emerald-200 flex flex-col gap-2.5 shadow-sm">
-                            <div class="flex items-center justify-between">
-                                <div class="flex items-center gap-2">
-                                    <i class="fa-solid fa-file-excel text-emerald-600 text-base"></i>
-                                    <div>
-                                        <p class="text-xs font-bold text-emerald-950 leading-tight">تعبئة تلقائية من إكسيل</p>
-                                        <p class="text-[10px] text-emerald-700">استيراد البيانات + ربط ملفات PDF دفعة واحدة</p>
+                        <!-- 2. بطاقة الإعدادات والتبويبات ونماذج الإدخال -->
+                        <div class="theme-card bg-white p-6 rounded-2xl border border-slate-200 shadow-xs space-y-6">
+                            
+                            <!-- الإعدادات العامة للفواتير -->
+                            <div class="theme-subcard grid grid-cols-1 md:grid-cols-4 gap-4 bg-slate-50 p-4 rounded-xl border border-slate-200">
+                                <div>
+                                    <label class="block text-xs font-bold text-slate-600 mb-1.5">لغة الفاتورة:</label>
+                                    <select id="invoice-lang" class="w-full px-3 py-2.5 border rounded-xl font-bold bg-white text-sm">
+                                        <option value="ar">اللغة العربية (Arabic)</option>
+                                        <option value="en">English (الإنجليزية)</option>
+                                    </select>
+                                </div>
+                                <div>
+                                    <label class="block text-xs font-bold text-slate-600 mb-1.5">وصف الخدمة الافتراضي:</label>
+                                    <input type="text" id="custom-exam-title" value="MEDICAL FITNESS FOR CCC" class="w-full px-3 py-2.5 border rounded-xl font-bold bg-white text-sm">
+                                </div>
+                                <div>
+                                    <label class="block text-xs font-bold text-slate-600 mb-1.5">سعر الوحدة الأساسي (قبل الضريبة):</label>
+                                    <div class="flex items-center gap-1.5">
+                                        <input type="number" id="base-amount" value="78.26" step="0.01" class="w-full px-3 py-2.5 border rounded-xl font-bold text-sm bg-white" dir="ltr">
+                                        <span class="text-xs font-black text-slate-600 bg-slate-200 px-3 py-3 rounded-xl">SAR</span>
                                     </div>
                                 </div>
-                                <div class="flex items-center gap-1.5">
-                                    <button type="button" id="rep-download-excel-template-btn" class="bg-white hover:bg-emerald-100 text-emerald-700 border border-emerald-200 px-2.5 py-1.5 rounded-lg text-[11px] font-bold transition-colors shadow-sm flex items-center gap-1" title="تحميل نموذج إكسيل جاهز">
-                                        <i class="fa-solid fa-download"></i> نموذج
+                                <div>
+                                    <label class="block text-xs font-bold text-slate-600 mb-1.5">نوع الباركود (QR Code):</label>
+                                    <select id="qr-mode" class="w-full px-3 py-2.5 border rounded-xl font-bold bg-white text-sm">
+                                        <option value="url" selected>رابط تحقق إلكتروني مباشر (الأول)</option>
+                                        <option value="zatca">باركود الفاتورة الضريبية (ZATCA TLV)</option>
+                                    </select>
+                                </div>
+                                <div class="md:col-span-4">
+                                    <label class="block text-xs font-bold text-slate-600 mb-1.5">🔗 رابط Google Drive الافتراضي لتحميل الفاتورة عند مسح الـ QR:</label>
+                                    <input type="url" id="global-drive-link" value="https://drive.google.com/drive/my-drive" placeholder="أدخل رابط Google Drive هنا..." class="w-full px-3.5 py-2.5 border rounded-xl font-bold bg-white text-sm text-left" dir="ltr">
+                                </div>
+                            </div>
+
+                            <!-- أزرار التبويبات الداخلية للفواتير -->
+                            <div class="border-b border-slate-200 flex flex-wrap gap-2">
+                                <button type="button" id="tab-btn-individual" onclick="switchInputTab('individual')" class="px-5 py-3 rounded-t-xl font-black text-sm transition flex items-center gap-2 bg-blue-600 text-white shadow-xs">
+                                    <span>👤 فواتير الأفراد (بالاسم أو ملف)</span>
+                                </button>
+                                <button type="button" id="tab-btn-bulk" onclick="switchInputTab('bulk')" class="px-5 py-3 rounded-t-xl font-black text-sm transition flex items-center gap-2 bg-slate-100 text-slate-600 hover:bg-slate-200">
+                                    <span>🔢 فاتورة كميات / أعداد (بدون اسم شخص)</span>
+                                </button>
+                            </div>
+
+                            <!-- أ. محتوى تبويب فواتير الأفراد (إدخال يدوي + استيراد دفعات CSV/JSON) -->
+                            <div id="tab-content-individual" class="grid grid-cols-1 lg:grid-cols-2 gap-6 pt-2">
+                                <div class="theme-subcard border-2 border-blue-100 bg-blue-50/20 p-5 rounded-2xl flex flex-col justify-between space-y-4">
+                                    <div>
+                                        <div class="flex justify-between items-center mb-3">
+                                            <h3 class="font-black text-blue-900">✍️ إضافة فاتورة مريض (يدوي)</h3>
+                                            <span class="text-[11px] bg-blue-100 text-blue-800 px-2.5 py-0.5 rounded-full font-bold">تحكم كامل قبل الإصدار</span>
+                                        </div>
+                                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 mb-3">
+                                            <div>
+                                                <label class="block text-[11px] font-bold text-slate-600 mb-1">اسم المريض بالكامل:</label>
+                                                <input type="text" id="manual-name" placeholder="اسم المريض..." class="w-full px-3.5 py-2 bg-white border rounded-xl font-bold text-sm">
+                                            </div>
+                                            <div>
+                                                <label class="block text-[11px] font-bold text-slate-600 mb-1">رقم الإقامة / الهوية:</label>
+                                                <input type="text" id="manual-id" placeholder="2458796321" class="w-full px-3.5 py-2 bg-white border rounded-xl font-bold text-sm" dir="ltr">
+                                            </div>
+                                        </div>
+                                        <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                                            <div>
+                                                <label class="block text-[11px] font-black text-blue-700 mb-1">رقم الفاتورة (قبل الإصدار):</label>
+                                                <div class="flex items-center bg-white border-2 border-blue-400 rounded-xl px-2.5 py-1.5" dir="ltr">
+                                                    <span class="text-xs font-bold text-slate-400 select-none">2026-</span>
+                                                    <input type="text" id="manual-inv-num" class="w-full font-black text-blue-700 text-sm outline-none text-center" placeholder="101001">
+                                                </div>
+                                            </div>
+                                            <div>
+                                                <label class="block text-[11px] font-bold text-slate-600 mb-1">تاريخ الإصدار:</label>
+                                                <input type="date" id="manual-date" class="w-full px-3 py-2 bg-white border rounded-xl font-bold text-sm" dir="ltr">
+                                            </div>
+                                            <div>
+                                                <label class="block text-[11px] font-bold text-slate-600 mb-1">سعر مخصص (اختياري):</label>
+                                                <input type="number" id="manual-price" placeholder="78.26" step="0.01" class="w-full px-3 py-2 bg-white border rounded-xl font-bold text-sm" dir="ltr">
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <button type="button" id="add-manual-btn" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 rounded-xl transition shadow-md">➕ إضافة وإصدار الفاتورة الآن</button>
+                                </div>
+
+                                <div class="theme-subcard border-2 border-emerald-100 bg-emerald-50/20 p-5 rounded-2xl flex flex-col justify-between">
+                                    <div>
+                                        <div class="flex justify-between items-center mb-3">
+                                            <h3 class="font-black text-emerald-900">📁 استيراد دفعات (JSON أو Excel CSV)</h3>
+                                            <div class="flex gap-2">
+                                                <button type="button" id="sample-csv-btn" class="text-xs bg-white text-emerald-700 border px-2.5 py-1 rounded-lg font-bold">⬇ نموذج CSV</button>
+                                                <button type="button" id="sample-json-btn" class="text-xs bg-white text-emerald-700 border px-2.5 py-1 rounded-lg font-bold">⬇ نموذج JSON</button>
+                                            </div>
+                                        </div>
+                                        <p class="text-xs text-slate-500 font-bold mb-3">سيتم ترقيم الفواتير المستوردة تسلسلياً بدءاً من رقم العداد الحالي، ويمكنك تعديل أي رقم لاحقاً من الجدول.</p>
+                                        <input type="file" id="file-upload" accept=".json,.csv" class="block w-full text-sm border rounded-xl bg-white mb-4 file:mr-3 file:py-2.5 file:px-4 file:border-0 file:font-bold file:bg-emerald-100 file:text-emerald-800">
+                                    </div>
+                                    <button type="button" id="process-file-btn" class="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-3 rounded-xl transition shadow-md">⚙️ استخراج وتوليد الفواتير</button>
+                                </div>
+                            </div>
+
+                            <!-- ب. محتوى تبويب فواتير الكميات والأعداد -->
+                            <div id="tab-content-bulk" class="hidden pt-2">
+                                <div class="theme-subcard border-2 border-violet-200 bg-violet-50/30 p-6 rounded-2xl space-y-5">
+                                    <div class="flex flex-wrap justify-between items-center border-b border-violet-200 pb-3 gap-2">
+                                        <div>
+                                            <h3 class="font-black text-violet-950 text-base">🧮 إصدار فاتورة إجمالية بالأعداد (بدون تحديد اسم شخص)</h3>
+                                            <p class="text-xs text-slate-500 font-bold mt-0.5">حدد رقم الفاتورة والعدد (مثلاً: 155) وسيقوم النظام بحساب المبلغ قبل وبعد الضريبة تلقائياً</p>
+                                        </div>
+                                        <span class="bg-violet-100 text-violet-800 text-xs font-black px-3 py-1 rounded-full">حاسبة فورية ذكية</span>
+                                    </div>
+
+                                    <div class="grid grid-cols-1 md:grid-cols-5 gap-4">
+                                        <div class="md:col-span-2">
+                                            <label class="block text-xs font-bold text-slate-700 mb-1.5">اسم الفحص / البيان في الفاتورة:</label>
+                                            <input type="text" id="bulk-exam-name" value="MEDICAL FITNESS FOR CCC" class="w-full px-4 py-2.5 bg-white border rounded-xl font-bold text-sm">
+                                        </div>
+                                        <div>
+                                            <label class="block text-xs font-black text-violet-800 mb-1.5">رقم الفاتورة (قبل الإصدار):</label>
+                                            <div class="flex items-center bg-white border-2 border-violet-400 rounded-xl px-3 py-2" dir="ltr">
+                                                <span class="text-xs font-bold text-slate-400 select-none">2026-</span>
+                                                <input type="text" id="bulk-inv-num" class="w-full font-black text-violet-800 text-sm outline-none text-center" placeholder="101001">
+                                            </div>
+                                        </div>
+                                        <div>
+                                            <label class="block text-xs font-bold text-slate-700 mb-1.5">العدد (الكمية):</label>
+                                            <input type="number" id="bulk-qty" value="155" min="1" step="1" class="w-full px-4 py-2 bg-white border-2 border-violet-400 rounded-xl font-black text-base text-violet-950 text-center" dir="ltr">
+                                        </div>
+                                        <div>
+                                            <label class="block text-xs font-bold text-slate-700 mb-1.5">تاريخ الفاتورة:</label>
+                                            <input type="date" id="bulk-date" class="w-full px-3.5 py-2.5 bg-white border rounded-xl font-bold text-sm" dir="ltr">
+                                        </div>
+                                    </div>
+
+                                    <div class="theme-card grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 bg-white p-4 rounded-xl border border-violet-200">
+                                        <div>
+                                            <label class="block text-[11px] font-bold text-slate-500 mb-1">سعر الوحدة قبل الضريبة:</label>
+                                            <input type="number" id="bulk-unit-price" value="78.26" step="0.01" class="w-full px-3 py-2 bg-slate-50 border rounded-lg font-black text-sm" dir="ltr">
+                                        </div>
+                                        <div>
+                                            <label class="block text-[11px] font-bold text-blue-700 mb-1">سعر الوحدة شامل الضريبة (90):</label>
+                                            <input type="number" id="bulk-unit-gross" value="90.00" step="0.01" class="w-full px-3 py-2 bg-blue-50 border rounded-lg font-black text-sm text-blue-900" dir="ltr">
+                                        </div>
+                                        <div>
+                                            <label class="block text-[11px] font-bold text-slate-500 mb-1">الإجمالي قبل الضريبة:</label>
+                                            <input type="number" id="bulk-subtotal" step="0.01" class="w-full px-3 py-2 bg-amber-50 border rounded-lg font-black text-sm text-amber-900" dir="ltr">
+                                        </div>
+                                        <div>
+                                            <label class="block text-[11px] font-bold text-slate-500 mb-1">مبلغ الضريبة (15%):</label>
+                                            <input type="text" id="bulk-tax" readonly class="w-full px-3 py-2 bg-rose-50 border rounded-lg font-black text-sm text-rose-700" dir="ltr">
+                                        </div>
+                                        <div class="sm:col-span-2 lg:col-span-4">
+                                            <label class="block text-[11px] font-bold text-emerald-700 mb-1">المبلغ النهائي بعد الضريبة (شامل 15%):</label>
+                                            <input type="number" id="bulk-total" step="0.01" class="w-full px-3 py-2.5 bg-emerald-50 border-2 border-emerald-400 rounded-lg font-black text-lg text-emerald-800" dir="ltr">
+                                        </div>
+                                    </div>
+
+                                    <div class="flex flex-wrap items-center justify-between gap-4 pt-1">
+                                        <p id="bulk-formula-hint" class="text-xs font-bold text-violet-800 bg-violet-100 px-3.5 py-2 rounded-xl" dir="ltr"></p>
+                                        <button type="button" id="add-bulk-btn" class="bg-violet-600 hover:bg-violet-700 text-white font-black px-8 py-3.5 rounded-xl transition shadow-lg">➕ إصدار وإضافة فاتورة الأعداد الآن</button>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- 3. شريط الإجراءات وجدول المراجعة للفواتير -->
+                            <div id="inv-action-bar" class="hidden pt-6 border-t border-slate-200 space-y-6">
+                                <div class="theme-subcard flex flex-wrap justify-between items-center gap-4 bg-slate-50 p-4 rounded-xl border">
+                                    <div class="w-full max-w-md">
+                                        <input type="text" id="inv-search-input" placeholder="🔍 ابحث بالاسم، رقم الإقامة، أو رقم الفاتورة..." class="w-full px-4 py-2.5 bg-white border rounded-xl text-sm font-bold">
+                                    </div>
+                                    <div class="flex flex-wrap items-center gap-3">
+                                        <div class="theme-card flex items-center gap-2 bg-white px-3 py-1.5 rounded-xl border">
+                                            <span class="text-xs font-bold text-slate-500">العداد القادم:</span>
+                                            <input type="number" id="seq-input" class="w-24 font-black text-blue-600 text-sm border-b text-center outline-none" dir="ltr">
+                                        </div>
+                                        <button type="button" id="inv-export-csv-btn" class="bg-teal-50 hover:bg-teal-100 text-teal-700 font-bold text-xs px-3.5 py-2.5 rounded-xl border">📊 تصدير الكشف (CSV)</button>
+                                        <button type="button" id="inv-clear-all-btn" class="bg-red-50 hover:bg-red-100 text-red-600 font-bold text-xs px-3.5 py-2.5 rounded-xl border">🗑️ تفريغ القائمة</button>
+                                    </div>
+                                </div>
+
+                                <div class="border rounded-xl overflow-hidden">
+                                    <div class="theme-subcard bg-slate-100 px-4 py-2.5 flex justify-between items-center border-b">
+                                        <span class="font-black text-xs text-slate-700">📋 جدول المراجعة والتحرير المباشر (يمكنك تعديل أرقام الفواتير، المبالغ، أو معاينة شاشة الـ QR)</span>
+                                        <span id="inv-filtered-count-badge" class="text-xs font-bold bg-blue-100 text-blue-800 px-2.5 py-0.5 rounded-full"></span>
+                                    </div>
+                                    <div class="max-h-64 overflow-y-auto">
+                                        <table class="w-full text-sm text-right">
+                                            <thead class="theme-subcard bg-slate-50 text-slate-600 sticky top-0 border-b text-xs z-10">
+                                                <tr>
+                                                    <th class="py-2.5 px-4">#</th>
+                                                    <th class="py-2.5 px-4">رقم الفاتورة</th>
+                                                    <th class="py-2.5 px-4">الاسم / بيان الفحص</th>
+                                                    <th class="py-2.5 px-4">رقم الهوية</th>
+                                                    <th class="py-2.5 px-4">العدد</th>
+                                                    <th class="py-2.5 px-4">التاريخ</th>
+                                                    <th class="py-2.5 px-4">المبلغ قبل الضريبة</th>
+                                                    <th class="py-2.5 px-4">الإجمالي شامل الضريبة</th>
+                                                    <th class="py-2.5 px-4 text-center">إجراءات</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody id="inv-patients-table-body" class="divide-y divide-slate-100"></tbody>
+                                        </table>
+                                    </div>
+                                </div>
+
+                                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                                    <button type="button" onclick="printAllInvoices()" class="w-full bg-slate-800 hover:bg-slate-900 text-white font-bold py-4 px-6 rounded-2xl transition text-base shadow-lg flex justify-center items-center gap-3">🖨️ طباعة الكل / حفظ PDF موحد</button>
+                                    <button type="button" id="zip-btn" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-4 px-6 rounded-2xl transition text-base shadow-lg flex justify-center items-center gap-3">
+                                        <span id="zip-text">🗂️ تحميل الفواتير كملفات PDF منفصلة (مضغوط ZIP)</span>
                                     </button>
-                                    <label for="rep-batch-excel-input" class="bg-emerald-600 hover:bg-emerald-700 text-white px-3 py-1.5 rounded-lg text-xs font-bold transition-colors cursor-pointer shadow-sm flex items-center gap-1.5">
-                                        <i class="fa-solid fa-file-import"></i> 1. استيراد إكسيل
-                                    </label>
-                                    <input type="file" id="rep-batch-excel-input" accept=".xlsx, .xls, .csv" class="hidden">
+                                </div>
+                                <div id="zip-progress" class="hidden w-full bg-slate-200 rounded-full h-3 overflow-hidden">
+                                    <div id="zip-progress-bar" class="bg-indigo-600 h-3 rounded-full transition-all duration-300" style="width: 0%;"></div>
                                 </div>
                             </div>
-                            <div class="pt-2 border-t border-emerald-200/60 flex items-center justify-between gap-2">
-                                <div class="flex items-center gap-1.5 text-[10px] text-emerald-800 font-bold">
-                                    <i class="fa-solid fa-wand-magic-sparkles text-amber-500"></i>
-                                    <span>ربط كل ملفات الـ PDF معاً دفعة واحدة:</span>
-                                </div>
-                                <label for="rep-batch-pdf-input" class="bg-gray-900 hover:bg-gray-800 text-white px-3 py-1.5 rounded-lg text-[11px] font-bold transition-colors cursor-pointer shadow-sm flex items-center gap-1.5 whitespace-nowrap">
-                                    <i class="fa-solid fa-file-pdf text-red-400"></i> 2. ربط PDF جماعي
-                                </label>
-                                <input type="file" id="rep-batch-pdf-input" accept=".pdf" multiple class="hidden">
-                            </div>
+                        </div>
+                    </div>
+
+                    <!-- حاوية صفحات الفواتير للطباعة والمعاينة -->
+                    <main id="invoices-container" class="w-full flex flex-col items-center mt-8"></main>
+                </div>
+
+                <!-- ===================================================================================== -->
+                <!-- التبويب الثاني: [🔬 نظام توثيق الفحوصات وباركود PDF وصلاحية الانتهاء]                 -->
+                <!-- ===================================================================================== -->
+                <div id="system-reports-view" class="hidden w-full max-w-[1600px] mx-auto px-4 sm:px-6 mt-6 flex-1 flex flex-col no-print">
                         </div>
 
                         <!-- حاوية بطاقات المرضى الديناميكية -->
