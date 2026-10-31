@@ -1,28 +1,456 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="ar" dir="rtl">
 <head>
-<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1">
-<title>نظام التقارير الطبية</title>
-<style>
-:root{font-family:Tahoma,Arial,sans-serif;color:#17302d;background:#f3f7f6}*{box-sizing:border-box}body{margin:0}button,input,select,textarea{font:inherit}button,.button{cursor:pointer;border:0;border-radius:9px;padding:10px 15px;background:#087965;color:#fff;text-decoration:none;display:inline-block}button:hover,.button:hover{filter:brightness(.93)}button:disabled{opacity:.55;cursor:wait}.secondary{background:#e6f2ef;color:#075c4f}.danger{background:#fff1f1;color:#ae3030}.outline{background:white;color:#087965;border:1px solid #a5c9c0}header{background:#fff;border-bottom:1px solid #dbeae6;padding:18px 5%;display:flex;align-items:center;justify-content:space-between;gap:15px;flex-wrap:wrap}header h1{font-size:20px;margin:0}header p{margin:5px 0 0;color:#65817a;font-size:12px}main{max-width:1450px;margin:24px auto;padding:0 18px}.card{background:white;border:1px solid #deebe8;border-radius:16px;padding:22px;box-shadow:0 5px 25px #1a4b3e0b}.login{max-width:440px;margin:8vh auto}.grid{display:grid;grid-template-columns:minmax(300px,410px) 1fr;gap:18px}.stack{display:grid;gap:13px}label{display:grid;gap:6px;font-size:13px;font-weight:bold;color:#395c54}input,select{width:100%;padding:10px;border:1px solid #ccdeda;border-radius:8px;background:#fff;color:#17302d}input:focus,select:focus{outline:2px solid #b8e1d6}.row{display:flex;gap:10px;align-items:center;flex-wrap:wrap}.row>*{flex:1}h2{font-size:18px;margin:0 0 15px}h3{font-size:15px}p{line-height:1.7}.muted{color:#657c77;font-size:13px}.stats{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:18px}.stat{background:#fff;border:1px solid #deebe8;border-radius:12px;padding:15px}.stat strong{display:block;font-size:24px;margin-top:8px;color:#087965}.toolbar{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:15px}.toolbar input[type=search]{flex:1;min-width:160px}.table-wrap{overflow:auto;max-height:70vh}table{width:100%;border-collapse:collapse;min-width:670px;font-size:13px}th,td{padding:12px 8px;border-bottom:1px solid #edf2f0;text-align:right}th{background:#f7faf9;color:#536e66}td button{padding:6px 9px;font-size:12px;margin:2px}.badge{display:inline-block;border-radius:20px;padding:5px 9px;font-size:12px;background:#e3f5ed;color:#08764e}.expired{background:#fff1ef;color:#ac3e32}.notice{border-radius:10px;padding:12px 15px;background:#eaf5f2;color:#285e50;font-size:13px;line-height:1.7}.error{background:#fff0ef;color:#a1362f}.hidden{display:none!important}.actions{display:flex;flex-wrap:wrap;gap:8px}.file-label{display:inline-block;cursor:pointer;background:#e6f2ef;color:#075c4f;border-radius:9px;padding:10px 15px;font-size:13px}.file-label input{display:none}.client{max-width:650px;margin:6vh auto}.client dl{display:grid;grid-template-columns:140px 1fr;margin:20px 0;direction:ltr;text-align:left}.client dt,.client dd{margin:0;padding:11px;border-bottom:1px solid #eee;overflow-wrap:anywhere}.client dt{font-weight:bold;background:#f8fbfa}.client h1{font-size:22px}.dialog-backdrop{position:fixed;inset:0;background:#092f29a8;display:grid;place-items:center;padding:15px;z-index:9}.dialog{max-width:500px;width:100%;max-height:90vh;overflow:auto}.qrbox{display:flex;justify-content:center;margin:20px}.qrbox img,.qrbox canvas{max-width:100%;height:auto}.small{font-size:12px}.ltr{direction:ltr;text-align:left}#toast{position:fixed;bottom:18px;left:18px;z-index:20;max-width:440px;box-shadow:0 8px 20px #0002}.required{color:#bd4439}@media(max-width:900px){.grid{grid-template-columns:1fr}.stats{grid-template-columns:repeat(2,1fr)}}@media print{body>*{display:none!important}#printArea{display:block!important;direction:ltr;text-align:center}#printArea img,#printArea canvas{margin:auto}#printArea h3{margin:3px}#printArea p{margin:3px}}
-</style>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
-<script src="https://unpkg.com/pdf-lib@1.17.1/dist/pdf-lib.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>نظام التقارير الطبية -   V10</title>
+    
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Tajawal:wght@500;700;800&display=swap" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+    <script src="https://unpkg.com/pdf-lib@1.17.1/dist/pdf-lib.min.js"></script>
+    <!-- مكتبة SheetJS لقراءة وتصدير ملفات الإكسيل -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+
+    <style>
+        body { background-color: #f3f4f6; -webkit-print-color-adjust: exact; print-color-adjust: exact; font-family: 'Tajawal', sans-serif; }
+        .english-ui { font-family: 'Inter', sans-serif; }
+        
+        .info-table { width: 100%; border-collapse: collapse; }
+        .info-table tr { border-bottom: 1px solid #e5e7eb; }
+        .info-table th { background-color: #f9fafb; color: #374151; font-weight: 600; padding: 12px; text-align: left; width: 35%; font-size: 14px; }
+        .info-table td { color: #111827; padding: 12px; text-align: left; font-weight: 500; font-size: 14px; word-break: break-word; }
+
+        ::-webkit-scrollbar { width: 6px; height: 8px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 4px; }
+        .custom-scrollbar::-webkit-scrollbar-track { background: #f8fafc; }
+
+        @keyframes slideInUp { from { transform: translateY(100%); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+        @keyframes fadeOut { from { opacity: 1; } to { opacity: 0; } }
+        .toast-enter { animation: slideInUp 0.3s ease-out forwards; }
+        .toast-exit { animation: fadeOut 0.3s ease-out forwards; }
+
+        @media print {
+            body { background: white !important; margin: 0; padding: 0; }
+            .no-print { display: none !important; }
+            #print-card-area { display: block !important; width: 8.5cm; height: 5.4cm; border: 2px solid #000; border-radius: 8px; padding: 10px; margin: 0 auto; text-align: center; page-break-inside: avoid; }
+            #print-card-area h3 { margin: 0 0 5px 0; font-size: 13px; font-family: Arial, sans-serif; }
+            #print-card-area p { margin: 0 0 3px 0; font-size: 10px; color: #333; }
+            #print-qr-container { display: flex; justify-content: center; margin-top: 5px; }
+            #print-qr-container img { width: 85px; height: 85px; margin: 0 auto; }
+            #admin-section, #login-section, #client-section, #qr-modal, #delete-modal, #clear-all-modal, #settings-modal, footer { display: none !important; }
+        }
+        #print-card-area { display: none; }
+    </style>
 </head>
-<body>
-<header class="no-print"><div><h1>نظام التقارير الطبية</h1><p>لوحة إدارة آمنة وربط مباشر للتقارير</p></div><div id="headerActions" class="actions hidden"><span id="adminEmail" class="muted"></span><button id="logout" class="secondary">تسجيل الخروج</button></div></header>
-<main>
-<div id="setupNotice" class="notice hidden"></div>
-<section id="loginView" class="card login hidden"><h2>تسجيل دخول الإدارة</h2><p class="muted">استخدم البريد الإلكتروني وكلمة المرور لحساب المدير في Firebase.</p><form id="loginForm" class="stack"><label>البريد الإلكتروني<input id="email" type="email" autocomplete="username" required></label><label>كلمة المرور<input id="password" type="password" autocomplete="current-password" required></label><button type="submit">دخول</button></form></section>
-<section id="adminView" class="hidden">
-<div class="stats"><div class="stat">إجمالي السجلات<strong id="total">0</strong></div><div class="stat">النشطة<strong id="active">0</strong></div><div class="stat">منتهية الصلاحية<strong id="expired">0</strong></div><div class="stat">تنتهي خلال ٧ أيام<strong id="soon">0</strong></div></div>
-<div class="grid"><div class="card"><h2 id="formTitle">إضافة تقرير</h2><form id="reportForm" class="stack"><input id="editToken" type="hidden"><label>اسم العيادة<input id="clinic" value="Blue Medical Field Complex" required></label><label>رقم الهوية أو الإقامة<input id="patientId" dir="ltr" required></label><label>اسم المريض<input id="patientName" required></label><div class="row"><label>العمر<input id="age" placeholder="32 Y"></label><label>الجنس<select id="gender"><option value="Male">Male</option><option value="Female">Female</option><option value="">غير محدد</option></select></label></div><label>رابط ملف التقرير على Google Drive<input id="driveUrl" type="url" dir="ltr" placeholder="https://drive.google.com/..." required></label><label>تاريخ انتهاء الصلاحية<input id="expiry" type="date" required></label><div class="notice">ارفع الملف إلى Drive أولاً، وضع رابط المشاركة هنا. لن يرفع النظام ملف PDF إلى Firebase.</div><div class="actions"><button id="saveReport" type="submit">حفظ التقرير</button><button id="cancelEdit" type="button" class="secondary hidden">إلغاء التعديل</button></div></form></div>
-<div class="card"><h2>سجلات المرضى</h2><div class="toolbar"><input type="search" id="search" placeholder="ابحث بالاسم أو الهوية أو العيادة"><button id="refresh" class="secondary">تحديث</button></div><div class="toolbar"><button id="backup" class="secondary">نسخة احتياطية JSON</button><button id="csv" class="secondary">تصدير CSV</button><label class="file-label">استيراد نسخة JSON<input id="importJson" type="file" accept=".json,application/json"></label><label class="file-label">استيراد Excel<input id="importExcel" type="file" accept=".xlsx,.xls,.csv"></label><button id="template" class="outline">نموذج Excel</button></div><div class="notice">الاستيراد يضيف السجلات الجديدة ولا يحذف الحالية. تأكد من بيانات الملفات قبل الاستيراد.</div><div class="table-wrap"><table><thead><tr><th>الحالة</th><th>المريض</th><th>الهوية</th><th>الانتهاء</th><th>إجراءات</th></tr></thead><tbody id="records"></tbody></table><p id="empty" class="muted">لا توجد سجلات لعرضها.</p></div></div></div>
-</section>
-<section id="clientView" class="card client hidden"><div id="clientLoading" class="notice">جارٍ التحقق من التقرير…</div><div id="clientError" class="notice error hidden">التقرير غير متاح، أو انتهت صلاحيته، أو تم حذفه. يرجى التواصل مع الجهة المصدرة.</div><div id="clientSuccess" class="hidden" dir="ltr"><span class="badge">Report available</span><h1>Medical Report</h1><p class="muted">Report details provided by the issuing clinic.</p><dl><dt>Clinic</dt><dd id="cClinic"></dd><dt>Patient name</dt><dd id="cName"></dd><dt>Patient ID</dt><dd id="cId"></dd><dt>Age</dt><dd id="cAge"></dd><dt>Gender</dt><dd id="cGender"></dd><dt>Issued</dt><dd id="cCreated"></dd><dt>Expires</dt><dd id="cExpiry"></dd></dl><a id="download" class="button" target="_blank" rel="noopener noreferrer">Open report</a><p class="muted">If the report cannot be opened, contact the clinic to check its sharing permissions.</p></div></section>
-</main>
-<div id="qrDialog" class="dialog-backdrop hidden"><div class="card dialog"><div class="row"><h2>رمز التقرير</h2><button id="closeQr" class="secondary" style="flex:0">إغلاق</button></div><p id="qrPatient" class="muted"></p><div id="qr" class="qrbox"></div><input id="qrUrl" dir="ltr" readonly><p class="muted">أي شخص يمتلك هذا الرابط قد يتمكن من عرض بيانات التقرير والملف إذا كانت صلاحيات Drive تسمح بذلك.</p><div class="actions"><button id="copyLink">نسخ الرابط</button><button id="printQr" class="secondary">طباعة البطاقة</button><label class="file-label">إضافة QR إلى PDF وتنزيله<input id="pdfInput" type="file" accept="application/pdf,.pdf"></label></div><p class="muted">بعد التنزيل، ارفع الملف المعدّل إلى Drive واستبدل الملف هناك عند الحاجة. تأكد من مكان الرمز في الصفحة الأولى.</p></div></div>
-<div id="printArea" class="hidden"><h3 id="pClinic"></h3><p id="pName"></p><p id="pId"></p><div id="pQr"></div><p>Scan to open report</p></div><div id="toast" class="notice hidden" role="status"></div>
-<script type="module" src="./app.js"></script>
-</body></html>
+<body class="min-h-screen text-gray-800 flex flex-col items-center p-2 sm:p-4 relative justify-between">
+
+    <div id="toast-container" class="fixed bottom-4 left-1/2 transform -translate-x-1/2 z-[9999] flex flex-col gap-2 w-full max-w-sm px-4 pointer-events-none"></div>
+
+    <main class="w-full max-w-[1600px] mx-auto flex-1 flex flex-col relative">
+        
+        <!-- Login Section -->
+        <section id="login-section" class="hidden bg-white rounded-2xl shadow-xl border border-gray-100 p-8 max-w-md mx-auto mt-12 transform transition-all w-full">
+            <div class="text-center mb-8">
+                <img src="../Blue.png" alt="Logo" class="h-16 object-contain mx-auto mb-4" onerror="this.onerror=null; this.src='https://placehold.co/120x40/ffffff/059669?text=Logo'">
+                <h2 class="text-2xl font-bold text-gray-800">بوابة الإدارة الطبية — Firebase</h2>
+                <p class="text-sm text-gray-500 mt-2">يرجى تسجيل الدخول للوصول لقاعدة البيانات</p>
+            </div>
+            <form id="login-form" class="space-y-5">
+                <div>
+                    <label class="block text-sm font-bold text-gray-700 mb-1">البريد الإلكتروني</label>
+                    <div class="relative">
+                        <i class="fa-solid fa-user absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400"></i>
+                        <input type="email" id="login-username" class="w-full pl-10 pr-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-emerald-500 outline-none" dir="ltr" placeholder="admin@example.com" required>
+                    </div>
+                </div>
+                <div>
+                    <label class="block text-sm font-bold text-gray-700 mb-1">كلمة المرور</label>
+                    <div class="relative">
+                        <i class="fa-solid fa-lock absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400"></i>
+                        <input type="password" id="login-password" class="w-full pl-10 pr-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-emerald-500 outline-none" dir="ltr" placeholder="••••••••" required>
+                    </div>
+                </div>
+                <div class="pt-4">
+                    <button type="submit" class="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-3.5 px-4 rounded-xl transition-all shadow-lg flex justify-center items-center gap-2">
+                        تسجيل الدخول <i class="fa-solid fa-arrow-left"></i>
+                    </button>
+                </div>
+            </form>
+        </section>
+
+        <!-- Admin Section -->
+        <section id="admin-section" class="hidden w-full flex-1 flex flex-col relative">
+            <!-- Header -->
+            <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-5 mb-4 flex flex-col md:flex-row justify-between items-center gap-4">
+                <div class="flex items-center gap-4">
+                    <img src="../Blue.png" alt="Logo" class="h-12 object-contain bg-white" onerror="this.onerror=null; this.src='https://placehold.co/120x40/ffffff/059669?text=Logo'">
+                    <div><h2 class="text-xl font-bold text-gray-800 hidden sm:block">نظام التقارير الذكي V10</h2></div>
+                </div>
+                <div class="flex items-center gap-2 flex-wrap justify-center">
+                    <button id="open-settings-btn" class="bg-emerald-50 hover:bg-emerald-100 text-emerald-700 px-3.5 py-2.5 rounded-xl font-bold transition-colors text-sm flex items-center gap-2 border border-emerald-200" title="إعدادات مكان وحجم QR">
+                        <i class="fa-solid fa-gear"></i> إعدادات الـ QR والربط
+                    </button>
+                    <button id="export-backup-btn" class="bg-blue-50 hover:bg-blue-100 text-blue-700 px-3.5 py-2.5 rounded-xl font-bold transition-colors text-sm flex items-center gap-2 border border-blue-200" title="تنزيل نسخة احتياطية">
+                        <i class="fa-solid fa-cloud-arrow-down"></i> نسخة احتياطية
+                    </button>
+                    <label for="import-backup-file" class="bg-indigo-50 hover:bg-indigo-100 text-indigo-700 px-3.5 py-2.5 rounded-xl font-bold transition-colors text-sm flex items-center gap-2 border border-indigo-200 cursor-pointer" title="استعادة السجلات">
+                        <i class="fa-solid fa-cloud-arrow-up"></i> استعادة
+                    </label>
+                    <input type="file" id="import-backup-file" accept=".json" class="hidden">
+                    <button id="clear-db-btn" class="bg-rose-50 hover:bg-rose-100 text-rose-700 px-3.5 py-2.5 rounded-xl font-bold transition-colors text-sm flex items-center gap-2 border border-rose-200"><i class="fa-solid fa-broom"></i> تصفير</button>
+                    <button id="logout-btn" class="bg-gray-100 hover:bg-gray-200 text-gray-600 px-4 py-2.5 rounded-xl font-bold transition-colors flex items-center gap-2" title="تسجيل الخروج"><i class="fa-solid fa-right-from-bracket"></i></button>
+                </div>
+            </div>
+
+            <!-- Stats -->
+            <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-3 mb-4">
+                <div class="bg-white p-3.5 rounded-xl shadow-sm border border-gray-100 flex flex-col gap-1 border-b-4 border-gray-400">
+                    <div class="flex justify-between items-center"><p class="text-[11px] sm:text-xs text-gray-500 font-bold">إجمالي التقارير</p><i class="fa-solid fa-folder-open text-gray-400"></i></div>
+                    <h3 id="stat-total" class="text-lg font-bold text-gray-800">0</h3>
+                </div>
+                <div class="bg-white p-3.5 rounded-xl shadow-sm border border-gray-100 flex flex-col gap-1 border-b-4 border-green-500">
+                    <div class="flex justify-between items-center"><p class="text-[11px] sm:text-xs text-gray-500 font-bold">تقارير نشطة</p><i class="fa-solid fa-check-circle text-green-500"></i></div>
+                    <h3 id="stat-active" class="text-lg font-bold text-gray-800">0</h3>
+                </div>
+                <div class="bg-white p-3.5 rounded-xl shadow-sm border border-gray-100 flex flex-col gap-1 border-b-4 border-red-500">
+                    <div class="flex justify-between items-center"><p class="text-[11px] sm:text-xs text-gray-500 font-bold">تقارير منتهية</p><i class="fa-solid fa-clock text-red-500"></i></div>
+                    <h3 id="stat-expired" class="text-lg font-bold text-gray-800">0</h3>
+                </div>
+                <div class="bg-white p-3.5 rounded-xl shadow-sm border border-gray-100 flex flex-col gap-1 border-b-4 border-blue-500">
+                    <div class="flex justify-between items-center"><p class="text-[11px] sm:text-xs text-gray-500 font-bold">تقارير هذا الشهر</p><i class="fa-solid fa-calendar-day text-blue-500"></i></div>
+                    <h3 id="stat-month" class="text-lg font-bold text-gray-800">0</h3>
+                </div>
+                <div class="bg-white p-3.5 rounded-xl shadow-sm border border-gray-100 flex flex-col gap-1 border-b-4 border-orange-500">
+                    <div class="flex justify-between items-center"><p class="text-[11px] sm:text-xs text-gray-500 font-bold">قريبة من الانتهاء</p><i class="fa-solid fa-bell text-orange-500"></i></div>
+                    <h3 id="stat-soon" class="text-lg font-bold text-gray-800">0</h3>
+                </div>
+                <div id="card-duplicates" class="bg-white p-3.5 rounded-xl shadow-sm border border-gray-100 flex flex-col gap-1 border-b-4 border-amber-400 cursor-pointer hover:bg-amber-50" title="انقر لتصفية المكرر">
+                    <div class="flex justify-between items-center"><p class="text-[11px] sm:text-xs text-amber-600 font-bold">تكرار بالهوية</p><i class="fa-solid fa-triangle-exclamation text-amber-500"></i></div>
+                    <h3 id="stat-duplicates" class="text-lg font-bold text-gray-800">0</h3>
+                </div>
+            </div>
+
+            <!-- Workspace: Docked Split Layout -->
+            <div class="flex flex-col xl:flex-row gap-6 mb-6 w-full items-start">
+                
+                <!-- Fixed Form (Docked on Right) -->
+                <div class="w-full xl:w-[440px] flex-shrink-0 bg-white rounded-2xl shadow-sm border border-gray-100 p-5 sm:p-6 relative overflow-hidden flex flex-col max-h-[85vh]">
+                    <div id="form-indicator" class="absolute top-0 right-0 w-1.5 h-full bg-emerald-600 transition-colors"></div>
+                    
+                    <div class="flex justify-between items-center mb-4 border-b border-gray-100 pb-3">
+                        <h3 id="form-title" class="text-lg font-bold text-gray-800 flex items-center gap-2">
+                            <i class="fa-solid fa-bolt text-emerald-600"></i> الإضافة السريعة (Batch)
+                        </h3>
+                        <span class="bg-emerald-50 text-emerald-700 text-[11px] font-bold px-2.5 py-1 rounded-full border border-emerald-100 shadow-sm" id="batch-counter">طلب واحد</span>
+                    </div>
+                    
+                    <form id="create-form" class="space-y-4 overflow-y-auto pr-2 custom-scrollbar flex-1 pb-2">
+                        <input type="hidden" id="edit-record-id" value="">
+                        
+                        <!-- Global Setup -->
+                        <div class="bg-gray-50 p-4 rounded-xl border border-gray-200 space-y-3 shadow-sm mb-2">
+                            <div>
+                                <label class="block text-[11px] font-bold text-gray-600 mb-1">اسم العيادة / المستشفى</label>
+                                <input type="text" id="input-clinic" required class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 outline-none text-sm bg-white font-bold" value="Blue Medical Field Complex" dir="ltr">
+                            </div>
+                            <div class="grid grid-cols-2 gap-3">
+                                <div>
+                                    <label class="block text-[11px] font-bold text-gray-600 mb-1">صلاحية التقرير</label>
+                                    <select id="input-validity" required class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 outline-none bg-white text-sm cursor-pointer font-bold">
+                                        <option value="365">سنة كاملة</option>
+                                        <option value="90">3 أشهر</option>
+                                        <option value="30">30 يوماً</option>
+                                        <option value="7">7 أيام</option>
+                                    </select>
+                                </div>
+                                <div>
+                                    <label class="block text-[11px] font-bold text-gray-600 mb-1">الجنس (للجميع)</label>
+                                    <select id="input-global-gender" required class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 outline-none bg-white text-sm font-bold english-ui cursor-pointer" dir="ltr">
+                                        <option value="Male">Male</option>
+                                        <option value="Female">Female</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- أداة استيراد بيانات المرضى من ملف Excel + الربط التلقائي للـ PDF -->
+                        <div id="excel-batch-import-box" class="bg-emerald-50/70 p-3 rounded-xl border border-emerald-200 flex flex-col gap-2.5 shadow-sm">
+                            <div class="flex items-center justify-between">
+                                <div class="flex items-center gap-2">
+                                    <i class="fa-solid fa-file-excel text-emerald-600 text-base"></i>
+                                    <div>
+                                        <p class="text-xs font-bold text-emerald-950 leading-tight">تعبئة تلقائية من إكسيل</p>
+                                        <p class="text-[10px] text-emerald-700">استيراد البيانات + ربط ملفات PDF دفعة واحدة</p>
+                                    </div>
+                                </div>
+                                <div class="flex items-center gap-1.5">
+                                    <button type="button" id="download-excel-template-btn" class="bg-white hover:bg-emerald-100 text-emerald-700 border border-emerald-200 px-2.5 py-1.5 rounded-lg text-[11px] font-bold transition-colors shadow-sm flex items-center gap-1" title="تحميل نموذج إكسيل جاهز">
+                                        <i class="fa-solid fa-download"></i> نموذج
+                                    </button>
+                                    <label for="batch-excel-input" class="bg-emerald-600 hover:bg-emerald-700 text-white px-3 py-1.5 rounded-lg text-xs font-bold transition-colors cursor-pointer shadow-sm flex items-center gap-1.5">
+                                        <i class="fa-solid fa-file-import"></i> 1. استيراد إكسيل
+                                    </label>
+                                    <input type="file" id="batch-excel-input" accept=".xlsx, .xls, .csv" class="hidden">
+                                </div>
+                            </div>
+                            <!-- زر الربط الجماعي الذكي لملفات الـ PDF -->
+                            <div class="pt-2 border-t border-emerald-200/60 flex items-center justify-between gap-2">
+                                <div class="flex items-center gap-1.5 text-[10px] text-emerald-800 font-bold">
+                                    <i class="fa-solid fa-wand-magic-sparkles text-amber-500"></i>
+                                    <span>ربط كل ملفات الـ PDF معاً دفعة واحدة:</span>
+                                </div>
+                                <label for="batch-pdf-input" class="bg-gray-900 hover:bg-gray-800 text-white px-3 py-1.5 rounded-lg text-[11px] font-bold transition-colors cursor-pointer shadow-sm flex items-center gap-1.5 whitespace-nowrap">
+                                    <i class="fa-solid fa-file-pdf text-red-400"></i> 2. ربط PDF جماعي
+                                </label>
+                                <input type="file" id="batch-pdf-input" accept=".pdf" multiple class="hidden">
+                            </div>
+                        </div>
+
+                        <!-- Dynamic Requests Container -->
+                        <div id="requests-container" class="space-y-4"></div>
+                        
+                        <!-- Add New Record Button (Dashed) -->
+                        <div class="pt-2 pb-1" id="add-request-btn-container">
+                            <button type="button" id="add-request-btn" class="w-full border-2 border-dashed border-emerald-400 bg-emerald-50 hover:bg-emerald-100 text-emerald-700 font-bold py-3 px-4 rounded-xl transition-colors flex justify-center items-center gap-2 text-sm shadow-sm">
+                                <i class="fa-solid fa-plus"></i> إضافة مريض آخر (أو اضغط Enter)
+                            </button>
+                        </div>
+                    </form>
+
+                    <div class="pt-4 border-t border-gray-100 flex flex-col gap-2 bg-white mt-auto">
+                        <button type="submit" form="create-form" id="submit-btn" class="w-full bg-gray-900 hover:bg-gray-800 text-white font-bold py-3.5 px-4 rounded-xl transition-all shadow-md flex justify-center items-center gap-2 text-sm">
+                            <i class="fa-solid fa-rocket"></i> تنفيذ العملية والحفظ
+                        </button>
+                        <button type="button" id="cancel-edit-btn" class="hidden w-full bg-gray-100 hover:bg-gray-200 text-gray-700 font-bold py-3 px-4 rounded-xl transition-colors text-sm">
+                            إلغاء التعديل
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Table Container (Left Side) -->
+                <div class="flex-1 w-full min-w-0 bg-white rounded-2xl shadow-sm border border-gray-100 p-4 sm:p-5 flex flex-col min-h-[500px]">
+                    <div class="flex flex-col lg:flex-row justify-between items-start lg:items-center mb-4 gap-4">
+                        <h3 class="text-xl font-bold text-gray-800 flex items-center gap-2">
+                            <i class="fa-solid fa-database text-emerald-600"></i> السجلات الموثقة
+                        </h3>
+                        <div class="flex gap-2 w-full lg:w-auto flex-wrap sm:flex-nowrap">
+                            <div id="export-selected-container" class="hidden w-full sm:w-auto flex-row gap-2">
+                                <button id="export-selected-btn" class="flex-1 bg-purple-50 hover:bg-purple-100 text-purple-700 px-3 py-2.5 rounded-xl font-bold transition-colors text-xs flex items-center justify-center gap-2 border border-purple-200">
+                                    <i class="fa-solid fa-link"></i> روابط (<span id="selected-count">0</span>)
+                                </button>
+                                <button id="print-selected-btn" class="flex-1 bg-gray-900 hover:bg-gray-800 text-white px-3 py-2.5 rounded-xl font-bold transition-colors text-xs flex items-center justify-center gap-2 shadow-sm">
+                                    <i class="fa-solid fa-print"></i> طباعة البطاقات
+                                </button>
+                            </div>
+                            
+                            <button id="export-csv-btn" class="flex-1 sm:flex-none bg-green-50 hover:bg-green-100 text-green-700 px-4 py-2.5 rounded-xl font-bold transition-colors text-sm flex items-center justify-center gap-2 border border-green-200"><i class="fa-solid fa-file-excel"></i> إكسيل</button>
+                            <button id="refresh-db-btn" class="bg-gray-100 hover:bg-gray-200 text-gray-600 px-4 py-2.5 rounded-xl transition-colors font-bold" title="تحديث"><i class="fa-solid fa-rotate"></i></button>
+                        </div>
+                    </div>
+
+                    <!-- Filters & Pagination Bar -->
+                    <div class="mb-4 flex flex-col md:flex-row gap-3 bg-gray-50 p-3 rounded-xl border border-gray-200">
+                        <div class="flex items-center gap-2 text-sm font-bold text-gray-700 whitespace-nowrap">
+                            <span>عرض:</span>
+                            <select id="rows-per-page" class="border border-gray-300 rounded-lg px-2 py-2 outline-none focus:ring-2 focus:ring-emerald-500 bg-white cursor-pointer">
+                                <option value="10">10</option>
+                                <option value="20" selected>20</option>
+                                <option value="50">50</option>
+                                <option value="all">الكل</option>
+                            </select>
+                        </div>
+                        <div class="relative flex-1">
+                            <i class="fa-solid fa-search absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400"></i>
+                            <input type="text" id="search-input" class="w-full pr-10 pl-3 py-2 border border-gray-300 rounded-lg outline-none focus:ring-2 focus:ring-emerald-500 bg-white text-sm" placeholder="ابحث بالاسم أو الهوية...">
+                        </div>
+                        <div class="relative w-full md:w-1/3 min-w-[220px]">
+                            <i class="fa-regular fa-calendar absolute right-3 top-1/2 transform -translate-y-1/2 text-emerald-600"></i>
+                            <input type="text" id="date-filter" class="w-full pr-10 pl-3 py-2 border border-gray-300 rounded-lg outline-none focus:ring-2 focus:ring-emerald-500 bg-white text-sm cursor-pointer font-bold placeholder-gray-500" placeholder="تصفية بالتاريخ (نطاق)...">
+                            <i id="clear-date-btn" class="fa-solid fa-xmark absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-red-500 cursor-pointer hidden"></i>
+                        </div>
+                    </div>
+
+                    <!-- Table -->
+                    <div class="flex-1 overflow-x-auto rounded-xl border border-gray-200 relative custom-scrollbar bg-white">
+                        <table class="w-full text-sm text-right text-gray-600 min-w-[900px]">
+                            <thead class="text-xs text-gray-700 uppercase bg-gray-100 border-b sticky top-0 z-10 shadow-sm">
+                                <tr>
+                                    <th class="px-3 py-3.5 text-center w-12 sticky right-0 bg-gray-100 z-20"><input type="checkbox" id="select-all" class="w-4 h-4 rounded border-gray-300 text-emerald-600 focus:ring-emerald-500 cursor-pointer"></th>
+                                    <th class="px-3 py-3.5 text-center w-12 sticky right-12 bg-gray-100 z-20 border-l border-gray-200">#</th>
+                                    <th class="px-3 py-3.5 text-center w-24">الحالة</th>
+                                    <th class="px-3 py-3.5 text-center w-36">تاريخ الإنشاء</th>
+                                    <th class="px-3 py-3.5 text-center">اسم المريض</th>
+                                    <th class="px-3 py-3.5 text-center w-32">رقم الهوية</th>
+                                    <th class="px-3 py-3.5 text-center w-40 sticky left-0 bg-gray-100 z-20 border-r border-gray-200">الإجراءات</th>
+                                </tr>
+                            </thead>
+                            <tbody id="records-tbody" class="divide-y divide-gray-100 bg-white"></tbody>
+                        </table>
+                        <div id="no-records-msg" class="hidden absolute inset-0 flex flex-col items-center justify-center text-gray-500 bg-white/90 z-20">
+                            <i class="fa-solid fa-folder-open text-5xl mb-3 text-gray-300"></i><p class="font-bold text-base mt-2">لا توجد سجلات مطابقة.</p>
+                        </div>
+                    </div>
+
+                    <!-- Pagination -->
+                    <div id="pagination-container" class="mt-4 flex flex-col sm:flex-row items-center justify-between border-t border-gray-100 pt-4 gap-4">
+                        <div class="text-sm text-gray-500 font-bold">إظهار <span id="page-info-start" class="text-gray-900">0</span> إلى <span id="page-info-end" class="text-gray-900">0</span> من <span id="page-info-total" class="text-gray-900">0</span> سجل</div>
+                        <nav aria-label="Pagination" class="inline-flex -space-x-px rounded-lg shadow-sm bg-white" id="pagination-nav"></nav>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Client Section -->
+        <section id="client-section" class="english-ui hidden w-full max-w-xl mx-auto mt-4 px-2 sm:px-0">
+            <div id="client-success-view" class="hidden bg-white rounded-2xl shadow-2xl shadow-emerald-950/5 border border-gray-100 overflow-hidden flex flex-col w-full" dir="ltr">
+                <div class="bg-white py-6 px-6 text-center text-gray-900 relative border-b border-gray-100 flex flex-col items-center justify-center gap-3">
+                    <img src="../Blue.png" alt="Clinic Logo" class="h-16 sm:h-20 object-contain bg-transparent" onerror="this.onerror=null; this.src='https://placehold.co/180x60/ffffff/059669?text=Clinic+Logo'">
+                    <div class="inline-flex items-center gap-2.5 bg-emerald-50 text-emerald-800 border border-emerald-200 px-5 py-2.5 rounded-full font-bold text-sm tracking-wide shadow-sm mt-1">
+                        <i class="fa-solid fa-circle-check text-emerald-600 text-base"></i> Report available
+                    </div>
+                </div>
+
+                <div class="p-4 sm:p-8 w-full overflow-hidden">
+                    <div class="flex items-center justify-center text-sm text-gray-500 mb-6 pb-4 border-b border-gray-100 font-medium gap-2">
+                        <i class="fa-regular fa-calendar text-gray-400"></i> Generated on: <span id="c-date" class="font-bold text-gray-700"></span>
+                    </div>
+                    <div class="w-full pb-2 overflow-x-auto">
+                        <table class="info-table mb-8 whitespace-nowrap">
+                            <tbody>
+                                <tr><th>Clinic</th><td id="c-clinic"></td></tr>
+                                <tr><th>Patient ID</th><td id="c-id" class="font-mono text-emerald-700 font-bold"></td></tr>
+                                <tr><th>Patient Name</th><td id="c-name" class="whitespace-normal uppercase font-bold text-gray-900"></td></tr>
+                                <tr><th>Age</th><td id="c-age"></td></tr>
+                                <tr><th>Gender</th><td id="c-gender"></td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    <div id="c-download-container" class="hidden flex flex-col gap-3 no-print mt-2">
+                        <a id="c-download-btn" href="#" target="_blank" class="w-full bg-emerald-600 hover:bg-emerald-700 text-white py-4 px-4 rounded-xl font-bold transition-all shadow-lg flex justify-center items-center gap-2 text-lg">
+                            <i class="fa-solid fa-cloud-arrow-down"></i> Download Report
+                        </a>
+                    </div>
+                </div>
+            </div>
+
+            <div id="client-error-view" class="hidden bg-white rounded-2xl shadow-xl border border-gray-100 p-8 text-center w-full" dir="ltr">
+                <div class="w-24 h-24 bg-red-50 text-red-500 rounded-full flex items-center justify-center mx-auto mb-5 border-4 border-white shadow-sm"><i class="fa-solid fa-circle-xmark text-5xl"></i></div>
+                <h1 class="text-2xl font-bold text-gray-900 mb-2">Report Unavailable</h1>
+                <p class="text-gray-500 text-sm mb-6 leading-relaxed">For patient privacy and security, this medical report link has expired or the data is invalid. Please contact the clinic for an updated record.</p>
+                <div class="bg-gray-50 p-3 rounded-lg border border-gray-200 text-xs text-gray-400 font-mono">ERR_DATA_INVALID_OR_EXPIRED</div>
+            </div>
+        </section>
+    </main>
+
+    <footer class="w-full text-center py-4 text-xs text-gray-500 font-bold admin-ui no-print"><span id="footer-signature">Designed by Eng. Bahaa Al-Sheikh</span></footer>
+
+    <!-- Modals -->
+    <div id="qr-modal" class="hidden fixed inset-0 z-[60] flex items-center justify-center bg-gray-900/60 backdrop-blur-sm admin-ui">
+        <div class="bg-white p-6 rounded-2xl shadow-2xl w-[90%] max-w-sm text-center border border-gray-100 relative">
+            <div class="w-14 h-14 bg-emerald-50 text-emerald-600 rounded-full flex items-center justify-center mx-auto mb-3"><i class="fa-solid fa-qrcode text-3xl"></i></div>
+            <h3 class="text-xl font-bold mb-1 text-gray-800">تم التوليد بنجاح</h3>
+            <p class="text-sm text-gray-500 mb-6">يمكنك طباعة البطاقة أو نسخ الرابط الموثق.</p>
+            <div class="flex justify-center mb-6 bg-white p-4 border-2 border-dashed border-gray-200 rounded-2xl"><div id="modal-qrcode-container"></div></div>
+            <div class="flex gap-3">
+                <button id="close-modal-btn" class="flex-1 bg-gray-100 hover:bg-gray-200 text-gray-800 py-3 rounded-xl font-bold transition-colors">إغلاق</button>
+                <button id="print-qr-btn" class="flex-1 bg-emerald-600 hover:bg-emerald-700 text-white py-3 rounded-xl font-bold transition-colors shadow-md flex justify-center items-center gap-2"><i class="fa-solid fa-print"></i> طباعة البطاقة</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- نافذة إعدادات الـ QR ومكان وحجم الـ QR -->
+    <div id="settings-modal" class="hidden fixed inset-0 z-[70] flex items-center justify-center bg-gray-900/60 backdrop-blur-sm admin-ui">
+        <div class="bg-white p-6 rounded-2xl shadow-2xl w-[95%] max-w-lg text-right border border-gray-100 relative max-h-[90vh] overflow-y-auto custom-scrollbar">
+            <div class="flex justify-between items-center mb-4 border-b border-gray-100 pb-3">
+                <h3 class="text-lg font-bold text-gray-800 flex items-center gap-2">
+                    <i class="fa-solid fa-gear text-emerald-600"></i> إعدادات مكان وحجم رمز الـ QR
+                </h3>
+                <button type="button" id="close-settings-btn" class="text-gray-400 hover:text-gray-600 w-8 h-8 flex items-center justify-center rounded-lg hover:bg-gray-100"><i class="fa-solid fa-xmark text-lg"></i></button>
+            </div>
+            
+            <div class="space-y-4 text-xs">
+                <!-- مكان الـ QR -->
+                <div class="bg-gray-50 p-3.5 rounded-xl border border-gray-200 space-y-2">
+                    <label class="block font-bold text-gray-700">موضع رمز الـ QR داخل ملف الـ PDF:</label>
+                    <select id="set-qr-position" class="w-full px-3 py-2 border border-gray-300 rounded-lg bg-white font-bold outline-none focus:ring-2 focus:ring-emerald-500">
+                        <option value="top-right">أعلى اليمين (افتراضي)</option>
+                        <option value="top-left">أعلى اليسار</option>
+                        <option value="bottom-right">أسفل اليمين</option>
+                        <option value="bottom-left">أسفل اليسار</option>
+                        <option value="center">المنتصف</option>
+                    </select>
+                </div>
+
+                <!-- حجم الـ QR -->
+                <div class="bg-gray-50 p-3.5 rounded-xl border border-gray-200 space-y-2">
+                    <label class="block font-bold text-gray-700">حجم رمز الـ QR:</label>
+                    <select id="set-qr-size" class="w-full px-3 py-2 border border-gray-300 rounded-lg bg-white font-bold outline-none focus:ring-2 focus:ring-emerald-500">
+                        <option value="60">صغير (60 بكسل)</option>
+                        <option value="75" selected>متوسط (75 بكسل)</option>
+                        <option value="95">كبير (95 بكسل)</option>
+                        <option value="120">كبير جداً (120 بكسل)</option>
+                    </select>
+                </div>
+
+                <!-- خيار QR الديناميكي للتعديل لاحقاً -->
+                <div class="bg-blue-50/70 p-3.5 rounded-xl border border-blue-200 space-y-2">
+                    <div class="flex items-center justify-between">
+                        <span class="font-bold text-blue-950">تفعيل روابط QR ثابتة مرتبطة بقاعدة البيانات:</span>
+                        <input type="checkbox" id="set-dynamic-qr" disabled class="w-4 h-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500 cursor-pointer" checked>
+                    </div>
+                    <p class="text-[10px] text-blue-800 leading-relaxed">عند التفعيل: لو قمت بتعديل اسم المريض أو عمره لاحقاً، سينعكس التعديل فوراً على نفس رمز الـ QR المطبوع مسبقاً دون الحاجة لإعادة طباعته.</p>
+                </div>
+            </div>
+
+            <div class="mt-6 pt-3 border-t border-gray-100 flex gap-2">
+                <button type="button" id="save-settings-btn" class="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-3 rounded-xl transition-colors text-sm shadow-md">
+                    حفظ الإعدادات
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <div id="delete-modal" class="hidden fixed inset-0 z-[60] flex items-center justify-center bg-gray-900/60 backdrop-blur-sm admin-ui">
+        <div class="bg-white p-6 rounded-2xl shadow-2xl w-[90%] max-w-sm text-center border border-gray-100">
+            <div class="w-16 h-16 bg-red-100 text-red-600 rounded-full flex items-center justify-center mx-auto mb-4"><i class="fa-solid fa-triangle-exclamation text-4xl"></i></div>
+            <h3 class="text-xl font-bold mb-2 text-gray-800">تأكيد الحذف</h3>
+            <p class="text-sm text-gray-500 mb-6">هل أنت متأكد من حذف هذا السجل نهائياً؟ سيصبح الرمز المرتبط به غير صالح.</p>
+            <div class="flex gap-3">
+                <button id="cancel-delete-btn" class="flex-1 bg-gray-100 hover:bg-gray-200 text-gray-800 py-3.5 rounded-xl font-bold transition-colors">تراجع</button>
+                <button id="confirm-delete-btn" class="flex-1 bg-red-600 hover:bg-red-700 text-white py-3.5 rounded-xl font-bold transition-colors shadow-md">نعم، احذف</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="clear-all-modal" class="hidden fixed inset-0 z-[60] flex items-center justify-center bg-gray-900/60 backdrop-blur-sm admin-ui">
+        <div class="bg-white p-6 rounded-2xl shadow-2xl w-[90%] max-w-md text-center border border-gray-100">
+            <div class="w-16 h-16 bg-rose-100 text-rose-600 rounded-full flex items-center justify-center mx-auto mb-4"><i class="fa-solid fa-broom text-4xl"></i></div>
+            <h3 class="text-xl font-bold mb-2 text-gray-800">تصفير قاعدة البيانات</h3>
+            <p class="text-sm text-gray-500 mb-6">هل أنت متأكد من مسح جميع السجلات الحالية؟ يُرجى التأكد من حفظ "نسخة احتياطية" أولاً.</p>
+            <div class="flex gap-3">
+                <button id="cancel-clear-btn" class="flex-1 bg-gray-100 hover:bg-gray-200 text-gray-800 py-3.5 rounded-xl font-bold transition-colors">لا، تراجع</button>
+                <button id="confirm-clear-btn" class="flex-1 bg-rose-600 hover:bg-rose-700 text-white py-3.5 rounded-xl font-bold transition-colors shadow-md flex justify-center items-center gap-2"><i class="fa-solid fa-trash-can"></i> نعم، امسح كل شيء</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Hidden Print Area -->
+    <div id="print-card-area">
+        <div style="display: flex; align-items: center; justify-content: center; gap: 8px; margin-bottom: 5px;">
+            <img src="../Blue.png" alt="Logo" style="height: 28px; object-fit: contain;" onerror="this.style.display='none'">
+            <h3 id="print-clinic-name" style="margin: 0; font-size: 13px;">Clinic Name</h3>
+        </div>
+        <p style="font-size: 10px; margin: 0 0 2px 0;">Name: <span id="print-patient-name" style="font-weight: bold;"></span></p>
+        <p style="font-size: 10px; margin: 0 0 2px 0;">ID: <span id="print-patient-id" style="font-weight: bold;"></span> | Age: <span id="print-patient-age" style="font-weight: bold;"></span></p>
+        <div id="print-qr-container"></div>
+        <p style="margin-top:3px; font-weight: bold; font-size: 8px;">Scan to Verify Report</p>
+    </div>
+
+    <script type="module" src="./app-v10.js"></script>
+</body>
+</html>
