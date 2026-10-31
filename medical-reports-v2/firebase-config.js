@@ -1,8 +1,9 @@
-// انسخ كائن firebaseConfig من إعدادات تطبيق الويب في Firebase إلى هنا.
-// هذه الإعدادات عامة بطبيعتها؛ لا تضع هنا مفتاح خدمة (service account) أو كلمة مرور.
 export const firebaseConfig = {
-  apiKey: "ضع_القيمة_هنا",
-  authDomain: "ضع_القيمة_هنا",
-  projectId: "ضع_القيمة_هنا",
-  appId: "ضع_القيمة_هنا"
+  apiKey: "AIzaSyAvs-3FxkuJrXDuwRHNVakq4Xf35dmqtnQ",
+  authDomain: "blur-6697a.firebaseapp.com",
+  projectId: "blur-6697a",
+  storageBucket: "blur-6697a.firebasestorage.app",
+  messagingSenderId: "1078337394702",
+  appId: "1:1078337394702:web:e9eb0c32eb60857ce1445f",
+  measurementId: "G-N9QVD9YCB0"
 };
